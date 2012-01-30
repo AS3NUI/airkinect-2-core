@@ -1,0 +1,13 @@
+<extension xmlns="http://ns.adobe.com/air/extension/3.1">
+	<id>com.as3nui.nativeExtensions.air.kinect</id>
+	<versionNumber>2.0.0</versionNumber>
+	<platforms>
+		<platform name="MacOS-x86">
+			<applicationDeployment>
+				<nativeLibrary>KinectExtension.framework</nativeLibrary>
+				<initializer>initializer</initializer>
+				<finalizer>finalizer</finalizer>
+			</applicationDeployment>
+		</platform>
+	</platforms>
+</extension>

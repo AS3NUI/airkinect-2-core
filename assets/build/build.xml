@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="airkinect-2-core">
+	<property file="build.properties"/>
+	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
+	<property name="Flex.ADT" value="${FLEX_HOME}/lib/adt.jar"/>
+
+	<!-- Folder Properties -->
+	<dirname property="AIRKinect.BUILD_ROOT" file="${ant.file.airkinect-2-core}"/>
+	<property name="AIRKinect.MODULE_ROOT" value="${AIRKinect.BUILD_ROOT}/../.."/>
+
+	<!-- Native Extension Properties -->
+	<property name="AIRKinect.EXTENSION_NAME" value="airkinect-2-core"/>
+	<property name="AIRKinect.EXTENSION_CLASS" value="com.as3nui.nativeExtensions.air.kinect.Kinect"/>
+
+	<!-- Project properties -->
+	<property name="AIRKinect.MODULE_SRC_ROOT" value="${AIRKinect.MODULE_ROOT}/src"/>
+	<property name="AIRKinect.ASSETS_ROOT" value="${AIRKinect.MODULE_ROOT}/assets"/>
+	<property name="AIRKinect.LIBS_ROOT" value="${AIRKinect.MODULE_ROOT}/libs"/>
+
+	<!-- Filename/Output Properties -->
+	<property name="AIRKinect.BIN_ROOT" location="${AIRKinect.MODULE_ROOT}/bin"/>
+
+	<!-- Certificate Properties -->
+	<property name="AIRKinect.AIR_CERTIFICATE_FILE" value="debugCert.p12"/>
+	<property name="AIRKinect.AIR_CERTIFICATE_NAME" value="debugCert"/>
+	<property name="AIRKinect.AIR_CERTIFICATE_PASSWORD" value="debugPW"/>
+	<property name="AIRKinect.AIR_ORG_NAME" value="as3nui"/>
+	<property name="AIRKinect.AIR_ORG_UNIT" value="as3nui"/>
+	<property name="AIRKinect.AIR_COUNTRY" value="US"/>
+	<property name="AIRKinect.AIR_KEY_TYPE" value="2048-RSA"/>
+	<property name="AIRKinect.AIR_CERTIFICATE_ROOT" location="${AIRKinect.BIN_ROOT}/cert"/>
+
+	<!-- Native Extension -->
+	<property name="AIRKinect.EXTENSION_NATIVE_ROOT" value="${AIRKinect.ASSETS_ROOT}/extension"/>
+	<property name="AIRKinect.EXTENSION_TMP_ROOT" value="${AIRKinect.BIN_ROOT}/tmp"/>
+
+	<available file="${AIRKinect.BIN_ROOT}" type="dir" property="AIRKinect.bin_root.present"/>
+	<available file="${AIRKinect.BIN_ROOT}/${AIRKinect.EXTENSION_NAME}.ane" type="file" property="AIRKinect.bin.present"/>
+	<available file="${AIRKinect.AIR_CERTIFICATE_ROOT}/${AIRKinect.AIR_CERTIFICATE_FILE}" type="file" property="AIRKinect.cert.present"/>
+	<available file="${AIRKinect.BIN_ROOT}/${AIRKinect.EXTENSION_NAME}.swc" type="file" property="AIRKinect.swc.present"/>
+
+	<target name="Clean">
+		<delete includeemptydirs="true">
+			<fileset dir="${AIRKinect.BIN_ROOT}"/>
+		</delete>
+	</target>
+
+	<target name="Create BIN Folder" unless="AIRKinect.bin_root.present">
+		<mkdir dir="${AIRKinect.BIN_ROOT}"/>
+	</target>
+
+	<target name="Build Extension SWC" depends="Create BIN Folder" unless="AIRKinect.swc.present">
+		<compc output="${AIRKinect.BIN_ROOT}/${AIRKinect.EXTENSION_NAME}.swc">
+			<load-config filename="${FLEX_HOME}/frameworks/air-config.xml" />
+			<include-sources file="${AIRKinect.MODULE_SRC_ROOT}/"/>
+			<include-libraries file="${AIRKinect.LIBS_ROOT}/"/>
+		</compc>
+	</target>
+
+	<target name="Generate Certificate" unless="AIRKinect.cert.present">
+		<mkdir dir="${AIRKinect.AIR_CERTIFICATE_ROOT}"/>
+		<java jar="${Flex.ADT}" fork="true">
+			<arg value="-certificate"/>
+			<arg value="-cn"/>
+			<arg value="${AIRKinect.AIR_CERTIFICATE_NAME}"/>
+			<arg value="-ou"/>
+			<arg value="${AIRKinect.AIR_ORG_UNIT}"/>
+			<arg value="-o"/>
+			<arg value="${AIRKinect.AIR_ORG_NAME}"/>
+			<arg value="-c"/>
+			<arg value="${AIRKinect.AIR_COUNTRY}"/>
+			<arg value="${AIRKinect.AIR_KEY_TYPE}"/>
+			<arg value="${AIRKinect.AIR_CERTIFICATE_ROOT}/${AIRKinect.AIR_CERTIFICATE_FILE}"/>
+			<arg value="${AIRKinect.AIR_CERTIFICATE_PASSWORD}"/>
+		</java>
+	</target>
+
+	<target name="Build Native Extension" depends="Build Extension SWC, Generate Certificate" unless="AIRKinect.bin.present">
+		<unzip src="${AIRKinect.BIN_ROOT}/${AIRKinect.EXTENSION_NAME}.swc" dest="${AIRKinect.EXTENSION_TMP_ROOT}"/>
+		
+		<pathconvert property="osxFiles" pathsep="' '" dirsep="/">
+			<path>
+				<dirset dir="${AIRKinect.EXTENSION_NATIVE_ROOT}" includes="**/*.framework"></dirset>
+			</path>
+			<chainedmapper>
+				<flattenmapper/>
+			</chainedmapper>
+		</pathconvert>
+
+		<!-- copy the source folder to the tmp folder -->
+		<copy todir="${AIRKinect.EXTENSION_TMP_ROOT}" flatten="false">
+			<fileset dir="${AIRKinect.EXTENSION_NATIVE_ROOT}" />
+		</copy>
+		<!-- move contents of mac folder one directory up in the tmp folder -->
+		<copy todir="${AIRKinect.EXTENSION_TMP_ROOT}">
+			<fileset dir="${AIRKinect.EXTENSION_TMP_ROOT}/mac" />
+		</copy>
+		<delete dir="${AIRKinect.EXTENSION_TMP_ROOT}/mac"/>
+		
+		<java jar="${Flex.ADT}" fork="true" dir="${AIRKinect.EXTENSION_TMP_ROOT}" failonerror="true">
+			<arg value="-package"/>
+			<arg value="-storetype"/>
+			<arg value="pkcs12"/>
+			<arg value="-keystore"/>
+			<arg value="${AIRKinect.AIR_CERTIFICATE_ROOT}/${AIRKinect.AIR_CERTIFICATE_FILE}"/>
+			<arg value="-storepass"/>
+			<arg value="${AIRKinect.AIR_CERTIFICATE_PASSWORD}"/>
+			<arg value="-tsa"/>
+			<arg value="none"/>
+			<arg value="-target"/>
+			<arg value="ane"/>
+			<arg value="${AIRKinect.BIN_ROOT}/${AIRKinect.EXTENSION_NAME}.ane"/>
+			<arg value="extension.xml"/>
+			<arg value="-swc"/>
+			<arg value="${AIRKinect.BIN_ROOT}/${AIRKinect.EXTENSION_NAME}.swc"/>
+			<arg value="-platform"/>
+			<arg value="MacOS-x86"/>
+			<arg value="library.swf"/>
+			<arg line="'${osxFiles}'"/>
+		</java>
+		<delete dir="${AIRKinect.EXTENSION_TMP_ROOT}"/>
+	</target>
+</project>
