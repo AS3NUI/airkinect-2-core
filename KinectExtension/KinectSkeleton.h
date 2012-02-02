@@ -55,7 +55,10 @@ typedef struct {
     float               worldRelativeZ;
     
     float               orientationConfidence;
-    float               orientation[9];
+    
+    float               orientationX;
+    float               orientationY;
+    float               orientationZ;
     
     int                 rgbX;
     int                 rgbY;

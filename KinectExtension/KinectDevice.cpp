@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <math.h>
 #include "KinectDevice.h"
 
 //colors for depth image
@@ -266,6 +267,7 @@ void KinectDevice::stop()
         infraredGenerator.Release();
         infraredGenerator = NULL;
     }
+    //TODO: cleanup bytearrays
     //reset defaults
     setDefaults();
     if(started)
@@ -556,16 +558,6 @@ void KinectDevice::run()
                 FREDispatchStatusEventAsync(freContext, (const uint8_t*) "depthFrame", (const uint8_t*) "");
             }
             
-            //user mask image
-            if(asUserMaskEnabled)
-            {
-                pthread_mutex_lock(&userMaskMutex);
-                userMaskHandler();
-                pthread_mutex_unlock(&userMaskMutex);
-                //dispatch user mask frame event
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "userMaskFrame", (const uint8_t*) "");
-            }
-            
             //infrared image - not available when rgb is enabled
             if(asInfraredEnabled && !imageGenerator.IsGenerating())
             {
@@ -586,12 +578,22 @@ void KinectDevice::run()
             }
             
             //user information
-            if(asUserEnabled || asSkeletonEnabled)
+            if(asUserEnabled || asSkeletonEnabled || asUserMaskEnabled)
             {
                 pthread_mutex_lock(&userMutex);
                 userHandler();
                 pthread_mutex_unlock(&userMutex);
                 FREDispatchStatusEventAsync(freContext, (const uint8_t*) "userFrame", (const uint8_t*) "");
+            }
+            
+            //user mask image
+            if(asUserMaskEnabled)
+            {
+                pthread_mutex_lock(&userMaskMutex);
+                userMaskHandler();
+                pthread_mutex_unlock(&userMaskMutex);
+                //dispatch user mask frame event
+                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "userMaskFrame", (const uint8_t*) "");
             }
         }
     }
@@ -716,12 +718,19 @@ void KinectDevice::userMaskHandler()
     RGBFrameBuffer = imageMetaData.RGB24Data();
     sceneFrameBuffer = sceneMetaData.Data();
     
-    if(userMaskByteArray == 0) userMaskByteArray = new uint32_t[asUserMaskPixelCount];
+    if(userMaskByteArray == 0)
+    {
+        userMaskByteArray = new uint32_t*[MAX_SKELETONS];
+        for(int i = 0; i < MAX_SKELETONS; i++)
+        {
+            userMaskByteArray[i] = new uint32_t[asUserMaskPixelCount];
+        }
+    }
     
-    uint32_t *userMaskRun = userMaskByteArray;
     int direction = asUserMaskMirrored ? -1 : 1;
     int directionFactor = asUserMaskMirrored ? 1 : 0;
     
+    int pixelNr = 0;
     for(uint32_t y = 0; y < asUserMaskHeight; y++)
     {
         const XnRGB24Pixel *pRGBBuffer = RGBFrameBuffer + ((y + directionFactor) * (rgbWidth * userMaskScale)) - directionFactor;
@@ -729,18 +738,15 @@ void KinectDevice::userMaskHandler()
         for(uint32_t x = 0; x < asUserMaskWidth; x++)
         {
             XnLabel label = *pSceneBuffer;
-            if(label == 0)
+            
+            for(int i = 0; i < MAX_SKELETONS; i++)
             {
-                *userMaskRun = 0;
-            }
-            else
-            {
-                *userMaskRun = 0xff << 24 | ((*pRGBBuffer).nBlue + ((*pRGBBuffer).nGreen << 8) + ((*pRGBBuffer).nRed << 16));;
+                userMaskByteArray[i][pixelNr] = (label == 0 || (label - 1) != i) ? 0 : 0xff << 24 | ((*pRGBBuffer).nBlue + ((*pRGBBuffer).nGreen << 8) + ((*pRGBBuffer).nRed << 16));
             }
             
             pRGBBuffer += (userMaskScale * direction);
             pSceneBuffer += (userMaskScale * direction);
-            userMaskRun++;
+            pixelNr++;
         }
     }
     
@@ -917,10 +923,10 @@ void KinectDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJ
     jointPositionConfidence = jointPosition.fConfidence;
     
     kUser.joints[targetIndex].orientationConfidence = orientation.fConfidence;
-    for(int i = 0; i < 9; i++)
-    {
-        kUser.joints[targetIndex].orientation[i] = orientation.orientation.elements[i];
-    }
+    
+    kUser.joints[targetIndex].orientationX = atan2f(orientation.orientation.elements[7], orientation.orientation.elements[8]);
+    kUser.joints[targetIndex].orientationY = -asinf(orientation.orientation.elements[6]);
+    kUser.joints[targetIndex].orientationZ = atan2f(orientation.orientation.elements[3], orientation.orientation.elements[0]);
     
     kUser.joints[targetIndex].positionConfidence = jointPositionConfidence;
 

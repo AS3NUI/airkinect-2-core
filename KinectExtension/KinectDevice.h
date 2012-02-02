@@ -63,7 +63,7 @@ public:
     
     int                     getAsUserMaskWidth();
     int                     getAsUserMaskHeight();
-    uint32_t                *userMaskByteArray;
+    uint32_t                **userMaskByteArray;
     pthread_mutex_t         userMaskMutex;
     
     int                     getAsInfraredWidth();

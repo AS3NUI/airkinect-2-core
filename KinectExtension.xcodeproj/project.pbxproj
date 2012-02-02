@@ -277,7 +277,10 @@
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KinectExtension/KinectExtension-Prefix.pch";
-				HEADER_SEARCH_PATHS = "/usr/include/ni/**";
+				HEADER_SEARCH_PATHS = (
+					"\"${SRCROOT}/cml-1_0_2\"",
+					"/usr/include/ni/**",
+				);
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -302,7 +305,10 @@
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KinectExtension/KinectExtension-Prefix.pch";
-				HEADER_SEARCH_PATHS = "/usr/include/ni/**";
+				HEADER_SEARCH_PATHS = (
+					"\"${SRCROOT}/cml-1_0_2\"",
+					"/usr/include/ni/**",
+				);
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",

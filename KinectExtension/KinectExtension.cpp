@@ -100,7 +100,8 @@ extern "C"
         short int trackedSkeletons = 0;
         
         FREObject userFrame, frameNumber, timestamp, users, user, userType, trackingID, hasSkeleton, joints, joint, jointName;
-        FREObject position, positionRelative, positionConfidence, orientation, orientationData, orientationConfidence, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition;
+        FREObject position, positionRelative, positionConfidence, orientation, orientationConfidence, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition;
+        FREObject orientationX, orientationY, orientationZ;
         FREObject positionX, positionY, positionZ, positionRelativeX, positionRelativeY, positionRelativeZ;
         FREObject rgbPositionX, rgbPositionY, rgbRelativePositionX, rgbRelativePositionY, depthPositionX, depthPositionY, depthRelativePositionX, depthRelativePositionY;
         
@@ -132,27 +133,14 @@ extern "C"
                     //position confidence
                     FRENewObjectFromDouble(device->userFrame.users[i].joints[j].positionConfidence, &positionConfidence);
                     
-                    FRENewObject( (const uint8_t*) "Vector.<Number>", 0, NULL, &orientationData, NULL);
-                    addOrientationValueToMatrix3D(device->userFrame.users[i].joints[j].orientation[0], 0, orientationData);
-                    addOrientationValueToMatrix3D(device->userFrame.users[i].joints[j].orientation[3], 1, orientationData);
-                    addOrientationValueToMatrix3D(device->userFrame.users[i].joints[j].orientation[6], 2, orientationData);
-                    addOrientationValueToMatrix3D(0, 3, orientationData);
-                    addOrientationValueToMatrix3D(device->userFrame.users[i].joints[j].orientation[1], 4, orientationData);
-                    addOrientationValueToMatrix3D(device->userFrame.users[i].joints[j].orientation[4], 5, orientationData);
-                    addOrientationValueToMatrix3D(device->userFrame.users[i].joints[j].orientation[7], 6, orientationData);
-                    addOrientationValueToMatrix3D(0, 7, orientationData);
-                    addOrientationValueToMatrix3D(device->userFrame.users[i].joints[j].orientation[2], 8, orientationData);
-                    addOrientationValueToMatrix3D(device->userFrame.users[i].joints[j].orientation[5], 9, orientationData);
-                    addOrientationValueToMatrix3D(device->userFrame.users[i].joints[j].orientation[8], 10, orientationData);
-                    addOrientationValueToMatrix3D(0, 11, orientationData);
-                    addOrientationValueToMatrix3D(0, 12, orientationData);
-                    addOrientationValueToMatrix3D(0, 13, orientationData);
-                    addOrientationValueToMatrix3D(0, 14, orientationData);
-                    addOrientationValueToMatrix3D(1, 15, orientationData);
+                    FRENewObjectFromDouble(device->userFrame.users[i].joints[j].orientationX, &orientationX);
+                    FRENewObjectFromDouble(device->userFrame.users[i].joints[j].orientationY, &orientationY);
+                    FRENewObjectFromDouble(device->userFrame.users[i].joints[j].orientationZ, &orientationZ);
                     
                     //orientation
-                    FREObject orientationParams[] = {orientationData};
-                    FRENewObject( (const uint8_t*) "flash.geom.Matrix3D", 1, orientationParams, &orientation, NULL);
+                    FREObject orientationParams[] = {orientationX, orientationY, orientationZ};
+                    FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 3, orientationParams, &orientation, NULL);
+                     
                     //orientation confidence
                     FRENewObjectFromDouble(device->userFrame.users[i].joints[j].orientationConfidence, &orientationConfidence);
                     //rgb position
@@ -266,19 +254,22 @@ extern "C"
     FREObject Kinect_getUserMaskFrame(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
         unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+        unsigned int trackingID; FREGetObjectAsUint32(argv[1], &trackingID);
+        
+        if(trackingID > 0) trackingID--;
         
         KinectDevice *device = kinectDeviceManager.getDevice(nr, ctx);
         
-        const unsigned int numRGBBytes = device->getAsUserMaskWidth() * device->getAsUserMaskHeight() * 4;
+        const unsigned int numUserMaskBytes = device->getAsUserMaskWidth() * device->getAsUserMaskHeight() * 4;
         
-		FREObject objectByteArray = argv[1];
+		FREObject objectByteArray = argv[2];
 		FREByteArray byteArray;			
 		FREObject length;
-		FRENewObjectFromUint32(numRGBBytes, &length);
+		FRENewObjectFromUint32(numUserMaskBytes, &length);
 		FRESetObjectProperty(objectByteArray, (const uint8_t*) "length", length, NULL);
 		FREAcquireByteArray(objectByteArray, &byteArray);
         pthread_mutex_lock(&device->userMaskMutex);
-		memcpy(byteArray.bytes, device->userMaskByteArray, numRGBBytes);
+		memcpy(byteArray.bytes, device->userMaskByteArray[trackingID], numUserMaskBytes);
         pthread_mutex_unlock(&device->userMaskMutex);		
         FREReleaseByteArray(objectByteArray);
         
