@@ -1,6 +1,5 @@
 package com.as3nui.nativeExtensions.air.kinect.data
 {
-	import flash.geom.Matrix3D;
 	import flash.geom.Point;
 	import flash.geom.Vector3D;
 
@@ -28,9 +27,9 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		public var positionConfidence:Number;
 		
 		/**
-		 * Orientation of the joint in world coordinates
+		 * Orientation of the joint as euler coordinates, mapped in world space
 		 */ 
-		public var orientation:Matrix3D;
+		public var orientation:Vector3D;
 		
 		/**
 		 * Accuracy of the joint orientation
@@ -57,7 +56,7 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 */ 
 		public var depthRelativePosition:Point;
 		
-		public function SkeletonJoint(name:String, position:Vector3D, positionRelative:Vector3D, positionConfidence:Number, orientation:Matrix3D, orientationConfidence:Number, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point)
+		public function SkeletonJoint(name:String, position:Vector3D, positionRelative:Vector3D, positionConfidence:Number, orientation:Vector3D, orientationConfidence:Number, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point)
 		{
 			this.name = name;
 			this.position = position;

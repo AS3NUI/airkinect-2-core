@@ -1,5 +1,6 @@
 package com.as3nui.nativeExtensions.air.kinect.data
 {
+	import flash.display.BitmapData;
 	import flash.geom.Point;
 	import flash.geom.Vector3D;
 	import flash.utils.Dictionary;
@@ -77,6 +78,11 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			return _type;
 		}
 		
+		/**
+		 * User Mask Bitmapdata
+		 */ 
+		public var userMaskData:BitmapData;
+		
 		public var skeletonJointNameIndices:Dictionary;
 		
 		public function User(type:String, trackingID:uint, position:Vector3D, positionRelative:Vector3D, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point, hasSkeleton:Boolean, skeletonJoints:Vector.<SkeletonJoint>)
@@ -93,6 +99,9 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			_skeletonJoints = skeletonJoints;
 		}
 		
+		/**
+		 * Get a joint by it's name
+		 */ 
 		public function getJointByName(jointName:String):SkeletonJoint
 		{
 			return _skeletonJoints[skeletonJointNameIndices[jointName]];

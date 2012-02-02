@@ -24,13 +24,13 @@ package com.as3nui.nativeExtensions.air.kinect
 	[Event(name="stopped", type="com.as3nui.nativeExtensions.air.kinect.events.KinectEvent")]
 	[Event(name="depthImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent")]
 	[Event(name="rgbImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent")]
-	[Event(name="userMaskImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent")]
 	[Event(name="infraredImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent")]
 	[Event(name="usersAdded", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
 	[Event(name="usersRemoved", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
 	[Event(name="usersWithSkeletonAdded", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
 	[Event(name="usersWithSkeletonRemoved", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
 	[Event(name="usersUpdated", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
+	[Event(name="userMaskImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
 	[Event(name="pointCloudUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.PointCloudEvent")]
 	/**
 	 * The Kinect class allows you to access the Kinect hardware in your AIR applications.
@@ -125,7 +125,7 @@ package com.as3nui.nativeExtensions.air.kinect
 		 */ 
 		public function get users():Vector.<User>
 		{
-			return skeletonGenerator.users;
+			return userGenerator.users;
 		}
 		
 		/**
@@ -133,13 +133,13 @@ package com.as3nui.nativeExtensions.air.kinect
 		 */ 
 		public function get usersWithSkeleton():Vector.<User>
 		{
-			return skeletonGenerator.usersWithSkeleton;
+			return userGenerator.usersWithSkeleton;
 		}
 		
 		private var context:ExtensionContext;
 		private var config:KinectConfig;
 		
-		private var skeletonGenerator:UserGenerator;
+		private var userGenerator:UserGenerator;
 		private var depthGenerator:DepthGenerator;
 		private var rgbGenerator:RGBGenerator;
 		private var userMaskGenerator:UserMaskGenerator;
@@ -158,10 +158,10 @@ package com.as3nui.nativeExtensions.air.kinect
 			_nr = nr;
 			_state = KinectState.STOPPED;
 			//create the generators for rgb, depth & user information
-			skeletonGenerator = new UserGenerator(nr);
+			userGenerator = new UserGenerator(nr);
 			depthGenerator = new DepthGenerator(nr);
 			rgbGenerator = new RGBGenerator(nr);
-			userMaskGenerator = new UserMaskGenerator(nr);
+			userMaskGenerator = new UserMaskGenerator(userGenerator, nr);
 			infraredGenerator = new InfraredGenerator(nr);
 			pointCloudGenerator = new PointCloudGenerator(nr);
 			//dispose the kinect on application exit
@@ -186,16 +186,16 @@ package com.as3nui.nativeExtensions.air.kinect
 				//add listeners to the generators
 				depthGenerator.addEventListener(CameraImageEvent.DEPTH_IMAGE_UPDATE, redispatchHandler, false, 0, true);
 				rgbGenerator.addEventListener(CameraImageEvent.RGB_IMAGE_UPDATE, redispatchHandler, false, 0, true);
-				userMaskGenerator.addEventListener(CameraImageEvent.USER_MASK_IMAGE_UPDATE, redispatchHandler, false, 0, true);
-				skeletonGenerator.addEventListener(UserEvent.USERS_ADDED, redispatchHandler, false, 0, true);
-				skeletonGenerator.addEventListener(UserEvent.USERS_REMOVED, redispatchHandler, false, 0, true);
-				skeletonGenerator.addEventListener(UserEvent.USERS_WITH_SKELETON_ADDED, redispatchHandler, false, 0, true);
-				skeletonGenerator.addEventListener(UserEvent.USERS_WITH_SKELETON_REMOVED, redispatchHandler, false, 0, true);
-				skeletonGenerator.addEventListener(UserEvent.USERS_UPDATED, redispatchHandler, false, 0, true);
+				userMaskGenerator.addEventListener(UserEvent.USER_MASK_IMAGE_UPDATE, redispatchHandler, false, 0, true);
+				userGenerator.addEventListener(UserEvent.USERS_ADDED, redispatchHandler, false, 0, true);
+				userGenerator.addEventListener(UserEvent.USERS_REMOVED, redispatchHandler, false, 0, true);
+				userGenerator.addEventListener(UserEvent.USERS_WITH_SKELETON_ADDED, redispatchHandler, false, 0, true);
+				userGenerator.addEventListener(UserEvent.USERS_WITH_SKELETON_REMOVED, redispatchHandler, false, 0, true);
+				userGenerator.addEventListener(UserEvent.USERS_UPDATED, redispatchHandler, false, 0, true);
 				infraredGenerator.addEventListener(CameraImageEvent.INFRARED_IMAGE_UPDATE, redispatchHandler, false, 0, true);
 				pointCloudGenerator.addEventListener(PointCloudEvent.POINT_CLOUD_UPDATE, redispatchHandler, false, 0, true);
 				//start the generators
-				skeletonGenerator.start(context, config);
+				userGenerator.start(context, config);
 				depthGenerator.start(context, config);
 				rgbGenerator.start(context, config);
 				userMaskGenerator.start(context, config);
@@ -246,16 +246,16 @@ package com.as3nui.nativeExtensions.air.kinect
 				//remove listeners from the generators
 				depthGenerator.removeEventListener(CameraImageEvent.DEPTH_IMAGE_UPDATE, redispatchHandler);
 				rgbGenerator.removeEventListener(CameraImageEvent.RGB_IMAGE_UPDATE, redispatchHandler);
-				userMaskGenerator.removeEventListener(CameraImageEvent.USER_MASK_IMAGE_UPDATE, redispatchHandler);
-				skeletonGenerator.removeEventListener(UserEvent.USERS_ADDED, redispatchHandler);
-				skeletonGenerator.removeEventListener(UserEvent.USERS_REMOVED, redispatchHandler);
-				skeletonGenerator.removeEventListener(UserEvent.USERS_WITH_SKELETON_ADDED, redispatchHandler);
-				skeletonGenerator.removeEventListener(UserEvent.USERS_WITH_SKELETON_REMOVED, redispatchHandler);
-				skeletonGenerator.removeEventListener(UserEvent.USERS_UPDATED, redispatchHandler);
+				userMaskGenerator.removeEventListener(UserEvent.USER_MASK_IMAGE_UPDATE, redispatchHandler);
+				userGenerator.removeEventListener(UserEvent.USERS_ADDED, redispatchHandler);
+				userGenerator.removeEventListener(UserEvent.USERS_REMOVED, redispatchHandler);
+				userGenerator.removeEventListener(UserEvent.USERS_WITH_SKELETON_ADDED, redispatchHandler);
+				userGenerator.removeEventListener(UserEvent.USERS_WITH_SKELETON_REMOVED, redispatchHandler);
+				userGenerator.removeEventListener(UserEvent.USERS_UPDATED, redispatchHandler);
 				infraredGenerator.removeEventListener(CameraImageEvent.INFRARED_IMAGE_UPDATE, redispatchHandler);
 				pointCloudGenerator.removeEventListener(PointCloudEvent.POINT_CLOUD_UPDATE, redispatchHandler);
 				//stop the generators
-				skeletonGenerator.stop();
+				userGenerator.stop();
 				depthGenerator.stop();
 				rgbGenerator.stop();
 				userMaskGenerator.stop();
