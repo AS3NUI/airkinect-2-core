@@ -8,7 +8,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
 
-	[Event(name="userMaskImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
+	[Event(name="usersMaskImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
 	public class UserMaskGenerator extends GeneratorBase
 	{
 		
@@ -85,7 +85,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 					}
 					if(userGenerator.users.length > 0)
 					{
-						dispatchEvent(new UserEvent(UserEvent.USER_MASK_IMAGE_UPDATE, false, false, userGenerator.users));
+						dispatchEvent(new UserEvent(UserEvent.USERS_MASK_IMAGE_UPDATE, false, false, userGenerator.users));
 					}
 					break;
 			}

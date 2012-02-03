@@ -30,7 +30,7 @@ package com.as3nui.nativeExtensions.air.kinect
 	[Event(name="usersWithSkeletonAdded", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
 	[Event(name="usersWithSkeletonRemoved", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
 	[Event(name="usersUpdated", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
-	[Event(name="userMaskImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
+	[Event(name="usersMaskImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
 	[Event(name="pointCloudUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.PointCloudEvent")]
 	/**
 	 * The Kinect class allows you to access the Kinect hardware in your AIR applications.
@@ -186,7 +186,7 @@ package com.as3nui.nativeExtensions.air.kinect
 				//add listeners to the generators
 				depthGenerator.addEventListener(CameraImageEvent.DEPTH_IMAGE_UPDATE, redispatchHandler, false, 0, true);
 				rgbGenerator.addEventListener(CameraImageEvent.RGB_IMAGE_UPDATE, redispatchHandler, false, 0, true);
-				userMaskGenerator.addEventListener(UserEvent.USER_MASK_IMAGE_UPDATE, redispatchHandler, false, 0, true);
+				userMaskGenerator.addEventListener(UserEvent.USERS_MASK_IMAGE_UPDATE, redispatchHandler, false, 0, true);
 				userGenerator.addEventListener(UserEvent.USERS_ADDED, redispatchHandler, false, 0, true);
 				userGenerator.addEventListener(UserEvent.USERS_REMOVED, redispatchHandler, false, 0, true);
 				userGenerator.addEventListener(UserEvent.USERS_WITH_SKELETON_ADDED, redispatchHandler, false, 0, true);
@@ -246,7 +246,7 @@ package com.as3nui.nativeExtensions.air.kinect
 				//remove listeners from the generators
 				depthGenerator.removeEventListener(CameraImageEvent.DEPTH_IMAGE_UPDATE, redispatchHandler);
 				rgbGenerator.removeEventListener(CameraImageEvent.RGB_IMAGE_UPDATE, redispatchHandler);
-				userMaskGenerator.removeEventListener(UserEvent.USER_MASK_IMAGE_UPDATE, redispatchHandler);
+				userMaskGenerator.removeEventListener(UserEvent.USERS_MASK_IMAGE_UPDATE, redispatchHandler);
 				userGenerator.removeEventListener(UserEvent.USERS_ADDED, redispatchHandler);
 				userGenerator.removeEventListener(UserEvent.USERS_REMOVED, redispatchHandler);
 				userGenerator.removeEventListener(UserEvent.USERS_WITH_SKELETON_ADDED, redispatchHandler);

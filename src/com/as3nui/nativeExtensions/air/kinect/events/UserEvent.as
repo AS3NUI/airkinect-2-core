@@ -15,7 +15,7 @@ package com.as3nui.nativeExtensions.air.kinect.events
 		
 		public static const USERS_UPDATED:String = "usersUpdated";
 		
-		public static const USER_MASK_IMAGE_UPDATE:String = "userMaskImageUpdate";
+		public static const USERS_MASK_IMAGE_UPDATE:String = "usersMaskImageUpdate";
 		
 		public var users:Vector.<User>;
 		

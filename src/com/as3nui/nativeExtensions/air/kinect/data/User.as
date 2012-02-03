@@ -1,5 +1,8 @@
 package com.as3nui.nativeExtensions.air.kinect.data
 {
+	import com.as3nui.nativeExtensions.air.kinect.constants.JointNames;
+	import com.as3nui.nativeExtensions.air.kinect.namespaces.as3nui;
+	
 	import flash.display.BitmapData;
 	import flash.geom.Point;
 	import flash.geom.Vector3D;
@@ -68,8 +71,29 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			return _skeletonJoints;
 		}
 		
+		public function get head():SkeletonJoint { return getJointByName(JointNames.HEAD); }
+		public function get neck():SkeletonJoint { return getJointByName(JointNames.NECK); }
+		public function get torso():SkeletonJoint { return getJointByName(JointNames.TORSO); }
+		
+		public function get leftShoulder():SkeletonJoint { return getJointByName(JointNames.LEFT_SHOULDER); }
+		public function get leftElbow():SkeletonJoint { return getJointByName(JointNames.LEFT_ELBOW); }
+		public function get leftHand():SkeletonJoint { return getJointByName(JointNames.LEFT_HAND); }
+		
+		public function get rightShoulder():SkeletonJoint { return getJointByName(JointNames.RIGHT_SHOULDER); }
+		public function get rightElbow():SkeletonJoint { return getJointByName(JointNames.RIGHT_ELBOW); }
+		public function get rightHand():SkeletonJoint { return getJointByName(JointNames.RIGHT_HAND); }
+		
+		public function get leftHip():SkeletonJoint { return getJointByName(JointNames.LEFT_HIP); }
+		public function get leftKnee():SkeletonJoint { return getJointByName(JointNames.LEFT_KNEE); }
+		public function get leftFoot():SkeletonJoint { return getJointByName(JointNames.LEFT_FOOT); }
+		
+		public function get rightHip():SkeletonJoint { return getJointByName(JointNames.RIGHT_HIP); }
+		public function get rightKnee():SkeletonJoint { return getJointByName(JointNames.RIGHT_KNEE); }
+		public function get rightFoot():SkeletonJoint { return getJointByName(JointNames.RIGHT_FOOT); }
+		
 		/**
-		 * Type of user
+		 * Type of skeleton
+		 * @see com.as3nui.nativeExtensions.air.kinect.constants.UserType for possible options
 		 */ 
 		private var _type:String;
 		
@@ -83,7 +107,23 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 */ 
 		public var userMaskData:BitmapData;
 		
-		public var skeletonJointNameIndices:Dictionary;
+		/**
+		 * Dictionary of skeleton joint names, mapping to index in the skeleton joints vector
+		 * This is set by the usergenerator, and is used to get a joint by it's name
+		 * 
+		 * @private
+		 */ 
+		as3nui var skeletonJointNameIndices:Dictionary;
+		
+		as3nui var _skeletonJointNames:Vector.<String>;
+		
+		/**
+		 * Get a list of all skeleton joint names for this user
+		 */ 
+		public function get skeletonJointNames():Vector.<String>
+		{
+			return as3nui::_skeletonJointNames.concat();
+		}
 		
 		public function User(type:String, trackingID:uint, position:Vector3D, positionRelative:Vector3D, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point, hasSkeleton:Boolean, skeletonJoints:Vector.<SkeletonJoint>)
 		{
@@ -101,10 +141,11 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		
 		/**
 		 * Get a joint by it's name
+		 * @see com.as3nui.nativeExtensions.air.kinect.constants.JointNames for the basic options
 		 */ 
 		public function getJointByName(jointName:String):SkeletonJoint
 		{
-			return _skeletonJoints[skeletonJointNameIndices[jointName]];
+			return _skeletonJoints[as3nui::skeletonJointNameIndices[jointName]];
 		}
 		
 		/**

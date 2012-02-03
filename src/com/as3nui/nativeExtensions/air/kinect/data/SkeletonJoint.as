@@ -27,7 +27,7 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		public var positionConfidence:Number;
 		
 		/**
-		 * Orientation of the joint as euler coordinates, mapped in world space
+		 * Orientation of the joint as euler coordinates (radians), mapped in world space
 		 */ 
 		public var orientation:Vector3D;
 		

@@ -3,6 +3,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 	import com.as3nui.nativeExtensions.air.kinect.data.User;
 	import com.as3nui.nativeExtensions.air.kinect.data.UserFrame;
 	import com.as3nui.nativeExtensions.air.kinect.events.UserEvent;
+	import com.as3nui.nativeExtensions.air.kinect.namespaces.as3nui;
 	
 	import flash.events.StatusEvent;
 	import flash.utils.Dictionary;
@@ -54,6 +55,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 		private var usersWithSkeletonByTrackingId:Dictionary;
 		
 		private var skeletonJointNameIndices:Dictionary;
+		private var skeletonJointNames:Vector.<String>;
 		
 		public function UserGenerator(nr:uint)
 		{
@@ -83,6 +85,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			context.call("setSkeletonEnabled", nr, _skeletonEnabled);
 			context.call("setSkeletonMode", nr, _skeletonMirrored);
 			skeletonJointNameIndices = context.call("getSkeletonJointNameIndices", nr) as Dictionary;
+			skeletonJointNames = context.call("getSkeletonJointNames", nr) as Vector.<String>;
 		}
 		
 		override protected function onStop():void
@@ -121,7 +124,8 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 							addedUsers.push(user);
 						}
 						
-						user.skeletonJointNameIndices = skeletonJointNameIndices;
+						user.as3nui::skeletonJointNameIndices = skeletonJointNameIndices;
+						user.as3nui::_skeletonJointNames = skeletonJointNames;
 						currentUsers.push(user);
 						if(user.hasSkeleton)
 						{
