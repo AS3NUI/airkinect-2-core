@@ -1,1 +1,22 @@
 AIRKinect Extension is a Native Extension for use with Adobe AIR 3.0. AIRKinect allows AIR developers to tap into the rich experience of the Microsoft Kinect and push interactivity to a new level.
+
+You can find the compiled .ane file in the bin directory of this repository.
+
+Requirements:
+=============
+
+Adobe Flash Builder 4.6 IDE | Flash Develop | Intellij
+
+Windows:
+--------
+1) Install Microsoft Kinect SDK: http://kinectforwindows.org/
+2) That's it
+
+OSX Lion:
+---------
+1) Install Macports: http://www.macports.org
+2) Execute the following command in Terminal: sudo port install libtool
+3) Execute the following command in Terminal: sudo port install libusb-devel +universal
+4) Download & install OpenNI OSX binary (unstable): http://www.openni.org/
+5) Download & install Nite OSX binary (unstable): http://www.openni.org/
+6) Download & install SensorKinect: https://github.com/avin2/SensorKinect
