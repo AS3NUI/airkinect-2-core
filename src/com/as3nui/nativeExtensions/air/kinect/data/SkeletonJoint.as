@@ -3,6 +3,13 @@ package com.as3nui.nativeExtensions.air.kinect.data
 	import flash.geom.Point;
 	import flash.geom.Vector3D;
 
+	/**
+	 * This class represents one joint in a user skeleton.
+	 * 
+	 * <p>It has position and orientation info. Next to global
+	 * positions (x, y, z), you can get position info in 2D in
+	 * RGB or depth space aswell.</p>
+	 */ 
 	public class SkeletonJoint extends Object
 	{
 		

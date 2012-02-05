@@ -8,6 +8,27 @@ package com.as3nui.nativeExtensions.air.kinect.data
 	import flash.geom.Vector3D;
 	import flash.utils.Dictionary;
 
+	/**
+	 * This class represents a user, tracked by the kinect.
+	 * 
+	 * <p>A user doesn't necessarely have a tracked skeleton, but will always
+	 * have a position. You can use the <code>hasSkeleton</code> property, to
+	 * check if a user has a tracked skeleton.</p>
+	 * 
+	 * <p>You can access the skeleton information through different properties
+	 * and methods:</p>
+	 * 
+	 * <p>
+	 * <ul>
+	 * <li><code>skeletonJoints</code>: collection of all skeleton joints</li>
+	 * <li><code>getJointByName(jointName:String)</code>: get a skeleton joint by a given name</li>
+	 * <li><code>head, neck, torso, leftShoulder, ...</code>: getters for default joints</li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * <p>When you enable user masking in the kinect config, the <code>userMask</code>
+	 * property will contain the rgb pixels for this user.</p>
+	 */ 
 	public class User
 	{
 		
@@ -115,6 +136,12 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 */ 
 		as3nui var skeletonJointNameIndices:Dictionary;
 		
+		/**
+		 * Vector of skeleton joint names.
+		 * This is set by the usergenerator
+		 * 
+		 * @private
+		 */ 
 		as3nui var _skeletonJointNames:Vector.<String>;
 		
 		/**
