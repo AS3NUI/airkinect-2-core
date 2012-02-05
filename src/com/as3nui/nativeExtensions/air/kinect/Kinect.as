@@ -38,23 +38,8 @@ package com.as3nui.nativeExtensions.air.kinect
 	 * <p>An instance of this class will give you access to the different video streams
 	 * and skeleton information of a Kinect sensor.</p>
 	 * 
-	 * @example The following code checks if there is a kinect available, attaches listeners
-	 * and starts the kinect device with the given configuration.
-	 * <listing version="3.0">
-	 * if(Kinect.isSupported())
-	 * {
-	 * 	var kinect:Kinect = Kinect.getKinect();
-	 * 
-	 * 	kinect.addEventListener(KinectEvent.STARTED, kinectStartedHandler);
-	 * 	kinect.addEventListener(KinectEvent.STOPPED, kinectStoppedHandler);
-	 * 
-	 * 	var config:KinectConfig = new KinectConfig();
-	 * 	config.skeletonEnabled = true;
-	 * 	config.rgbEnabled = true;
-	 * 
-	 * 	kinect.start(config);
-	 * }
-	 * </listing>
+	 * @includeExample BasicSkeletonExample.as
+	 * @includeExample BasicCameraExample.as
 	 */
 	public class Kinect extends EventDispatcher
 	{
