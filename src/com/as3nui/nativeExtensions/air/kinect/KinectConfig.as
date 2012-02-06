@@ -39,5 +39,7 @@ package com.as3nui.nativeExtensions.air.kinect
 		public var pointCloudWidth:uint = 320;
 		public var pointCloudHeight:uint = 240;
 		public var pointCloudMirrored:Boolean = false;
+		public var pointCloudDensity:uint = 1;
+		public var pointCloudIncludeRGB:Boolean = false;
 	}
 }

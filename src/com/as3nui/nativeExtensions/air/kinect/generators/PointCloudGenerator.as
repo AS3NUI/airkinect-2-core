@@ -30,6 +30,20 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			return _mirrored;
 		}
 		
+		protected var _density:uint;
+		
+		public function get density():uint
+		{
+			return _density;
+		}
+		
+		protected var _includeRGB:Boolean;
+		
+		public function get includeRGB():Boolean
+		{
+			return _includeRGB;
+		}
+		
 		private var pointBytes:ByteArray;
 		
 		public function PointCloudGenerator(nr:uint)
@@ -46,13 +60,15 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			_width = config.pointCloudWidth;
 			_height = config.pointCloudHeight;
 			_mirrored = config.pointCloudMirrored;
+			_density = config.pointCloudDensity;
+			_includeRGB = config.pointCloudIncludeRGB;
 		}
 		
 		override protected function onStart():void
 		{
 			pointBytes = new ByteArray();
 			context.call("setPointCloudEnabled", nr, enabled);
-			context.call("setPointCloudMode", nr, _width, _height, _mirrored);
+			context.call("setPointCloudMode", nr, _width, _height, _mirrored, _density, _includeRGB);
 		}
 		
 		override protected function onStop():void
