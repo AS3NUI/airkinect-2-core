@@ -45,7 +45,7 @@ public:
     void                    setInfraredMode(unsigned int width, unsigned int height, bool mirrored);
     void                    setInfraredEnabled(bool enabled);
     
-    void                    setPointCloudMode(unsigned int width, unsigned int height, bool mirrored);
+    void                    setPointCloudMode(unsigned int width, unsigned int height, bool mirrored, unsigned int density, bool includeRGB);
     void                    setPointCloudEnabled(bool enabled);
     
     kinectUserFrame         userFrame;
@@ -73,6 +73,7 @@ public:
     
     int                     getAsPointCloudWidth();
     int                     getAsPointCloudHeight();
+    int                     getAsPointCloudByteArrayLength();
     ushort                  *pointCloudByteArray;
     pthread_mutex_t         pointCloudMutex;
     
@@ -161,6 +162,8 @@ private:
     int                     asPointCloudPixelCount;
     bool                    asPointCloudMirrored;
     bool                    asPointCloudEnabled;
+    int                     asPointCloudDensity;
+    bool                    asPointCloudIncludeRGB;
     
     int                     pointCloudWidth;
     int                     pointCloudHeight;
@@ -192,6 +195,7 @@ private:
     
     void                    userMaskHandler();
     void                    pointCloudHandler();
+    void                    pointCloudWithRGBHandler();
 };
 
 #endif

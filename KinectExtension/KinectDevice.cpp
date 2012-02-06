@@ -136,6 +136,8 @@ void KinectDevice::setDefaults()
     asPointCloudPixelCount = asPointCloudWidth * asPointCloudHeight;
     asPointCloudMirrored = false;
     asPointCloudEnabled = false;
+    asPointCloudDensity = 1;
+    asPointCloudIncludeRGB = false;
     
     pointCloudWidth = 640;
     pointCloudHeight = 480;
@@ -193,6 +195,18 @@ int KinectDevice::getAsPointCloudWidth()
 int KinectDevice::getAsPointCloudHeight()
 {
     return asPointCloudHeight;
+}
+
+int KinectDevice::getAsPointCloudByteArrayLength()
+{
+    if(asPointCloudIncludeRGB)
+    {
+        return (asPointCloudWidth * asPointCloudHeight * sizeof(ushort) * 6) / asPointCloudDensity;
+    }
+    else
+    {
+        return (asPointCloudWidth * asPointCloudHeight * sizeof(ushort) * 3) / asPointCloudDensity;
+    }
 }
 
 void KinectDevice::start()
@@ -267,7 +281,19 @@ void KinectDevice::stop()
         infraredGenerator.Release();
         infraredGenerator = NULL;
     }
-    //TODO: cleanup bytearrays
+    //cleanup bytearrays
+    if(depthByteArray != 0) delete [] depthByteArray;
+    if(RGBByteArray != 0) delete [] RGBByteArray;
+    if(infraredByteArray != 0) delete [] infraredByteArray;
+    if(pointCloudByteArray != 0) delete [] pointCloudByteArray;
+    if(userMaskByteArray != 0)
+    {
+        for(int i = 0; i < MAX_SKELETONS; i++)
+        {
+            delete [] userMaskByteArray[i];
+        }
+        delete [] userMaskByteArray;
+    }
     //reset defaults
     setDefaults();
     if(started)
@@ -432,7 +458,7 @@ void KinectDevice::run()
                 return;
             }
         }
-        if(asRGBEnabled || asUserMaskEnabled)
+        if(asRGBEnabled || asUserMaskEnabled || (asPointCloudEnabled && asPointCloudIncludeRGB))
         {
             rc = imageGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
@@ -572,7 +598,14 @@ void KinectDevice::run()
             if(asPointCloudEnabled)
             {
                 pthread_mutex_lock(&pointCloudMutex);
-                pointCloudHandler();
+                if(asPointCloudIncludeRGB)
+                {
+                    pointCloudWithRGBHandler();
+                }
+                else
+                {
+                    pointCloudHandler();
+                }
                 pthread_mutex_unlock(&pointCloudMutex);
                 FREDispatchStatusEventAsync(freContext, (const uint8_t*) "pointCloudFrame", (const uint8_t*) "");
             }
@@ -741,7 +774,11 @@ void KinectDevice::userMaskHandler()
             
             for(int i = 0; i < MAX_SKELETONS; i++)
             {
-                userMaskByteArray[i][pixelNr] = (label == 0 || (label - 1) != i) ? 0 : 0xff << 24 | ((*pRGBBuffer).nBlue + ((*pRGBBuffer).nGreen << 8) + ((*pRGBBuffer).nRed << 16));
+                userMaskByteArray[i][pixelNr] = 0;
+            }
+            if(label > 0)
+            {
+                userMaskByteArray[label - 1][pixelNr] = 0xff << 24 | ((*pRGBBuffer).nBlue + ((*pRGBBuffer).nGreen << 8) + ((*pRGBBuffer).nRed << 16));
             }
             
             pRGBBuffer += (userMaskScale * direction);
@@ -795,11 +832,11 @@ void KinectDevice::pointCloudHandler()
     int direction = asPointCloudMirrored ? -1 : 1;
     int directionFactor = asPointCloudMirrored ? 1 : 0;
     
-    for(uint32_t y = 0; y < asPointCloudHeight; y++)
+    for(uint32_t y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
     {
         const XnDepthPixel *pDepthBuffer = depthFrameBuffer + ((y + directionFactor) * (pointCloudWidth * pointCloudScale)) - directionFactor;
         
-        for(uint32_t x = 0; x < asPointCloudWidth; x++)
+        for(uint32_t x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
         {
             //write to point cloud
             *pointCloudRun = x;
@@ -809,7 +846,45 @@ void KinectDevice::pointCloudHandler()
             *pointCloudRun = *pDepthBuffer;
             pointCloudRun++;
             
-            pDepthBuffer += (pointCloudScale * direction);
+            pDepthBuffer += (pointCloudScale * direction * asPointCloudDensity);
+        }
+    }
+}
+
+void KinectDevice::pointCloudWithRGBHandler()
+{
+    RGBFrameBuffer = imageMetaData.RGB24Data();
+    depthFrameBuffer = depthMetaData.Data();
+    
+    if(pointCloudByteArray == 0) pointCloudByteArray = new ushort[pointCloudPixelCount * 6];
+    
+    ushort *pointCloudRun = pointCloudByteArray;
+    int direction = asPointCloudMirrored ? -1 : 1;
+    int directionFactor = asPointCloudMirrored ? 1 : 0;
+    
+    for(uint32_t y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
+    {
+        const XnRGB24Pixel *pRGBBuffer = RGBFrameBuffer + ((y + directionFactor) * (rgbWidth * pointCloudScale)) - directionFactor;
+        const XnDepthPixel *pDepthBuffer = depthFrameBuffer + ((y + directionFactor) * (pointCloudWidth * pointCloudScale)) - directionFactor;
+        
+        for(uint32_t x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
+        {
+            //write to point cloud
+            *pointCloudRun = x;
+            pointCloudRun++;
+            *pointCloudRun = y;
+            pointCloudRun++;
+            *pointCloudRun = *pDepthBuffer;
+            pointCloudRun++;
+            *pointCloudRun = (*pRGBBuffer).nRed;
+            pointCloudRun++;
+            *pointCloudRun = (*pRGBBuffer).nGreen;
+            pointCloudRun++;
+            *pointCloudRun = (*pRGBBuffer).nBlue;
+            pointCloudRun++;
+            
+            pRGBBuffer += (pointCloudScale * direction * asPointCloudDensity);
+            pDepthBuffer += (pointCloudScale * direction * asPointCloudDensity);
         }
     }
 }
@@ -1086,12 +1161,14 @@ void KinectDevice::setInfraredEnabled(bool enabled)
     asInfraredEnabled = enabled;
 }
 
-void KinectDevice::setPointCloudMode(unsigned int width, unsigned int height, bool mirrored)
+void KinectDevice::setPointCloudMode(unsigned int width, unsigned int height, bool mirrored, unsigned int density, bool includeRGB)
 {
     //printf("KinectDevice::setPointCloudMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
     asPointCloudWidth = width;
     asPointCloudHeight = height;
-    asPointCloudPixelCount = asPointCloudWidth * asPointCloudHeight;
+    asPointCloudDensity = density;
+    asPointCloudIncludeRGB = includeRGB;
+    asPointCloudPixelCount = (asPointCloudWidth * asPointCloudHeight) / asPointCloudDensity;
     asPointCloudMirrored = mirrored;
     pointCloudScale = pointCloudWidth / asPointCloudWidth;
 }

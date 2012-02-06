@@ -89,6 +89,20 @@ extern "C"
         return skeletonJointNameIndices;
     }
     
+    FREObject Kinect_getSkeletonJointNames(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+    {
+        FREObject skeletonJointNames, skeletonJointName;
+        FRENewObject( (const uint8_t*) "Vector.<String>", 0, NULL, &skeletonJointNames, NULL);
+        
+        for(int i = 0; i < NUM_JOINTS; i++)
+        {
+            FRENewObjectFromUTF8(strlen(JOINT_NAMES[i]), (const uint8_t*) JOINT_NAMES[i], &skeletonJointName);
+            FRESetArrayElementAt(skeletonJointNames, i, skeletonJointName);
+        }
+        
+        return skeletonJointNames;
+    }
+    
     FREObject Kinect_getUserFrame(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
         unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
@@ -409,7 +423,9 @@ extern "C"
         unsigned int width; FREGetObjectAsUint32(argv[1], &width);
         unsigned int height; FREGetObjectAsUint32(argv[2], &height);
         unsigned int mirrored; FREGetObjectAsBool(argv[3], &mirrored);
-        kinectDeviceManager.getDevice(nr, ctx)->setPointCloudMode(width, height, (mirrored != 0));
+        unsigned int density; FREGetObjectAsUint32(argv[4], &density);
+        unsigned int includeRGB; FREGetObjectAsBool(argv[5], &includeRGB);
+        kinectDeviceManager.getDevice(nr, ctx)->setPointCloudMode(width, height, (mirrored != 0), density, includeRGB);
         return NULL;
     }
     
@@ -428,7 +444,10 @@ extern "C"
         KinectDevice *device = kinectDeviceManager.getDevice(nr, ctx);
         
         FREObject objectPointsByteArray = argv[1];
-        const unsigned int numPointBytes = device->getAsPointCloudWidth() * device->getAsPointCloudHeight() * (2 * 3);
+        
+        //caculate the size of the byte array
+        const unsigned int numPointBytes = device->getAsPointCloudByteArrayLength();
+        
         FREByteArray pointsByteArray;			
         FREObject pointsLength;
 		FRENewObjectFromUint32(numPointBytes, &pointsLength);
@@ -456,6 +475,7 @@ extern "C"
         { (const uint8_t*) "setSkeletonEnabled", 0, Kinect_setSkeletonEnabled },
         { (const uint8_t*) "getUserFrame", 0, Kinect_getUserFrame },
         { (const uint8_t*) "getSkeletonJointNameIndices", 0, Kinect_getSkeletonJointNameIndices },
+        { (const uint8_t*) "getSkeletonJointNames", 0, Kinect_getSkeletonJointNames },
         { (const uint8_t*) "setUserMaskMode", 0, Kinect_setUserMaskMode },
         { (const uint8_t*) "setUserMaskEnabled", 0, Kinect_setUserMaskEnabled },
         { (const uint8_t*) "getUserMaskFrame", 0, Kinect_getUserMaskFrame },
