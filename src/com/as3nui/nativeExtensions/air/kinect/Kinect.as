@@ -1,6 +1,7 @@
 package com.as3nui.nativeExtensions.air.kinect
 {
 	import com.as3nui.nativeExtensions.air.kinect.constants.KinectState;
+	import com.as3nui.nativeExtensions.air.kinect.data.PointCloudRegion;
 	import com.as3nui.nativeExtensions.air.kinect.data.User;
 	import com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.KinectEvent;
@@ -192,32 +193,6 @@ package com.as3nui.nativeExtensions.air.kinect
 			}
 		}
 		
-		private function contextStatusHandler(event:StatusEvent):void
-		{
-			//trace("[Kinect] contextStatusHandler", event.code, event.level);
-			switch(event.code)
-			{
-				case "status":
-					switch(event.level)
-					{
-						case "started":
-							_state = KinectState.STARTED;
-							dispatchEvent(new KinectEvent(KinectEvent.STARTED));
-							break;
-						case "stopped":
-							_state = KinectState.STOPPED;
-							dispatchEvent(new KinectEvent(KinectEvent.STOPPED));
-							break;
-					}
-					break;
-			}
-		}
-		
-		private function redispatchHandler(event:Event):void
-		{
-			dispatchEvent(event.clone());
-		}
-		
 		/**
 		 * Stops the Kinect sensor.
 		 */ 
@@ -253,6 +228,46 @@ package com.as3nui.nativeExtensions.air.kinect
 				//dispatch the stopped event
 				dispatchEvent(new KinectEvent(KinectEvent.STOPPED));
 			}
+		}
+		
+		/**
+		 * Sets regions to track in the point cloud
+		 * 
+		 * These regions describe a 3D area, and will get extra information from the native
+		 * extension like the nr of points inside the area.
+		 */ 
+		public function setPointCloudRegions(pointCloudRegions:Vector.<PointCloudRegion>):void
+		{
+			pointCloudGenerator.setPointCloudRegions(pointCloudRegions);
+		}
+		
+		private function contextStatusHandler(event:StatusEvent):void
+		{
+			//trace("[Kinect] contextStatusHandler", event.code, event.level);
+			switch(event.code)
+			{
+				case "status":
+					switch(event.level)
+					{
+						case "started":
+							_state = KinectState.STARTED;
+							dispatchEvent(new KinectEvent(KinectEvent.STARTED));
+							break;
+						case "stopped":
+							_state = KinectState.STOPPED;
+							dispatchEvent(new KinectEvent(KinectEvent.STOPPED));
+							break;
+					}
+					break;
+				case "trace":
+					trace(event.level);
+					break;
+			}
+		}
+		
+		private function redispatchHandler(event:Event):void
+		{
+			dispatchEvent(event.clone());
 		}
 		
 		/**

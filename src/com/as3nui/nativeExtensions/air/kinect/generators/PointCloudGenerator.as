@@ -1,8 +1,10 @@
 package com.as3nui.nativeExtensions.air.kinect.generators
 {
+	import com.as3nui.nativeExtensions.air.kinect.data.PointCloudRegion;
 	import com.as3nui.nativeExtensions.air.kinect.events.PointCloudEvent;
 	
 	import flash.events.StatusEvent;
+	import flash.geom.Vector3D;
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
 
@@ -45,6 +47,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 		}
 		
 		private var pointBytes:ByteArray;
+		private var pointCloudRegions:Vector.<PointCloudRegion>;
 		
 		public function PointCloudGenerator(nr:uint)
 		{
@@ -52,6 +55,15 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			_width = 320;
 			_height = 240;
 			_mirrored = false;
+		}
+		
+		public function setPointCloudRegions(pointCloudRegions:Vector.<PointCloudRegion>):void
+		{
+			this.pointCloudRegions = pointCloudRegions;
+			if(context != null)
+			{
+				context.call("setPointCloudRegions", nr, pointCloudRegions);
+			}
 		}
 		
 		override protected function applyConfig():void
@@ -69,6 +81,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			pointBytes = new ByteArray();
 			context.call("setPointCloudEnabled", nr, enabled);
 			context.call("setPointCloudMode", nr, _width, _height, _mirrored, _density, _includeRGB);
+			context.call("setPointCloudRegions", nr, pointCloudRegions);
 		}
 		
 		override protected function onStop():void
@@ -81,7 +94,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			switch(event.code)
 			{
 				case "pointCloudFrame":
-					context.call("getPointCloudFrame", nr, pointBytes);
+					context.call("getPointCloudFrame", nr, pointBytes, pointCloudRegions);
 					pointBytes.position = 0;
 					pointBytes.endian = Endian.LITTLE_ENDIAN;
 					dispatchEvent(new PointCloudEvent(PointCloudEvent.POINT_CLOUD_UPDATE, false, false, pointBytes));
