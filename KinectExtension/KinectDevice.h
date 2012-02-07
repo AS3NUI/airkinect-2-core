@@ -13,6 +13,7 @@
 #include <Adobe AIR/Adobe AIR.h>
 #include <XnCppWrapper.h>
 #include "KinectSkeleton.h"
+#include "PointCloudRegion.h"
 
 class KinectDevice
 {
@@ -47,6 +48,7 @@ public:
     
     void                    setPointCloudMode(unsigned int width, unsigned int height, bool mirrored, unsigned int density, bool includeRGB);
     void                    setPointCloudEnabled(bool enabled);
+    void                    setPointCloudRegions(PointCloudRegion *pointCloudRegions, unsigned int numRegions);
     
     kinectUserFrame         userFrame;
     pthread_mutex_t         userMutex;
@@ -76,6 +78,9 @@ public:
     int                     getAsPointCloudByteArrayLength();
     ushort                  *pointCloudByteArray;
     pthread_mutex_t         pointCloudMutex;
+    
+    PointCloudRegion        *pointCloudRegions;
+    unsigned int            numRegions;
     
 private:
     int                     nr;

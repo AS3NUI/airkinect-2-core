@@ -4,6 +4,7 @@
 #include "KinectExtension.h"
 #include "KinectDevice.h"
 #include "KinectDeviceManager.h"
+#include "PointCloudRegion.h"
 
 // Symbols tagged with EXPORT are externally visible.
 // Must use the -fvisibility=hidden gcc option.
@@ -445,7 +446,6 @@ extern "C"
         
         FREObject objectPointsByteArray = argv[1];
         
-        //caculate the size of the byte array
         const unsigned int numPointBytes = device->getAsPointCloudByteArrayLength();
         
         FREByteArray pointsByteArray;			
@@ -457,6 +457,81 @@ extern "C"
 		memcpy(pointsByteArray.bytes, device->pointCloudByteArray, numPointBytes);
         pthread_mutex_unlock(&device->pointCloudMutex);		
 		FREReleaseByteArray(objectPointsByteArray);
+        
+        //set the region information?
+        FREObject asPointCloudRegions = argv[2];
+        if(asPointCloudRegions != NULL && &device->pointCloudRegions != 0)
+        {
+            //loop through these actionscript regions and get the native info back
+            FREObject asPointCloudRegion, asRegionId;
+            FREObject asNumPoints;
+            unsigned int regionId;
+            
+            uint32_t numRegions;
+            FREGetArrayLength(asPointCloudRegions, &numRegions);
+            
+            for(int i = 0; i < numRegions; i++)
+            {
+                FREGetArrayElementAt(asPointCloudRegions, i, &asPointCloudRegion);
+                FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "regionId", &asRegionId, NULL);
+                FREGetObjectAsUint32(asRegionId, &regionId);
+                //get the region with this id from the device memory
+                for(int j = 0; j < device->numRegions; j++)
+                {
+                    PointCloudRegion *nativeRegion = &device->pointCloudRegions[j];
+                    if(nativeRegion->regionId == regionId)
+                    {
+                        //update the actionscript properties
+                        FRENewObjectFromUint32(nativeRegion->numPoints, &asNumPoints);
+                        FRESetObjectProperty(asPointCloudRegion, (const uint8_t *) "numPoints", asNumPoints, NULL);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return NULL;
+    }
+    
+    FREObject Kinect_setPointCloudRegions(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+    {
+        unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+        
+        KinectDevice *device = kinectDeviceManager.getDevice(nr, ctx);
+        
+        FREObject asPointCloudRegions = argv[1];
+        FREObject asPointCloudRegion, asRegionId, asX, asY, asZ, asWidth, asHeight, asDepth;
+        unsigned int regionId;
+        double x, y, z, width, height, depth;
+
+        uint32_t numRegions;
+        FREGetArrayLength(asPointCloudRegions, &numRegions);
+        
+        PointCloudRegion *nativeRegions = new PointCloudRegion[numRegions];
+        
+        for(int i = 0; i < numRegions; i++)
+        {
+            FREGetArrayElementAt(asPointCloudRegions, i, &asPointCloudRegion);
+            FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "regionId", &asRegionId, NULL);
+            FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "x", &asX, NULL);
+            FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "y", &asY, NULL);
+            FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "z", &asZ, NULL);
+            FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "width", &asWidth, NULL);
+            FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "height", &asHeight, NULL);
+            FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "depth", &asDepth, NULL);
+            FREGetObjectAsUint32(asRegionId, &regionId);
+            FREGetObjectAsDouble(asX, &x);
+            FREGetObjectAsDouble(asY, &y);
+            FREGetObjectAsDouble(asZ, &z);
+            FREGetObjectAsDouble(asWidth, &width);
+            FREGetObjectAsDouble(asHeight, &height);
+            FREGetObjectAsDouble(asDepth, &depth);
+            PointCloudRegion *nativeRegion = new PointCloudRegion();
+            nativeRegion->setProperties(regionId, x, y, z, width, height, depth);
+            nativeRegions[i] = *nativeRegion;
+        }
+        
+        device->setPointCloudRegions(nativeRegions, numRegions);
         
         return NULL;
     }
@@ -491,7 +566,8 @@ extern "C"
         { (const uint8_t*) "getInfraredFrame", 0, Kinect_getInfraredFrame },
         { (const uint8_t*) "setPointCloudMode", 0, Kinect_setPointCloudMode },
         { (const uint8_t*) "setPointCloudEnabled", 0, Kinect_setPointCloudEnabled },
-        { (const uint8_t*) "getPointCloudFrame", 0, Kinect_getPointCloudFrame }
+        { (const uint8_t*) "getPointCloudFrame", 0, Kinect_getPointCloudFrame },
+        { (const uint8_t*) "setPointCloudRegions", 0, Kinect_setPointCloudRegions }
 	};
     
     void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, uint32_t* numFunctions, const FRENamedFunction** functions)
@@ -516,10 +592,6 @@ extern "C"
     
 	void contextFinalizer(FREContext ctx)
     {
-        //printf("contextFinalizer\n");
-        
-        //check if this is the last one?
-        
 		return;
 	}
     

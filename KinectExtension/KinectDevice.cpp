@@ -145,6 +145,7 @@ void KinectDevice::setDefaults()
     pointCloudScale = pointCloudWidth / asPointCloudWidth;
     
     pointCloudByteArray = 0;
+    pointCloudRegions = 0;
 }
 
 int KinectDevice::getAsDepthWidth()
@@ -293,6 +294,10 @@ void KinectDevice::stop()
             delete [] userMaskByteArray[i];
         }
         delete [] userMaskByteArray;
+    }
+    if(pointCloudRegions != 0)
+    {
+        delete [] pointCloudRegions;
     }
     //reset defaults
     setDefaults();
@@ -826,11 +831,19 @@ void KinectDevice::pointCloudHandler()
 {
     depthFrameBuffer = depthMetaData.Data();
     
-    if(pointCloudByteArray == 0) pointCloudByteArray = new ushort[pointCloudPixelCount * 3];
+    if(pointCloudByteArray == 0) pointCloudByteArray = new ushort[(pointCloudPixelCount * 3) / asPointCloudDensity];
     
     ushort *pointCloudRun = pointCloudByteArray;
     int direction = asPointCloudMirrored ? -1 : 1;
     int directionFactor = asPointCloudMirrored ? 1 : 0;
+    
+    if(pointCloudRegions != 0)
+    {
+        for(int i = 0; i < numRegions; i++)
+        {
+            pointCloudRegions[i].numPoints = 0;
+        }
+    }
     
     for(uint32_t y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
     {
@@ -846,6 +859,19 @@ void KinectDevice::pointCloudHandler()
             *pointCloudRun = *pDepthBuffer;
             pointCloudRun++;
             
+            //check regions
+            for(int i = 0; i < numRegions; i++)
+            {
+                if(
+                   x >= pointCloudRegions[i].x && x <= pointCloudRegions[i].maxX &&
+                   y >= pointCloudRegions[i].y && y <= pointCloudRegions[i].maxY &&
+                   *pDepthBuffer >= pointCloudRegions[i].z && *pDepthBuffer <= pointCloudRegions[i].maxZ
+                )
+                {
+                    pointCloudRegions[i].numPoints++;
+                }
+            }
+            
             pDepthBuffer += (pointCloudScale * direction * asPointCloudDensity);
         }
     }
@@ -856,11 +882,19 @@ void KinectDevice::pointCloudWithRGBHandler()
     RGBFrameBuffer = imageMetaData.RGB24Data();
     depthFrameBuffer = depthMetaData.Data();
     
-    if(pointCloudByteArray == 0) pointCloudByteArray = new ushort[pointCloudPixelCount * 6];
+    if(pointCloudByteArray == 0) pointCloudByteArray = new ushort[(pointCloudPixelCount * 6) / asPointCloudDensity];
     
     ushort *pointCloudRun = pointCloudByteArray;
     int direction = asPointCloudMirrored ? -1 : 1;
     int directionFactor = asPointCloudMirrored ? 1 : 0;
+    
+    if(pointCloudRegions != 0)
+    {
+        for(int i = 0; i < numRegions; i++)
+        {
+            pointCloudRegions[i].numPoints = 0;
+        }
+    }
     
     for(uint32_t y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
     {
@@ -882,6 +916,19 @@ void KinectDevice::pointCloudWithRGBHandler()
             pointCloudRun++;
             *pointCloudRun = (*pRGBBuffer).nBlue;
             pointCloudRun++;
+            
+            //check regions
+            for(int i = 0; i < numRegions; i++)
+            {
+                if(
+                   x >= pointCloudRegions[i].x && x <= pointCloudRegions[i].maxX &&
+                   y >= pointCloudRegions[i].y && y <= pointCloudRegions[i].maxY &&
+                   *pDepthBuffer >= pointCloudRegions[i].z && *pDepthBuffer <= pointCloudRegions[i].maxZ
+                   )
+                {
+                    pointCloudRegions[i].numPoints++;
+                }
+            }
             
             pRGBBuffer += (pointCloudScale * direction * asPointCloudDensity);
             pDepthBuffer += (pointCloudScale * direction * asPointCloudDensity);
@@ -1177,6 +1224,12 @@ void KinectDevice::setPointCloudEnabled(bool enabled)
 {
     //printf("KinectDevice::setPointCloudEnabled(%s)\n", (enabled) ? "true" : "false");
     asPointCloudEnabled = enabled;
+}
+
+void KinectDevice::setPointCloudRegions(PointCloudRegion *pointCloudRegions, unsigned int numRegions)
+{
+    this->pointCloudRegions = pointCloudRegions;
+    this->numRegions = numRegions;
 }
 
 void KinectDevice::dispose()

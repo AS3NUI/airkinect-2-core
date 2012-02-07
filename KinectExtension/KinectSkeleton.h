@@ -104,7 +104,7 @@ typedef struct {
 typedef struct {
     int                 frameNumber;
     int                 timeStamp;
-    kinectUser      users[MAX_SKELETONS];
+    kinectUser          users[MAX_SKELETONS];
 } kinectUserFrame;
 
 #endif
