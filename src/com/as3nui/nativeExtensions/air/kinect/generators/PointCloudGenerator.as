@@ -97,7 +97,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 					context.call("getPointCloudFrame", nr, pointBytes, pointCloudRegions);
 					pointBytes.position = 0;
 					pointBytes.endian = Endian.LITTLE_ENDIAN;
-					dispatchEvent(new PointCloudEvent(PointCloudEvent.POINT_CLOUD_UPDATE, false, false, pointBytes));
+					dispatchEvent(new PointCloudEvent(PointCloudEvent.POINT_CLOUD_UPDATE, false, false, pointBytes, pointCloudRegions));
 					break;
 			}
 		}
