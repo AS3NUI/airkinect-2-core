@@ -19,7 +19,6 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 	import com.as3nui.nativeExtensions.air.kinect.events.PointCloudEvent;
 	
 	import flash.events.StatusEvent;
-	import flash.geom.Vector3D;
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
 
@@ -84,8 +83,8 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 		override protected function applyConfig():void
 		{
 			enabled = config.pointCloudEnabled;
-			_width = config.pointCloudWidth;
-			_height = config.pointCloudHeight;
+			_width = config.pointCloudResolution.x;
+			_height = config.pointCloudResolution.y;
 			_mirrored = config.pointCloudMirrored;
 			_density = config.pointCloudDensity;
 			_includeRGB = config.pointCloudIncludeRGB;

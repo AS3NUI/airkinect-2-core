@@ -31,8 +31,8 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 		override protected function applyConfig():void
 		{
 			enabled = config.infraredEnabled;
-			_width = config.infraredWidth;
-			_height = config.infraredHeight;
+			_width = config.infraredResolution.x;
+			_height = config.infraredResolution.y;
 			_mirrored = config.infraredMirrored;
 		}
 		

@@ -60,8 +60,8 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 		override protected function applyConfig():void
 		{
 			enabled = config.userMaskEnabled;
-			_width = config.userMaskWidth;
-			_height = config.userMaskHeight;
+			_width = config.userMaskResolution.x;
+			_height = config.userMaskResolution.y;
 			_mirrored = config.userMaskMirrored;
 		}
 		

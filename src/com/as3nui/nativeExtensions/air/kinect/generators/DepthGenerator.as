@@ -41,8 +41,8 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 		override protected function applyConfig():void
 		{
 			enabled = config.depthEnabled;
-			_width = config.depthWidth;
-			_height = config.depthHeight;
+			_width = config.depthResolution.x;
+			_height = config.depthResolution.y;
 			_mirrored = config.depthMirrored;
 			_showUserColors = config.depthShowUserColors;
 		}

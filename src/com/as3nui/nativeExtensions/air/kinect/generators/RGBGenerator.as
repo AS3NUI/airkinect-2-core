@@ -31,8 +31,8 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 		override protected function applyConfig():void
 		{
 			enabled = config.rgbEnabled;
-			_width = config.rgbWidth;
-			_height = config.rgbHeight;
+			_width = config.rgbResolution.x;
+			_height = config.rgbResolution.y;
 			_mirrored = config.rgbMirrored;
 		}
 		
