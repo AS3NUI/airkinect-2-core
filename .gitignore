@@ -7,11 +7,11 @@
 
 .settings/org.eclipse.core.resources.prefs
 
-assets/build/*
+build/*
 
-assets/extension/*
+extension/*
 
-bin/cert/debugCert.p12
+cert/*
 
 docs/*
 

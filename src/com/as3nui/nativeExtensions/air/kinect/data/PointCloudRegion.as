@@ -18,7 +18,7 @@ package com.as3nui.nativeExtensions.air.kinect.data
 	/**
 	 * The pointcloud region class defines a 3D region in the point cloud.
 	 * 
-	 * <p>The x & y position is the pixel position in the point cloud image, the z
+	 * <p>The x &amp; y position is the pixel position in the point cloud image, the z
 	 * position is the depth. The <code>numPoints</code> property will be updated by the
 	 * extension, and will contain the nr of points in this 3D area</p>
 	 */ 
