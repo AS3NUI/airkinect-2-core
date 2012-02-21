@@ -16,26 +16,29 @@
 package com.as3nui.nativeExtensions.air.kinect
 {
 	import com.as3nui.nativeExtensions.air.kinect.constants.KinectState;
+	import com.as3nui.nativeExtensions.air.kinect.data.KinectCapabilities;
 	import com.as3nui.nativeExtensions.air.kinect.data.PointCloudRegion;
 	import com.as3nui.nativeExtensions.air.kinect.data.User;
+	import com.as3nui.nativeExtensions.air.kinect.data.UserFrame;
 	import com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.KinectEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.PointCloudEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.UserEvent;
+	import com.as3nui.nativeExtensions.air.kinect.events.UserFrameEvent;
 	import com.as3nui.nativeExtensions.air.kinect.generators.DepthGenerator;
 	import com.as3nui.nativeExtensions.air.kinect.generators.InfraredGenerator;
 	import com.as3nui.nativeExtensions.air.kinect.generators.PointCloudGenerator;
 	import com.as3nui.nativeExtensions.air.kinect.generators.RGBGenerator;
 	import com.as3nui.nativeExtensions.air.kinect.generators.UserGenerator;
 	import com.as3nui.nativeExtensions.air.kinect.generators.UserMaskGenerator;
-	
+
 	import flash.desktop.NativeApplication;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.StatusEvent;
 	import flash.external.ExtensionContext;
 	import flash.utils.Dictionary;
-	
+
 	[Event(name="started", type="com.as3nui.nativeExtensions.air.kinect.events.KinectEvent")]
 	[Event(name="stopped", type="com.as3nui.nativeExtensions.air.kinect.events.KinectEvent")]
 	[Event(name="depthImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent")]
@@ -63,6 +66,8 @@ package com.as3nui.nativeExtensions.air.kinect
 		private static var kinectInstanceMap:Dictionary;
 		
 		private static var _sharedContext:ExtensionContext;
+
+		private static var _kinectCapabilities:KinectCapabilities;
 		
 		private static function get sharedContext():ExtensionContext
 		{
@@ -78,16 +83,35 @@ package com.as3nui.nativeExtensions.air.kinect
 		 */ 
 		public static function isSupported():Boolean
 		{
-			return (sharedContext.call("getDeviceCount") as uint > 0);
+			return (numKinects() > 0);
+		}
+
+		/**
+		 * Get the current number of sensors connected to the system
+		 * @return	Number of Kinect Sensors connected
+		 */
+		public static function numKinects():uint {
+			return (sharedContext.call("getDeviceCount") as uint);
+		}
+
+		/**
+		 * Get the current Capabilities from the native code
+		 * @return	Kinect Capabilities object for the current native framework
+		 */
+		public static function get Capabilities():KinectCapabilities {
+			if(!_kinectCapabilities) {
+				var nativeCapabilities:Object = sharedContext.call("getCapabilities") as Object;
+				_kinectCapabilities = new KinectCapabilities(nativeCapabilities);
+			}
+			return _kinectCapabilities;
 		}
 		
 		/**
 		 * Get an instance of the Kinect class. You'll use this method to get
 		 * instances of the class, instead of creating instances yourself.
 		 */ 
-		public static function getKinect():Kinect
+		public static function getKinect(nr:uint = 0):Kinect
 		{
-			var nr:uint = 0;
 			var kinect:Kinect = null;
 			if(kinectInstanceMap == null) kinectInstanceMap = new Dictionary();
 			if(kinectInstanceMap[nr] == null)
@@ -146,7 +170,7 @@ package com.as3nui.nativeExtensions.air.kinect
 		private var userMaskGenerator:UserMaskGenerator;
 		private var infraredGenerator:InfraredGenerator;
 		private var pointCloudGenerator:PointCloudGenerator;
-		
+
 		/**
 		 * Private constructor of the Kinect class. Use Kinect.getKinect() instead of calling this method.
 		 */ 
@@ -158,6 +182,7 @@ package com.as3nui.nativeExtensions.air.kinect
 			}
 			_nr = nr;
 			_state = KinectState.STOPPED;
+
 			//create the generators for rgb, depth & user information
 			userGenerator = new UserGenerator(nr);
 			depthGenerator = new DepthGenerator(nr);
@@ -188,11 +213,13 @@ package com.as3nui.nativeExtensions.air.kinect
 				depthGenerator.addEventListener(CameraImageEvent.DEPTH_IMAGE_UPDATE, redispatchHandler, false, 0, true);
 				rgbGenerator.addEventListener(CameraImageEvent.RGB_IMAGE_UPDATE, redispatchHandler, false, 0, true);
 				userMaskGenerator.addEventListener(UserEvent.USERS_MASK_IMAGE_UPDATE, redispatchHandler, false, 0, true);
+				userGenerator.addEventListener(UserFrameEvent.USER_FRAME_UPDATE, redispatchHandler, false, 0, true);
 				userGenerator.addEventListener(UserEvent.USERS_ADDED, redispatchHandler, false, 0, true);
 				userGenerator.addEventListener(UserEvent.USERS_REMOVED, redispatchHandler, false, 0, true);
 				userGenerator.addEventListener(UserEvent.USERS_WITH_SKELETON_ADDED, redispatchHandler, false, 0, true);
 				userGenerator.addEventListener(UserEvent.USERS_WITH_SKELETON_REMOVED, redispatchHandler, false, 0, true);
 				userGenerator.addEventListener(UserEvent.USERS_UPDATED, redispatchHandler, false, 0, true);
+				userGenerator.addEventListener(UserFrameEvent.USER_FRAME_UPDATE, redispatchHandler, false, 0, true);
 				infraredGenerator.addEventListener(CameraImageEvent.INFRARED_IMAGE_UPDATE, redispatchHandler, false, 0, true);
 				pointCloudGenerator.addEventListener(PointCloudEvent.POINT_CLOUD_UPDATE, redispatchHandler, false, 0, true);
 				//start the generators
@@ -227,6 +254,7 @@ package com.as3nui.nativeExtensions.air.kinect
 				userGenerator.removeEventListener(UserEvent.USERS_WITH_SKELETON_ADDED, redispatchHandler);
 				userGenerator.removeEventListener(UserEvent.USERS_WITH_SKELETON_REMOVED, redispatchHandler);
 				userGenerator.removeEventListener(UserEvent.USERS_UPDATED, redispatchHandler);
+				userGenerator.removeEventListener(UserFrameEvent.USER_FRAME_UPDATE, redispatchHandler);
 				infraredGenerator.removeEventListener(CameraImageEvent.INFRARED_IMAGE_UPDATE, redispatchHandler);
 				pointCloudGenerator.removeEventListener(PointCloudEvent.POINT_CLOUD_UPDATE, redispatchHandler);
 				//stop the generators
@@ -244,7 +272,82 @@ package com.as3nui.nativeExtensions.air.kinect
 				dispatchEvent(new KinectEvent(KinectEvent.STOPPED));
 			}
 		}
-		
+
+		// -------------------------------------------
+		// Real Time Adjustable config features
+		// -------------------------------------------
+		public function setSkeletonMirror(value:Boolean):void {
+			if(config.skeletonEnabled){
+				config.skeletonMirrored = value;
+				context.call("setSkeletonMirror", nr,  value);
+			}
+		}
+
+		public function setDepthMirror(value:Boolean):void {
+			if(config.depthEnabled) {
+				config.depthMirrored = value;
+				setImageMirror(ImageTypes.DEPTH_IMAGE,  value);
+			}
+		}
+
+		public function setRGBMirror(value:Boolean):void {
+			if(config.rgbEnabled) {
+				config.rgbMirrored = value;
+				setImageMirror(ImageTypes.RGB_IMAGE,  value);
+			}
+		}
+
+		public function setUserMaskMirror(value:Boolean):void {
+			if(config.userMaskEnabled) {
+				config.userMaskMirrored = value;
+				setImageMirror(ImageTypes.USERMASK_IMAGE,  value)
+			}
+		}
+
+		public function setPointCloudMirror(value:Boolean):void {
+			if(config.pointCloudEnabled) {
+				config.pointCloudMirrored = value;
+				setImageMirror(ImageTypes.POINTCLOUD_IMAGE,  value)
+			}
+		}
+
+		private function setImageMirror(imageType:uint, value:Boolean):void {
+			context.call("setImageMirror", nr,  imageType, value);
+		}
+
+		public function setPointCloudDensity(value:uint):void {
+			context.call("setPointCloudDensity", nr,  value);
+		}
+
+		public function setPointCloudIncludeRGB(value:Boolean):void {
+			context.call("setPointCloudIncludeRGB", nr,  value);
+		}
+
+		// -------------------------------------------
+		// Simulation Mode Functionality
+		// -------------------------------------------
+
+		/**
+		 * Allows for this kinect to disregard updates from the context and only listen for manual User Frame updates.
+		 * @param value
+		 */
+		public function set skeletonSimulationMode(value:Boolean):void {
+			userGenerator.skeletonSimulationMode = value;
+		}
+
+		public function get skeletonSimulationMode():Boolean {
+			return userGenerator.skeletonSimulationMode;
+		}
+
+		/**
+		 * Allows for constructed UserFrames to be passed thru the kinect as if they were coming from the context.
+		 * This is used for simulated skeleton playback
+		 * @param userFrame			Userframe inwhich to pass thru to User Generator
+		 */
+		public function simulateUserFrame(userFrame:UserFrame):void {
+			if(userGenerator.skeletonEnabled) userGenerator.simulateUserFrame(userFrame);
+		}
+
 		/**
 		 * Sets regions to track in the point cloud
 		 * 
@@ -302,3 +405,10 @@ package com.as3nui.nativeExtensions.air.kinect
 	}
 }
 internal class Enforcer{};
+
+internal class ImageTypes{
+	internal static const RGB_IMAGE:uint 			= 1;
+	internal static const DEPTH_IMAGE:uint 			= 2;
+	internal static const POINTCLOUD_IMAGE:uint 	= 3;
+	internal static const USERMASK_IMAGE:uint 		= 4;
+}

@@ -26,7 +26,7 @@ package com.as3nui.nativeExtensions.air.kinect.data
 	/**
 	 * This class represents a user, tracked by the kinect.
 	 * 
-	 * <p>A user doesn't necessarely have a tracked skeleton, but will always
+	 * <p>A user doesn't necessarily have a tracked skeleton, but will always
 	 * have a position. You can use the <code>hasSkeleton</code> property, to
 	 * check if a user has a tracked skeleton.</p>
 	 * 
@@ -48,10 +48,20 @@ package com.as3nui.nativeExtensions.air.kinect.data
 	{
 		
 		/**
+		 * Current user User ID
+		 */
+		private var _userID:uint;
+		
+		public function get userID():uint
+		{
+			return _userID;
+		}
+
+		/**
 		 * Current user Tracking ID
 		 */
 		private var _trackingID:uint;
-		
+
 		public function get trackingID():uint
 		{
 			return _trackingID;
@@ -76,7 +86,7 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 * Relative 2D position of the user, mapped in RGB space
 		 */ 
 		public var rgbRelativePosition:Point;
-		
+
 		/**
 		 * Absolute 2D position of the user, mapped in depth space
 		 */ 
@@ -128,14 +138,14 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		public function get rightFoot():SkeletonJoint { return getJointByName(JointNames.RIGHT_FOOT); }
 		
 		/**
-		 * Type of skeleton
-		 * @see com.as3nui.nativeExtensions.air.kinect.constants.UserType for possible options
+		 * Framework used to generate this skeleton
+		 * @see com.as3nui.nativeExtensions.air.kinect.constants.Framework for possible options
 		 */ 
-		private var _type:String;
+		private var _framework:String;
 		
-		public function get type():String
+		public function get framework():String
 		{
-			return _type;
+			return _framework;
 		}
 		
 		/**
@@ -167,9 +177,10 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			return as3nui::_skeletonJointNames.concat();
 		}
 		
-		public function User(type:String, trackingID:uint, position:Vector3D, positionRelative:Vector3D, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point, hasSkeleton:Boolean, skeletonJoints:Vector.<SkeletonJoint>)
+		public function User(framework:String, userID:uint, trackingID:uint,  position:Vector3D, positionRelative:Vector3D, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point, hasSkeleton:Boolean, skeletonJoints:Vector.<SkeletonJoint>)
 		{
-			_type = type;
+			_framework = framework;
+			_userID = userID;
 			_trackingID = trackingID;
 			this.position = position;
 			this.positionRelative = positionRelative;
@@ -195,8 +206,8 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 */ 
 		public function copyFrom(otherUser:User):void
 		{
-			_type = otherUser.type;
-			_trackingID = otherUser.trackingID;
+			_framework = otherUser.framework;
+			_userID = otherUser.userID;
 			position.copyFrom(otherUser.position);
 			positionRelative.copyFrom(otherUser.positionRelative);
 			rgbPosition.copyFrom(otherUser.rgbPosition);
@@ -208,6 +219,23 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			{
 				_skeletonJoints[i].copyFrom(otherUser.skeletonJoints[i]);
 			}
+		}
+
+		public function toJSON(s:String):* {
+			var jsonObject:Object = {
+				framework:_framework,
+				userID:_userID,
+				trackingID: _trackingID,
+				position:position,
+				positionRelative:positionRelative,
+				rgbPosition:rgbPosition,
+				rgbRelativePosition:rgbRelativePosition,
+				depthPosition:depthPosition,
+				depthRelativePosition:depthRelativePosition,
+				hasSkeleton:hasSkeleton,
+				skeletonJoints:_skeletonJoints
+			};
+			return jsonObject;
 		}
 	}
 }

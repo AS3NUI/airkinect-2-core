@@ -23,36 +23,36 @@ package com.as3nui.nativeExtensions.air.kinect
 	{
 		//--------------- depth configuration ---------------//
 		public var depthEnabled:Boolean = false;
-		public var depthResolution:Point = CameraResolution.RESOLUTION_320_240;
-		public var depthMirrored:Boolean = false;
+		public var depthResolution:Point = CameraResolution.RESOLUTION_640_480;
+		public var depthMirrored:Boolean = true;
 		public var depthShowUserColors:Boolean = false;
 		
 		//--------------- rgb configuration ---------------//
 		public var rgbEnabled:Boolean = false;
-		public var rgbResolution:Point = CameraResolution.RESOLUTION_320_240;
-		public var rgbMirrored:Boolean = false;
+		public var rgbResolution:Point = CameraResolution.RESOLUTION_640_480;
+		public var rgbMirrored:Boolean = true;
 		
 		//--------------- user configuration ---------------//
 		public var userEnabled:Boolean = false;
-		public var userMirrored:Boolean = false;
+		public var userMirrored:Boolean = true;
 		public var skeletonEnabled:Boolean = false;
-		public var skeletonMirrored:Boolean = false;
+		public var skeletonMirrored:Boolean = true;
 		
 		//--------------- user mask configuration ---------------//
 		public var userMaskEnabled:Boolean = false;
-		public var userMaskResolution:Point = CameraResolution.RESOLUTION_320_240;
-		public var userMaskMirrored:Boolean = false;
+		public var userMaskResolution:Point = CameraResolution.RESOLUTION_640_480;
+		public var userMaskMirrored:Boolean = true;
 		
 		//--------------- infrared configuration ---------------//
 		//NOTE: you cannot use infrared with rgb or player mask
 		public var infraredEnabled:Boolean = false;
 		public var infraredResolution:Point = CameraResolution.RESOLUTION_320_240;
-		public var infraredMirrored:Boolean = false;
+		public var infraredMirrored:Boolean = true;
 		
 		//--------------- point cloud configuration ---------------//
 		public var pointCloudEnabled:Boolean = false;
-		public var pointCloudResolution:Point = CameraResolution.RESOLUTION_320_240;
-		public var pointCloudMirrored:Boolean = false;
+		public var pointCloudResolution:Point = CameraResolution.RESOLUTION_640_480;
+		public var pointCloudMirrored:Boolean = true;
 		public var pointCloudDensity:uint = 1;
 		public var pointCloudIncludeRGB:Boolean = false;
 	}

@@ -13,11 +13,25 @@
 *    See the License for the specific language governing permissions and
 *    limitations under the License.
 */
-package com.as3nui.nativeExtensions.air.kinect.constants
+package com.as3nui.nativeExtensions.air.kinect.events
 {
-	public class UserType
+	import com.as3nui.nativeExtensions.air.kinect.data.UserFrame;
+
+	import flash.events.Event;
+
+	public class UserFrameEvent extends Event
 	{
-		public static const MSSDK:String = "mssdk";
-		public static const OPENNI:String = "openni";
+		public static const USER_FRAME_UPDATE:String = "userFrameUpdated";
+		public var userFrame:UserFrame;
+		public function UserFrameEvent(userFrame:UserFrame = null)
+		{
+			super(USER_FRAME_UPDATE);
+			this.userFrame = userFrame;
+		}
+		
+		override public function clone():Event
+		{
+			return new UserFrameEvent(userFrame);
+		}
 	}
 }

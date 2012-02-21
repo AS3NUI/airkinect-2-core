@@ -18,6 +18,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 	import com.as3nui.nativeExtensions.air.kinect.data.User;
 	import com.as3nui.nativeExtensions.air.kinect.data.UserFrame;
 	import com.as3nui.nativeExtensions.air.kinect.events.UserEvent;
+	import com.as3nui.nativeExtensions.air.kinect.events.UserFrameEvent;
 	import com.as3nui.nativeExtensions.air.kinect.namespaces.as3nui;
 	
 	import flash.events.StatusEvent;
@@ -71,6 +72,8 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 		
 		private var skeletonJointNameIndices:Dictionary;
 		private var skeletonJointNames:Vector.<String>;
+
+		private var _simulationMode:Boolean;
 		
 		public function UserGenerator(nr:uint)
 		{
@@ -109,75 +112,81 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 		
 		override protected function statusHandler(event:StatusEvent):void
 		{
+			if(_simulationMode) return;
 			switch(event.code)
 			{
 				case "userFrame":
 					var userFrame:UserFrame = context.call("getUserFrame", nr) as UserFrame;
-					
-					//update the users - copy the data inside existing users, so user references keep working
-					var user:User;
-					var otherUser:User;
-					
-					//which users should we remove?
-					var removedUsers:Vector.<User> = getUsersToRemoveAndRemoveFromDictionary(userFrame.users, _users, usersByTrackingId);
-					var removedUsersWithSkeleton:Vector.<User> = getUsersToRemoveAndRemoveFromDictionary(userFrame.usersWithSkeleton, _usersWithSkeleton, usersWithSkeletonByTrackingId);
-					var addedUsers:Vector.<User> = new Vector.<User>();
-					var addedUsersWithSkeleton:Vector.<User> = new Vector.<User>();
-					var currentUsers:Vector.<User> = new Vector.<User>();
-					var currentUsersWithSkeleton:Vector.<User> = new Vector.<User>();
-					for each(otherUser in userFrame.users)
-					{
-						//existing? Update the properties
-						user = usersByTrackingId[otherUser.trackingID];
-						if(user != null)
-						{
-							user.copyFrom(otherUser);
-						}
-						else
-						{
-							usersByTrackingId[otherUser.trackingID] = user = otherUser;
-							addedUsers.push(user);
-						}
-						
-						user.as3nui::skeletonJointNameIndices = skeletonJointNameIndices;
-						user.as3nui::_skeletonJointNames = skeletonJointNames;
-						currentUsers.push(user);
-						if(user.hasSkeleton)
-						{
-							currentUsersWithSkeleton.push(user);
-							if(usersWithSkeletonByTrackingId[user.trackingID] == null)
-							{
-								usersWithSkeletonByTrackingId[otherUser.trackingID] = user;
-								addedUsersWithSkeleton.push(user);
-							}
-						}
-					}
-					
-					_users = currentUsers;
-					_usersWithSkeleton = currentUsersWithSkeleton;
-					
-					//dispatch removed event
-					if(removedUsers.length > 0)
-					{
-						dispatchEvent(new UserEvent(UserEvent.USERS_REMOVED, false, false, removedUsers));
-					}
-					if(removedUsersWithSkeleton.length > 0)
-					{
-						dispatchEvent(new UserEvent(UserEvent.USERS_WITH_SKELETON_REMOVED, false, false, removedUsersWithSkeleton));
-					}
-					//dispatch added event
-					if(addedUsers.length > 0)
-					{
-						dispatchEvent(new UserEvent(UserEvent.USERS_ADDED, false, false, addedUsers));
-					}
-					if(addedUsersWithSkeleton.length > 0)
-					{
-						dispatchEvent(new UserEvent(UserEvent.USERS_WITH_SKELETON_ADDED, false, false, addedUsersWithSkeleton));
-					}
-					//dispatch updated event
-					dispatchEvent(new UserEvent(UserEvent.USERS_UPDATED, false, false, _users));
-					break;
+					handleUserFrame(userFrame);
 			}
+		}
+
+		private function handleUserFrame(userFrame:UserFrame):void {
+			//Allows for manual digesting of full user frame. This event should not be used
+			this.dispatchEvent(new UserFrameEvent(userFrame));
+
+			//update the users - copy the data inside existing users, so user references keep working
+			var user:User;
+			var otherUser:User;
+
+			//which users should we remove?
+			var removedUsers:Vector.<User> = getUsersToRemoveAndRemoveFromDictionary(userFrame.users, _users, usersByTrackingId);
+			var removedUsersWithSkeleton:Vector.<User> = getUsersToRemoveAndRemoveFromDictionary(userFrame.usersWithSkeleton, _usersWithSkeleton, usersWithSkeletonByTrackingId);
+			var addedUsers:Vector.<User> = new Vector.<User>();
+			var addedUsersWithSkeleton:Vector.<User> = new Vector.<User>();
+			var currentUsers:Vector.<User> = new Vector.<User>();
+			var currentUsersWithSkeleton:Vector.<User> = new Vector.<User>();
+			for each(otherUser in userFrame.users)
+			{
+				//existing? Update the properties
+				user = usersByTrackingId[otherUser.trackingID];
+				if(user != null)
+				{
+					user.copyFrom(otherUser);
+				}
+				else
+				{
+					usersByTrackingId[otherUser.trackingID] = user = otherUser;
+					addedUsers.push(user);
+				}
+
+				user.as3nui::skeletonJointNameIndices = skeletonJointNameIndices;
+				user.as3nui::_skeletonJointNames = skeletonJointNames;
+				currentUsers.push(user);
+				if(user.hasSkeleton)
+				{
+					currentUsersWithSkeleton.push(user);
+					if(usersWithSkeletonByTrackingId[user.trackingID] == null)
+					{
+						usersWithSkeletonByTrackingId[otherUser.trackingID] = user;
+						addedUsersWithSkeleton.push(user);
+					}
+				}
+			}
+
+			_users = currentUsers;
+			_usersWithSkeleton = currentUsersWithSkeleton;
+
+			//dispatch removed event
+			if(removedUsers.length > 0)
+			{
+				dispatchEvent(new UserEvent(UserEvent.USERS_REMOVED, false, false, removedUsers));
+			}
+			if(removedUsersWithSkeleton.length > 0)
+			{
+				dispatchEvent(new UserEvent(UserEvent.USERS_WITH_SKELETON_REMOVED, false, false, removedUsersWithSkeleton));
+			}
+			//dispatch added event
+			if(addedUsers.length > 0)
+			{
+				dispatchEvent(new UserEvent(UserEvent.USERS_ADDED, false, false, addedUsers));
+			}
+			if(addedUsersWithSkeleton.length > 0)
+			{
+				dispatchEvent(new UserEvent(UserEvent.USERS_WITH_SKELETON_ADDED, false, false, addedUsersWithSkeleton));
+			}
+			//dispatch updated event
+			dispatchEvent(new UserEvent(UserEvent.USERS_UPDATED, false, false, _users));
 		}
 		
 		private function getUsersToRemoveAndRemoveFromDictionary(newUsers:Vector.<User>, previousUsers:Vector.<User>, dictionary:Dictionary):Vector.<User>
@@ -201,6 +210,18 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 				}
 			}
 			return removedUsers;
+		}
+
+		public function set skeletonSimulationMode(value:Boolean):void {
+			_simulationMode = value;
+		}
+
+		public function get skeletonSimulationMode():Boolean {
+			return _simulationMode;
+		}
+
+		public function simulateUserFrame(userFrame:UserFrame):void {
+			handleUserFrame(userFrame);
 		}
 	}
 }

@@ -23,7 +23,6 @@ package com.as3nui.nativeExtensions.air.kinect.constants
 	 */ 
 	public class JointNames
 	{
-		
 		public static const HEAD:String = "head";
 		public static const NECK:String = "neck";
 		public static const TORSO:String = "torso";

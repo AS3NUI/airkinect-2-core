@@ -18,3 +18,7 @@ cert/*
 docs/*
 
 examples/*
+/assets
+/airkinect-2-core.iml
+/bin-debug
+/.fxpProperties

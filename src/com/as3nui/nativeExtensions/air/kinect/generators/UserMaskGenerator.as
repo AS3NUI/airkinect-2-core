@@ -88,7 +88,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 					var i:uint = 0;
 					for each(var user:User in userGenerator.users)
 					{
-						context.call("getUserMaskFrame", nr, user.trackingID, userMaskByteArrays[i]);
+						context.call("getUserMaskFrame", nr, user.userID, userMaskByteArrays[i]);
 						userMaskByteArrays[i].position = 0;
 						userMaskByteArrays[i].endian = Endian.LITTLE_ENDIAN;
 						if(user.userMaskData == null)
