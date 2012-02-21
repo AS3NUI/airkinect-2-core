@@ -43,68 +43,51 @@ const char JOINT_NAMES[][16] = {
     "right_foot"
 };
 
-typedef struct {
-    float               positionConfidence;
+struct kinectTransform {
+	double              worldX;
+    double              worldY;
+    double              worldZ;
     
-    float               worldX;
-    float               worldY;
-    float               worldZ;
-    
-    float               worldRelativeX;
-    float               worldRelativeY;
-    float               worldRelativeZ;
-    
-    float               orientationConfidence;
-    
-    float               orientationX;
-    float               orientationY;
-    float               orientationZ;
+    double              worldRelativeX;
+    double              worldRelativeY;
+    double              worldRelativeZ;
     
     int                 rgbX;
     int                 rgbY;
     
-    float               rgbRelativeX;
-    float               rgbRelativeY;
+    double              rgbRelativeX;
+    double              rgbRelativeY;
     
     int                 depthX;
     int                 depthY;
     
-    float               depthRelativeX;
-    float               depthRelativeY;
-} kinectSkeletonJoint;
+    double              depthRelativeX;
+    double              depthRelativeY;
+};
 
-typedef struct {
+struct kinectSkeletonJoint : kinectTransform{
+    double              positionConfidence;
+    
+    double              orientationConfidence;
+    
+    double              orientationX;
+    double              orientationY;
+    double              orientationZ;
+};
+
+struct kinectUser: kinectTransform{
     int                 trackingID;
+	int                 userID;
     bool                isTracking;
-    
-    float               worldX;
-    float               worldY;
-    float               worldZ;
-    
-    float               worldRelativeX;
-    float               worldRelativeY;
-    float               worldRelativeZ;
-    
-    int                 rgbX;
-    int                 rgbY;
-    
-    float               rgbRelativeX;
-    float               rgbRelativeY;
-    
-    int                 depthX;
-    int                 depthY;
-    
-    float               depthRelativeX;
-    float               depthRelativeY;
     
     bool                hasSkeleton;
     kinectSkeletonJoint joints[NUM_JOINTS];
-} kinectUser;
+};
 
 typedef struct {
     int                 frameNumber;
     int                 timeStamp;
-    kinectUser          users[MAX_SKELETONS];
+	kinectUser          users[MAX_SKELETONS];
 } kinectUserFrame;
 
 #endif

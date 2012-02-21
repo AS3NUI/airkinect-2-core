@@ -13,7 +13,7 @@ PointCloudRegion::PointCloudRegion()
 {
 }
 
-void PointCloudRegion::setProperties(unsigned int regionId, float x, float y, float z, float width, float height, float depth)
+void PointCloudRegion::setProperties(unsigned int regionId, double x, double y, double z, double width, double height, double depth)
 {
     this->regionId = regionId;
     this->x = x;

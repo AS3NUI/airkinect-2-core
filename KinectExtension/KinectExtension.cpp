@@ -24,6 +24,11 @@ extern "C"
 		return retObj;
     }
     
+    FREObject Kinect_getCapabilities(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+    {
+		return kinectDeviceManager.getCapabilities();
+    }
+    
     FREObject Kinect_applicationShutdown(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
         kinectDeviceManager.shutDown();
@@ -49,6 +54,16 @@ extern "C"
         unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
         unsigned int mirrored; FREGetObjectAsBool(argv[1], &mirrored);
         kinectDeviceManager.getDevice(nr, ctx)->setUserMode((mirrored != 0));
+        return NULL;
+    }
+    
+	FREObject Kinect_setUserColor(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+    {
+        unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+		unsigned int userID; FREGetObjectAsUint32(argv[1], &userID);
+		unsigned int color; FREGetObjectAsUint32(argv[2], &color);
+        unsigned int useIntensity; FREGetObjectAsBool(argv[3], &useIntensity);
+		kinectDeviceManager.getDevice(nr, ctx)->setUserColor(userID, color, (useIntensity != 0));
         return NULL;
     }
     
@@ -114,7 +129,7 @@ extern "C"
         
         short int trackedSkeletons = 0;
         
-        FREObject userFrame, frameNumber, timestamp, users, user, userType, trackingID, hasSkeleton, joints, joint, jointName;
+        FREObject userFrame, frameNumber, timestamp, users, user, userType, userID, trackingID, hasSkeleton, joints, joint, jointName;
         FREObject position, positionRelative, positionConfidence, orientation, orientationConfidence, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition;
         FREObject orientationX, orientationY, orientationZ;
         FREObject positionX, positionY, positionZ, positionRelativeX, positionRelativeY, positionRelativeZ;
@@ -164,8 +179,8 @@ extern "C"
                     FREObject rgbPositionParams[] = {rgbPositionX, rgbPositionY};
                     FRENewObject( (const uint8_t*) "flash.geom.Point", 2, rgbPositionParams, &rgbPosition, NULL);
                     //rgb relative position
-                    FRENewObjectFromInt32(device->userFrame.users[i].joints[j].rgbRelativeX, &rgbRelativePositionX);
-                    FRENewObjectFromInt32(device->userFrame.users[i].joints[j].rgbRelativeY, &rgbRelativePositionY);
+                    FRENewObjectFromDouble(device->userFrame.users[i].joints[j].rgbRelativeX, &rgbRelativePositionX);
+                    FRENewObjectFromDouble(device->userFrame.users[i].joints[j].rgbRelativeY, &rgbRelativePositionY);
                     FREObject rgbRelativePositionParams[] = {rgbRelativePositionX, rgbRelativePositionY};
                     FRENewObject( (const uint8_t*) "flash.geom.Point", 2, rgbRelativePositionParams, &rgbRelativePosition, NULL);
                     //depth position
@@ -174,8 +189,8 @@ extern "C"
                     FREObject depthPositionParams[] = {depthPositionX, depthPositionY};
                     FRENewObject( (const uint8_t*) "flash.geom.Point", 2, depthPositionParams, &depthPosition, NULL);
                     //depth relative position
-                    FRENewObjectFromInt32(device->userFrame.users[i].joints[j].depthRelativeX, &depthRelativePositionX);
-                    FRENewObjectFromInt32(device->userFrame.users[i].joints[j].depthRelativeY, &depthRelativePositionY);
+                    FRENewObjectFromDouble(device->userFrame.users[i].joints[j].depthRelativeX, &depthRelativePositionX);
+                    FRENewObjectFromDouble(device->userFrame.users[i].joints[j].depthRelativeY, &depthRelativePositionY);
                     FREObject depthRelativePositionParams[] = {depthRelativePositionX, depthRelativePositionY};
                     FRENewObject( (const uint8_t*) "flash.geom.Point", 2, depthRelativePositionParams, &depthRelativePosition, NULL);
                     //create the joint
@@ -204,8 +219,8 @@ extern "C"
                 FREObject rgbPositionParams[] = {rgbPositionX, rgbPositionY};
                 FRENewObject( (const uint8_t*) "flash.geom.Point", 2, rgbPositionParams, &rgbPosition, NULL);
                 //user rgb relative position
-                FRENewObjectFromInt32(device->userFrame.users[i].rgbRelativeX, &rgbRelativePositionX);
-                FRENewObjectFromInt32(device->userFrame.users[i].rgbRelativeY, &rgbRelativePositionY);
+                FRENewObjectFromDouble(device->userFrame.users[i].rgbRelativeX, &rgbRelativePositionX);
+                FRENewObjectFromDouble(device->userFrame.users[i].rgbRelativeY, &rgbRelativePositionY);
                 FREObject rgbRelativePositionParams[] = {rgbRelativePositionX, rgbRelativePositionY};
                 FRENewObject( (const uint8_t*) "flash.geom.Point", 2, rgbRelativePositionParams, &rgbRelativePosition, NULL);
                 //user depth position
@@ -214,17 +229,18 @@ extern "C"
                 FREObject depthPositionParams[] = {depthPositionX, depthPositionY};
                 FRENewObject( (const uint8_t*) "flash.geom.Point", 2, depthPositionParams, &depthPosition, NULL);
                 //user depth relative position
-                FRENewObjectFromInt32(device->userFrame.users[i].depthRelativeX, &depthRelativePositionX);
-                FRENewObjectFromInt32(device->userFrame.users[i].depthRelativeY, &depthRelativePositionY);
+                FRENewObjectFromDouble(device->userFrame.users[i].depthRelativeX, &depthRelativePositionX);
+                FRENewObjectFromDouble(device->userFrame.users[i].depthRelativeY, &depthRelativePositionY);
                 FREObject depthRelativePositionParams[] = {depthRelativePositionX, depthRelativePositionY};
                 FRENewObject( (const uint8_t*) "flash.geom.Point", 2, depthRelativePositionParams, &depthRelativePosition, NULL);
                 
                 FRENewObjectFromUTF8(6, (const uint8_t*) "openni", &userType);
+				FRENewObjectFromUint32(device->userFrame.users[i].userID, &userID);
 				FRENewObjectFromUint32(device->userFrame.users[i].trackingID, &trackingID);
 				FRENewObjectFromBool((device->userFrame.users[i].hasSkeleton) ? 1 : 0, &hasSkeleton);
-				FREObject skeletonParams[] = {userType, trackingID, position, positionRelative, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition, hasSkeleton, joints};
+				FREObject skeletonParams[] = {userType, userID, trackingID, position, positionRelative, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition, hasSkeleton, joints};
                 
-				FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.data.User", 10, skeletonParams, &user, NULL);
+				FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.data.User", 11, skeletonParams, &user, NULL);
                 
 				FRESetArrayElementAt(users, trackedSkeletons, user);
 				trackedSkeletons++;
@@ -538,6 +554,7 @@ extern "C"
     
     FRENamedFunction _Static_methods[] = {
 		{ (const uint8_t*) "getDeviceCount", 0, Kinect_getDeviceCount},
+		{ (const uint8_t*) "getCapabilities", 0, Kinect_getCapabilities },
         { (const uint8_t*) "applicationShutdown", 0, Kinect_applicationShutdown}
     };
     
@@ -545,6 +562,7 @@ extern "C"
 		{ (const uint8_t*) "start", 0, Kinect_start },
 		{ (const uint8_t*) "stop", 0, Kinect_stop },
         { (const uint8_t*) "setUserMode", 0, Kinect_setUserMode },
+		{ (const uint8_t*) "setUserColor", 0, Kinect_setUserColor },
         { (const uint8_t*) "setUserEnabled", 0, Kinect_setUserEnabled },
         { (const uint8_t*) "setSkeletonMode", 0, Kinect_setSkeletonMode },
         { (const uint8_t*) "setSkeletonEnabled", 0, Kinect_setSkeletonEnabled },
@@ -567,7 +585,11 @@ extern "C"
         { (const uint8_t*) "setPointCloudMode", 0, Kinect_setPointCloudMode },
         { (const uint8_t*) "setPointCloudEnabled", 0, Kinect_setPointCloudEnabled },
         { (const uint8_t*) "getPointCloudFrame", 0, Kinect_getPointCloudFrame },
-        { (const uint8_t*) "setPointCloudRegions", 0, Kinect_setPointCloudRegions }
+        { (const uint8_t*) "setPointCloudRegions", 0, Kinect_setPointCloudRegions },
+		//{ (const uint8_t*) "setPointCloudDensity", 0, Kinect_setPointCloudDensity },
+		//{ (const uint8_t*) "setPointCloudIncludeRGB", 0, Kinect_setPointCloudIncludeRGB },
+		//{ (const uint8_t*) "setSkeletonMirror", 0, Kinect_setSkeletonMirror },
+		//{ (const uint8_t*) "setImageMirror", 0, Kinect_setImageMirror }
 	};
     
     void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, uint32_t* numFunctions, const FRENamedFunction** functions)

@@ -13,22 +13,22 @@ class PointCloudRegion
 {
 public:
     PointCloudRegion();
-    void                    setProperties(unsigned int regionId, float x, float y, float z, float width, float height, float depth);
+    void                    setProperties(unsigned int regionId, double x, double y, double z, double width, double height, double depth);
     
     unsigned int            numPoints;
     
     unsigned int            regionId;
     
-    float                   x;
-    float                   y;
-    float                   z;
-    float                   width;
-    float                   height;
-    float                   depth;
-    
-    float                   maxX;
-    float                   maxY;
-    float                   maxZ;
+    double                  x;
+    double                  y;
+    double                  z;
+    double                  width;
+    double                  height;
+    double                  depth;
+
+    double                  maxX;
+    double                  maxY;
+    double                  maxZ;
 };
 
 #endif

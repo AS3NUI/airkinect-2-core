@@ -24,7 +24,7 @@ public:
     bool                            isStarted();
     void                            startUp();
     void                            shutDown();
-    
+    FREObject						getCapabilities();
     KinectDevice                    *getDevice(int nr, FREContext freContext);
     
 private:

@@ -13,12 +13,35 @@
 #include <Adobe AIR/Adobe AIR.h>
 #include <XnCppWrapper.h>
 #include "KinectSkeleton.h"
+#include "KinectCapabilities.h"
 #include "PointCloudRegion.h"
 
 class KinectDevice
 {
     static const int        MAX_DEPTH = 10000;
 public:
+    static KinectCapabilities	getCapabilities(){
+		KinectCapabilities kinectCapabilities;
+		
+		kinectCapabilities.hasCameraElevationSupport				= false;
+		kinectCapabilities.hasDepthCameraSupport					= true;
+		kinectCapabilities.hasDepthUserSupport						= true;
+		kinectCapabilities.hasInfraredSupport						= true;
+		kinectCapabilities.hasJointOrientationConfidenceSupport		= true;
+		kinectCapabilities.hasJointOrientationSupport				= true;
+		kinectCapabilities.hasMultipleSensorSupport					= false;
+		kinectCapabilities.hasPointCloudRegionSupport				= true;
+		kinectCapabilities.hasPointCloudSupport						= true;
+		kinectCapabilities.hasPositionConfidenceSupport				= true;
+		kinectCapabilities.hasRGBCameraSupport						= true;
+		kinectCapabilities.hasSkeletonSupport						= true;
+		kinectCapabilities.hasUserMaskSupport						= true;
+        
+		kinectCapabilities.maxSensors								= 1;
+		kinectCapabilities.framework								= "openni";
+		return kinectCapabilities;
+	};
+    
     KinectDevice(int nr, xn::Context context);
     
     FREContext              freContext;
@@ -29,6 +52,7 @@ public:
     void                    dispose();
     
     void                    setUserMode(bool mirrored);
+    void                    setUserColor(int userID, int color, bool useIntensity);
     void                    setUserEnabled(bool enabled);
     void                    setSkeletonMode(bool mirrored);
     void                    setSkeletonEnabled(bool enabled);
@@ -128,6 +152,8 @@ private:
     int                     depthScale;
     
     float                   depthHistogram[MAX_DEPTH];
+    
+    float                   userIndexColors[MAX_SKELETONS][4];
     
     int                     asRGBWidth;
     int                     asRGBHeight;

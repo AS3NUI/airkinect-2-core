@@ -5,12 +5,14 @@ extern "C"
     
     //methods
     FREObject Kinect_getDeviceCount(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
+    FREObject Kinect_getCapabilities(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_applicationShutdown(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     
     FREObject Kinect_start(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_stop(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
 
     FREObject Kinect_setUserMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
+    FREObject Kinect_setUserColor(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_setUserEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_setSkeletonMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_setSkeletonEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);

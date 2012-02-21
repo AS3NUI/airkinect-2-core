@@ -11,21 +11,23 @@
 #include "KinectDevice.h"
 
 //colors for depth image
+/*
 const XnFloat Colors[][3] =
 {
-	{0,1,1},
-	{0,0,1},
-	{0,1,0},
-	{1,1,0},
-	{1,0,0},
-	{1,.5,0},
-	{.5,1,0},
-	{0,.5,1},
-	{.5,0,1},
-	{1,1,.5},
-	{1,1,1}
+	{0.0f,1.0f,1.0f},
+	{0.0f,0.0f,1.0f},
+	{0.0f,1.0f,0.0f},
+	{1.0f,1.0f,0.0f},
+	{1.0f,0.0f,0.0f},
+	{1.0f,0.5f,0.0f},
+	{0.5f,1.0f,0.0f},
+	{0.0f,0.5f,1.0f},
+	{0.5f,0.0f,1.0f},
+	{1.0f,1.0f,0.5f},
+	{1.0f,1.0f,1.0f}
 };
 const XnUInt32 nColors = 10;
+*/
 
 XnBool needPose = FALSE;
 XnChar strPose[20] = "";
@@ -146,6 +148,25 @@ void KinectDevice::setDefaults()
     
     pointCloudByteArray = 0;
     pointCloudRegions = 0;
+    
+    //player index coloring
+    setUserColor(1, 0xff0000, 1);
+	setUserColor(2, 0x00ff00, 1);
+	setUserColor(3, 0x0000ff, 1);
+	setUserColor(4, 0xffff00, 1);
+	setUserColor(5, 0xff00ff, 1);
+	setUserColor(6, 0x8080ff, 1);
+    
+    setUserColor(7, 0xff0000, 1);
+	setUserColor(8, 0x00ff00, 1);
+	setUserColor(9, 0x0000ff, 1);
+	setUserColor(10, 0xffff00, 1);
+	setUserColor(11, 0xff00ff, 1);
+	setUserColor(12, 0x8080ff, 1);
+    
+    setUserColor(13, 0xff0000, 1);
+	setUserColor(14, 0x00ff00, 1);
+	setUserColor(15, 0x0000ff, 1);
 }
 
 int KinectDevice::getAsDepthWidth()
@@ -202,11 +223,11 @@ int KinectDevice::getAsPointCloudByteArrayLength()
 {
     if(asPointCloudIncludeRGB)
     {
-        return (asPointCloudWidth * asPointCloudHeight * sizeof(ushort) * 6) / asPointCloudDensity;
+        return (asPointCloudPixelCount * sizeof(ushort) * 6);
     }
     else
     {
-        return (asPointCloudWidth * asPointCloudHeight * sizeof(ushort) * 3) / asPointCloudDensity;
+        return (asPointCloudPixelCount * sizeof(ushort) * 3);
     }
 }
 
@@ -463,7 +484,7 @@ void KinectDevice::run()
                 return;
             }
         }
-        if(asRGBEnabled || asUserMaskEnabled || (asPointCloudEnabled && asPointCloudIncludeRGB))
+        if(asRGBEnabled || asUserMaskEnabled || asPointCloudEnabled)
         {
             rc = imageGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
@@ -641,8 +662,6 @@ void KinectDevice::rgbFrameHandler()
 {
     RGBFrameBuffer = imageMetaData.RGB24Data();
     
-    if(RGBByteArray == 0) RGBByteArray = new uint32_t[asRGBPixelCount];
-    
     uint32_t *rgbRun = RGBByteArray;
     int direction = asRGBMirrored ? -1 : 1;
     int directionFactor = asRGBMirrored ? 1 : 0;
@@ -663,8 +682,6 @@ void KinectDevice::rgbFrameHandler()
 void KinectDevice::depthFrameHandler()
 {
     depthFrameBuffer = depthMetaData.Data();
-    
-    if(depthByteArray == 0) depthByteArray = new uint32_t[asDepthPixelCount];
     
     uint32_t *depthRun = depthByteArray;
     int direction = asDepthMirrored ? -1 : 1;
@@ -704,8 +721,6 @@ void KinectDevice::depthFrameWithUserColorsHandler()
     depthFrameBuffer = depthMetaData.Data();
     sceneFrameBuffer = sceneMetaData.Data();
     
-    if(depthByteArray == 0) depthByteArray = new uint32_t[asDepthPixelCount];
-    
     uint32_t *depthRun = depthByteArray;
     int direction = asDepthMirrored ? -1 : 1;
     int directionFactor = asDepthMirrored ? 1 : 0;
@@ -729,17 +744,29 @@ void KinectDevice::depthFrameWithUserColorsHandler()
                 value = depthHistogram[*pDepthBuffer];
             }
             
-            XnLabel label = *pSceneBuffer;
+            short label = *pSceneBuffer;
             
-            XnUInt32 nColorID = label % nColors;
             if(label == 0)
             {
-                nColorID = nColors;
+                red = ((int) value) << 16;
+                green = ((int) value) << 8;
+                blue = ((int) value);
             }
-            
-            red = ((int) (value * Colors[nColorID][0])) << 16;
-            green = ((int) (value * Colors[nColorID][1])) << 8;
-            blue = ((int) (value * Colors[nColorID][2]));
+            else
+            {
+                if(userIndexColors[label][3] == 1)
+                {
+                    red = ((int) (value * userIndexColors[label][0])) << 16;
+                    green = ((int) (value * userIndexColors[label][1])) << 8;
+                    blue = ((int) (value * userIndexColors[label][2]));
+                }
+                else
+                {
+                    red = ((int) (0xFF && userIndexColors[label][0])) << 16;
+                    green = ((int) (0xFF && userIndexColors[label][1])) << 8;
+                    blue = ((int) (0xFF && userIndexColors[label][2]));
+                }
+            }
             
             *depthRun = 0xff << 24 | (red + green + blue);
             
@@ -755,15 +782,6 @@ void KinectDevice::userMaskHandler()
     //we need depth, rgb & scene info
     RGBFrameBuffer = imageMetaData.RGB24Data();
     sceneFrameBuffer = sceneMetaData.Data();
-    
-    if(userMaskByteArray == 0)
-    {
-        userMaskByteArray = new uint32_t*[MAX_SKELETONS];
-        for(int i = 0; i < MAX_SKELETONS; i++)
-        {
-            userMaskByteArray[i] = new uint32_t[asUserMaskPixelCount];
-        }
-    }
     
     int direction = asUserMaskMirrored ? -1 : 1;
     int directionFactor = asUserMaskMirrored ? 1 : 0;
@@ -798,8 +816,6 @@ void KinectDevice::infraredHandler()
 {
     infraredFrameBuffer = infraredMetaData.Data();
     
-    if(infraredByteArray == 0) infraredByteArray = new uint32_t[asInfraredPixelCount];
-    
     uint32_t *depthRun = infraredByteArray;
     int direction = asInfraredMirrored ? -1 : 1;
     int directionFactor = asInfraredMirrored ? 1 : 0;
@@ -830,8 +846,6 @@ void KinectDevice::infraredHandler()
 void KinectDevice::pointCloudHandler()
 {
     depthFrameBuffer = depthMetaData.Data();
-    
-    if(pointCloudByteArray == 0) pointCloudByteArray = new ushort[(pointCloudPixelCount * 3) / asPointCloudDensity];
     
     ushort *pointCloudRun = pointCloudByteArray;
     int direction = asPointCloudMirrored ? -1 : 1;
@@ -881,8 +895,6 @@ void KinectDevice::pointCloudWithRGBHandler()
 {
     RGBFrameBuffer = imageMetaData.RGB24Data();
     depthFrameBuffer = depthMetaData.Data();
-    
-    if(pointCloudByteArray == 0) pointCloudByteArray = new ushort[(pointCloudPixelCount * 6) / asPointCloudDensity];
     
     ushort *pointCloudRun = pointCloudByteArray;
     int direction = asPointCloudMirrored ? -1 : 1;
@@ -958,6 +970,7 @@ void KinectDevice::userHandler()
         {
             rc = userGenerator.GetCoM(aUsers[i], position);
             userFrame.users[i].isTracking = true;
+            userFrame.users[i].userID = aUsers[i];
             userFrame.users[i].trackingID = aUsers[i];
             userFrame.users[i].hasSkeleton = (asSkeletonEnabled && userGenerator.GetSkeletonCap().IsTracking(aUsers[i]));
             
@@ -983,10 +996,10 @@ void KinectDevice::userHandler()
             if(asRGBMirrored) userFrame.users[i].rgbRelativeX = 1 - userFrame.users[i].rgbRelativeX;
             if(asDepthMirrored) userFrame.users[i].depthRelativeX = 1 - userFrame.users[i].depthRelativeX;
             
-            userFrame.users[i].rgbX = userFrame.users[i].rgbRelativeX * asRGBWidth;
-            userFrame.users[i].rgbY = userFrame.users[i].rgbRelativeY * asRGBHeight;
-            userFrame.users[i].depthX = userFrame.users[i].depthRelativeX * asDepthWidth;
-            userFrame.users[i].depthY = userFrame.users[i].depthRelativeY * asDepthHeight;
+            userFrame.users[i].rgbX = (int) (userFrame.users[i].rgbRelativeX * asRGBWidth);
+            userFrame.users[i].rgbY = (int) (userFrame.users[i].rgbRelativeY * asRGBHeight);
+            userFrame.users[i].depthX = (int) (userFrame.users[i].depthRelativeX * asDepthWidth);
+            userFrame.users[i].depthY = (int) (userFrame.users[i].depthRelativeY * asDepthHeight);
             
             if (userFrame.users[i].hasSkeleton)
             {
@@ -1075,10 +1088,10 @@ void KinectDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJ
     if(asRGBMirrored) kUser.joints[targetIndex].rgbRelativeX = 1 - kUser.joints[targetIndex].rgbRelativeX;
     if(asDepthMirrored) kUser.joints[targetIndex].depthRelativeX = 1 - kUser.joints[targetIndex].depthRelativeX;
     
-    kUser.joints[targetIndex].rgbX = kUser.joints[targetIndex].rgbRelativeX * asRGBWidth;
-    kUser.joints[targetIndex].rgbY = kUser.joints[targetIndex].rgbRelativeY * asRGBHeight;
-    kUser.joints[targetIndex].depthX = kUser.joints[targetIndex].depthRelativeX * asDepthWidth;
-    kUser.joints[targetIndex].depthY = kUser.joints[targetIndex].depthRelativeY * asDepthHeight;
+    kUser.joints[targetIndex].rgbX = (int) (kUser.joints[targetIndex].rgbRelativeX * asRGBWidth);
+    kUser.joints[targetIndex].rgbY = (int) (kUser.joints[targetIndex].rgbRelativeY * asRGBHeight);
+    kUser.joints[targetIndex].depthX = (int) (kUser.joints[targetIndex].depthRelativeX * asDepthWidth);
+    kUser.joints[targetIndex].depthY = (int) (kUser.joints[targetIndex].depthRelativeY * asDepthHeight);
 }
 
 void KinectDevice::calculateHistogram()
@@ -1120,6 +1133,16 @@ void KinectDevice::setUserMode(bool mirrored)
     asUserMirrored = mirrored;
 }
 
+void KinectDevice::setUserColor(int userID, int color, bool useIntensity)
+{
+	if(userID > MAX_SKELETONS) return;
+	
+    userIndexColors[userID - 1][0] = (0xFF & (color >> 16)) / 255.0f;
+    userIndexColors[userID - 1][1] = (0xFF & (color >> 8)) / 255.0f;
+    userIndexColors[userID - 1][2] = (0xFF & (color)) / 255.0f;
+    userIndexColors[userID - 1][3] = useIntensity ? 1 : 0;
+}
+
 void KinectDevice::setUserEnabled(bool enabled)
 {
     //printf("KinectDevice::setSkeletonEnabled(%s)\n", (enabled) ? "true" : "false");
@@ -1141,11 +1164,20 @@ void KinectDevice::setSkeletonEnabled(bool enabled)
 void KinectDevice::setDepthMode(unsigned int width, unsigned int height, bool mirrored)
 {
     //printf("KinectDevice::setDepthMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
+    
+    pthread_mutex_lock(&depthMutex);
+    
     asDepthWidth = width;
     asDepthHeight = height;
     asDepthPixelCount = asDepthWidth * asDepthHeight;
     asDepthMirrored = mirrored;
     depthScale = depthWidth / asDepthWidth;
+    
+    //reset bytearray
+    if(depthByteArray != 0) delete [] depthByteArray;
+    depthByteArray = new uint32_t[asDepthPixelCount];
+    
+    pthread_mutex_unlock(&depthMutex);
 }
 
 void KinectDevice::setDepthEnabled(bool enabled)
@@ -1163,11 +1195,20 @@ void KinectDevice::setDepthShowUserColors(bool show)
 void KinectDevice::setRGBMode(unsigned int width, unsigned int height, bool mirrored)
 {
     //printf("KinectDevice::setRGBMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
+    
+    pthread_mutex_lock(&rgbMutex);
+    
     asRGBWidth = width;
     asRGBHeight = height;
     asRGBPixelCount = asRGBWidth * asRGBHeight;
     asRGBMirrored = mirrored;
     rgbScale = rgbWidth / asRGBWidth;
+    
+    //reset bytearray
+    if(RGBByteArray != 0) delete [] RGBByteArray;
+    RGBByteArray = new uint32_t[asRGBPixelCount];
+    
+    pthread_mutex_unlock(&rgbMutex);
 }
 
 void KinectDevice::setRGBEnabled(bool enabled)
@@ -1179,11 +1220,31 @@ void KinectDevice::setRGBEnabled(bool enabled)
 void KinectDevice::setUserMaskMode(unsigned int width, unsigned int height, bool mirrored)
 {
     //printf("KinectDevice::setUserMaskMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
+    
+    pthread_mutex_lock(&userMaskMutex);
+    
     asUserMaskWidth = width;
     asUserMaskHeight = height;
     asUserMaskPixelCount = asUserMaskWidth * asUserMaskHeight;
     asUserMaskMirrored = mirrored;
     userMaskScale = userMaskWidth / asUserMaskWidth;
+    
+    //reset bytearray
+    if(userMaskByteArray != 0)
+    {
+        for(int i = 0; i < MAX_SKELETONS; i++)
+        {
+            delete [] userMaskByteArray[i];
+        }
+        delete [] userMaskByteArray;
+    }
+    userMaskByteArray = new uint32_t*[MAX_SKELETONS];
+    for(int i = 0; i < MAX_SKELETONS; i++)
+    {
+        userMaskByteArray[i] = new uint32_t[asUserMaskPixelCount];
+    }
+    
+    pthread_mutex_unlock(&userMaskMutex);
 }
 
 void KinectDevice::setUserMaskEnabled(bool enabled)
@@ -1195,11 +1256,19 @@ void KinectDevice::setUserMaskEnabled(bool enabled)
 void KinectDevice::setInfraredMode(unsigned int width, unsigned int height, bool mirrored)
 {
     //printf("KinectDevice::setInfraredMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
+    
+    pthread_mutex_lock(&infraredMutex);
+    
     asInfraredWidth = width;
     asInfraredHeight = height;
     asInfraredPixelCount = asInfraredWidth * asInfraredHeight;
     asInfraredMirrored = mirrored;
     infraredScale = infraredWidth / asInfraredWidth;
+    
+    if(infraredByteArray != 0) delete [] infraredByteArray;
+    infraredByteArray = new uint32_t[asInfraredPixelCount];
+    
+    pthread_mutex_unlock(&infraredMutex);
 }
 
 void KinectDevice::setInfraredEnabled(bool enabled)
@@ -1211,6 +1280,9 @@ void KinectDevice::setInfraredEnabled(bool enabled)
 void KinectDevice::setPointCloudMode(unsigned int width, unsigned int height, bool mirrored, unsigned int density, bool includeRGB)
 {
     //printf("KinectDevice::setPointCloudMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
+    
+    pthread_mutex_lock(&pointCloudMutex);
+    
     asPointCloudWidth = width;
     asPointCloudHeight = height;
     asPointCloudDensity = density;
@@ -1218,6 +1290,18 @@ void KinectDevice::setPointCloudMode(unsigned int width, unsigned int height, bo
     asPointCloudPixelCount = (asPointCloudWidth * asPointCloudHeight) / asPointCloudDensity;
     asPointCloudMirrored = mirrored;
     pointCloudScale = pointCloudWidth / asPointCloudWidth;
+    
+    if(pointCloudByteArray != 0) delete [] pointCloudByteArray;
+    if(asPointCloudIncludeRGB)
+    {
+        pointCloudByteArray = new ushort[asPointCloudPixelCount * 6];
+    }
+    else
+    {
+        pointCloudByteArray = new ushort[asPointCloudPixelCount * 3];
+    }
+    
+    pthread_mutex_unlock(&pointCloudMutex);
 }
 
 void KinectDevice::setPointCloudEnabled(bool enabled)

@@ -19,6 +19,7 @@
 		6CD9764F14C85B990061A00B /* KinectExtension.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CD9764E14C85B990061A00B /* KinectExtension.cpp */; };
 		6CD9765714C85BF80061A00B /* libOpenNI.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD9765614C85BF80061A00B /* libOpenNI.dylib */; };
 		6CD9765914C85C2B0061A00B /* Adobe AIR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD9765814C85C2B0061A00B /* Adobe AIR.framework */; };
+		6CF82D9314F398B700924B14 /* KinectCapabilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CF82D9214F398B700924B14 /* KinectCapabilities.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		6CD9764E14C85B990061A00B /* KinectExtension.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = KinectExtension.cpp; sourceTree = "<group>"; };
 		6CD9765614C85BF80061A00B /* libOpenNI.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libOpenNI.dylib; sourceTree = "<group>"; };
 		6CD9765814C85C2B0061A00B /* Adobe AIR.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "Adobe AIR.framework"; path = "../../../../../../Applications/Adobe Flash Builder 4.6/sdks/4.6.0/runtimes/air/mac/Adobe AIR.framework"; sourceTree = "<group>"; };
+		6CF82D9214F398B700924B14 /* KinectCapabilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectCapabilities.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +110,7 @@
 				6C0AAC1D14CEA46A0034797C /* KinectDevice.cpp */,
 				6C89350414E1A73900121F8F /* PointCloudRegion.h */,
 				6C89350714E1A77F00121F8F /* PointCloudRegion.cpp */,
+				6CF82D9214F398B700924B14 /* KinectCapabilities.h */,
 			);
 			path = KinectExtension;
 			sourceTree = "<group>";
@@ -141,6 +144,7 @@
 				6C0AAC1514CEA1670034797C /* KinectDeviceManager.h in Headers */,
 				6C0AAC1814CEA2910034797C /* KinectDevice.h in Headers */,
 				6C89350514E1A73900121F8F /* PointCloudRegion.h in Headers */,
+				6CF82D9314F398B700924B14 /* KinectCapabilities.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,6 +289,7 @@
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KinectExtension/KinectExtension-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "/usr/include/ni/**";
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
@@ -310,6 +315,7 @@
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KinectExtension/KinectExtension-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "/usr/include/ni/**";
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
