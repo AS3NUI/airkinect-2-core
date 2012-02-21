@@ -80,7 +80,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			}
 		}
 		
-		override protected function applyConfig():void
+		override public function applyConfig():void
 		{
 			enabled = config.pointCloudEnabled;
 			_width = config.pointCloudResolution.x;
@@ -93,9 +93,14 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 		override protected function onStart():void
 		{
 			pointBytes = new ByteArray();
+			sendConfigToContext();
+			context.call("setPointCloudRegions", nr, pointCloudRegions);
+		}
+		
+		override public function sendConfigToContext():void
+		{
 			context.call("setPointCloudEnabled", nr, enabled);
 			context.call("setPointCloudMode", nr, _width, _height, _mirrored, _density, _includeRGB);
-			context.call("setPointCloudRegions", nr, pointCloudRegions);
 		}
 		
 		override protected function onStop():void

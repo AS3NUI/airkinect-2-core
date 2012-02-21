@@ -58,7 +58,11 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			}
 		}
 		
-		protected function applyConfig():void
+		public function applyConfig():void
+		{
+		}
+		
+		public function sendConfigToContext():void
 		{
 		}
 		

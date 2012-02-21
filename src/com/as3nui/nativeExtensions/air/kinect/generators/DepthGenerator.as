@@ -38,7 +38,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			super(nr);
 		}
 		
-		override protected function applyConfig():void
+		override public function applyConfig():void
 		{
 			enabled = config.depthEnabled;
 			_width = config.depthResolution.x;
@@ -50,6 +50,11 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 		override protected function onStart():void
 		{
 			super.onStart();
+			sendConfigToContext();
+		}
+		
+		override public function sendConfigToContext():void
+		{
 			context.call("setDepthEnabled", nr, enabled);
 			context.call("setDepthMode", nr, _width, _height, _mirrored);
 			context.call("setDepthShowUserColors", nr, _showUserColors);

@@ -31,7 +31,7 @@ package com.as3nui.nativeExtensions.air.kinect
 	import com.as3nui.nativeExtensions.air.kinect.generators.RGBGenerator;
 	import com.as3nui.nativeExtensions.air.kinect.generators.UserGenerator;
 	import com.as3nui.nativeExtensions.air.kinect.generators.UserMaskGenerator;
-
+	
 	import flash.desktop.NativeApplication;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -276,49 +276,53 @@ package com.as3nui.nativeExtensions.air.kinect
 		// -------------------------------------------
 		// Real Time Adjustable config features
 		// -------------------------------------------
-		public function setSkeletonMirror(value:Boolean):void {
-			if(config.skeletonEnabled){
-				config.skeletonMirrored = value;
-				context.call("setSkeletonMode", nr, config.skeletonMirrored);
-			}
+		public function setSkeletonMirror(value:Boolean):void
+		{
+			config.skeletonMirrored = value;
+			userGenerator.applyConfig();
+			userGenerator.sendConfigToContext();
 		}
 
-		public function setDepthMirror(value:Boolean):void {
-			if(config.depthEnabled) {
-				config.depthMirrored = value;
-				context.call("setDepthMode", nr, depthGenerator.width, depthGenerator.height, config.depthMirrored);
-			}
+		public function setDepthMirror(value:Boolean):void
+		{
+			config.depthMirrored = value;
+			depthGenerator.applyConfig();
+			depthGenerator.sendConfigToContext();
 		}
 
-		public function setRGBMirror(value:Boolean):void {
-			if(config.rgbEnabled) {
-				config.rgbMirrored = value;
-				context.call("setRGBMode", nr, rgbGenerator.width, rgbGenerator.height, config.rgbMirrored);
-			}
+		public function setRGBMirror(value:Boolean):void
+		{
+			config.rgbMirrored = value;
+			rgbGenerator.applyConfig();
+			rgbGenerator.sendConfigToContext();
 		}
 
-		public function setUserMaskMirror(value:Boolean):void {
-			if(config.userMaskEnabled) {
-				config.userMaskMirrored = value;
-				context.call("setUserMaskMode", nr, userMaskGenerator.width, userMaskGenerator.height, config.userMaskMirrored);
-			}
+		public function setUserMaskMirror(value:Boolean):void
+		{
+			config.userMaskMirrored = value;
+			userMaskGenerator.applyConfig();
+			userMaskGenerator.sendConfigToContext();
 		}
 
-		public function setPointCloudMirror(value:Boolean):void {
-			if(config.pointCloudEnabled) {
-				config.pointCloudMirrored = value;
-				context.call("setPointCloudMode", nr, pointCloudGenerator.width, pointCloudGenerator.height, config.pointCloudMirrored, config.pointCloudDensity, config.pointCloudIncludeRGB);
-			}
+		public function setPointCloudMirror(value:Boolean):void
+		{
+			config.pointCloudMirrored = value;
+			pointCloudGenerator.applyConfig();
+			pointCloudGenerator.sendConfigToContext();
 		}
 
-		public function setPointCloudDensity(value:uint):void {
+		public function setPointCloudDensity(value:uint):void
+		{
 			config.pointCloudDensity = value;
-			context.call("setPointCloudMode", nr, pointCloudGenerator.width, pointCloudGenerator.height, config.pointCloudMirrored, config.pointCloudDensity, config.pointCloudIncludeRGB);
+			pointCloudGenerator.applyConfig();
+			pointCloudGenerator.sendConfigToContext();
 		}
 
-		public function setPointCloudIncludeRGB(value:Boolean):void {
+		public function setPointCloudIncludeRGB(value:Boolean):void
+		{
 			config.pointCloudIncludeRGB = value;
-			context.call("setPointCloudMode", nr, pointCloudGenerator.width, pointCloudGenerator.height, config.pointCloudMirrored, config.pointCloudDensity, config.pointCloudIncludeRGB);
+			pointCloudGenerator.applyConfig();
+			pointCloudGenerator.sendConfigToContext();
 		}
 
 		// -------------------------------------------

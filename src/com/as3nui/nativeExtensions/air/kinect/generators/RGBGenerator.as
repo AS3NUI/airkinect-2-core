@@ -16,6 +16,7 @@
 package com.as3nui.nativeExtensions.air.kinect.generators
 {
 	import com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent;
+	import com.as3nui.nativeExtensions.air.kinect.namespaces.as3nui;
 	
 	import flash.events.StatusEvent;
 	
@@ -28,7 +29,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			super(nr);
 		}
 		
-		override protected function applyConfig():void
+		override public function applyConfig():void
 		{
 			enabled = config.rgbEnabled;
 			_width = config.rgbResolution.x;
@@ -39,6 +40,11 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 		override protected function onStart():void
 		{
 			super.onStart();
+			sendConfigToContext();
+		}
+		
+		override public function sendConfigToContext():void
+		{
 			context.call("setRGBEnabled", nr, enabled);
 			context.call("setRGBMode", nr, _width, _height, _mirrored);
 		}

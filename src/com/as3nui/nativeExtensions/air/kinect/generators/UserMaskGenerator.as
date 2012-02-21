@@ -57,7 +57,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			this.userGenerator = userGenerator;
 		}
 		
-		override protected function applyConfig():void
+		override public function applyConfig():void
 		{
 			enabled = config.userMaskEnabled;
 			_width = config.userMaskResolution.x;
@@ -74,7 +74,11 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			{
 				userMaskByteArrays.push(new ByteArray());
 			}
-			
+			sendConfigToContext();
+		}
+		
+		override public function sendConfigToContext():void
+		{
 			context.call("setUserMaskEnabled", nr, enabled);
 			context.call("setUserMaskMode", nr, _width, _height, _mirrored);
 		}

@@ -84,7 +84,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			usersWithSkeletonByTrackingId = new Dictionary();
 		}
 		
-		override protected function applyConfig():void
+		override public function applyConfig():void
 		{
 			enabled = config.userEnabled;
 			_mirrored = config.userMirrored;
@@ -98,12 +98,17 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			usersByTrackingId = new Dictionary();
 			_usersWithSkeleton.length = 0;
 			usersWithSkeletonByTrackingId = new Dictionary();
+			sendConfigToContext();
+			skeletonJointNameIndices = context.call("getSkeletonJointNameIndices", nr) as Dictionary;
+			skeletonJointNames = context.call("getSkeletonJointNames", nr) as Vector.<String>;
+		}
+		
+		override public function sendConfigToContext():void
+		{
 			context.call("setUserEnabled", nr, enabled);
 			context.call("setUserMode", nr, _mirrored);
 			context.call("setSkeletonEnabled", nr, _skeletonEnabled);
 			context.call("setSkeletonMode", nr, _skeletonMirrored);
-			skeletonJointNameIndices = context.call("getSkeletonJointNameIndices", nr) as Dictionary;
-			skeletonJointNames = context.call("getSkeletonJointNames", nr) as Vector.<String>;
 		}
 		
 		override protected function onStop():void

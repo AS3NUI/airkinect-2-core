@@ -28,7 +28,7 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 			super(nr);
 		}
 		
-		override protected function applyConfig():void
+		override public function applyConfig():void
 		{
 			enabled = config.infraredEnabled;
 			_width = config.infraredResolution.x;
@@ -39,6 +39,11 @@ package com.as3nui.nativeExtensions.air.kinect.generators
 		override protected function onStart():void
 		{
 			super.onStart();
+			sendConfigToContext();
+		}
+		
+		override public function sendConfigToContext():void
+		{
 			context.call("setInfraredEnabled", nr, enabled);
 			context.call("setInfraredMode", nr, _width, _height, _mirrored);
 		}
