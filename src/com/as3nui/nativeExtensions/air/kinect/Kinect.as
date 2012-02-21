@@ -279,48 +279,46 @@ package com.as3nui.nativeExtensions.air.kinect
 		public function setSkeletonMirror(value:Boolean):void {
 			if(config.skeletonEnabled){
 				config.skeletonMirrored = value;
-				context.call("setSkeletonMirror", nr,  value);
+				context.call("setSkeletonMode", nr, config.skeletonMirrored);
 			}
 		}
 
 		public function setDepthMirror(value:Boolean):void {
 			if(config.depthEnabled) {
 				config.depthMirrored = value;
-				setImageMirror(ImageTypes.DEPTH_IMAGE,  value);
+				context.call("setDepthMode", nr, depthGenerator.width, depthGenerator.height, config.depthMirrored);
 			}
 		}
 
 		public function setRGBMirror(value:Boolean):void {
 			if(config.rgbEnabled) {
 				config.rgbMirrored = value;
-				setImageMirror(ImageTypes.RGB_IMAGE,  value);
+				context.call("setRGBMode", nr, rgbGenerator.width, rgbGenerator.height, config.rgbMirrored);
 			}
 		}
 
 		public function setUserMaskMirror(value:Boolean):void {
 			if(config.userMaskEnabled) {
 				config.userMaskMirrored = value;
-				setImageMirror(ImageTypes.USERMASK_IMAGE,  value)
+				context.call("setUserMaskMode", nr, userMaskGenerator.width, userMaskGenerator.height, config.userMaskMirrored);
 			}
 		}
 
 		public function setPointCloudMirror(value:Boolean):void {
 			if(config.pointCloudEnabled) {
 				config.pointCloudMirrored = value;
-				setImageMirror(ImageTypes.POINTCLOUD_IMAGE,  value)
+				context.call("setPointCloudMode", nr, pointCloudGenerator.width, pointCloudGenerator.height, config.pointCloudMirrored, config.pointCloudDensity, config.pointCloudIncludeRGB);
 			}
 		}
 
-		private function setImageMirror(imageType:uint, value:Boolean):void {
-			context.call("setImageMirror", nr,  imageType, value);
-		}
-
 		public function setPointCloudDensity(value:uint):void {
-			context.call("setPointCloudDensity", nr,  value);
+			config.pointCloudDensity = value;
+			context.call("setPointCloudMode", nr, pointCloudGenerator.width, pointCloudGenerator.height, config.pointCloudMirrored, config.pointCloudDensity, config.pointCloudIncludeRGB);
 		}
 
 		public function setPointCloudIncludeRGB(value:Boolean):void {
-			context.call("setPointCloudIncludeRGB", nr,  value);
+			config.pointCloudIncludeRGB = value;
+			context.call("setPointCloudMode", nr, pointCloudGenerator.width, pointCloudGenerator.height, config.pointCloudMirrored, config.pointCloudDensity, config.pointCloudIncludeRGB);
 		}
 
 		// -------------------------------------------
