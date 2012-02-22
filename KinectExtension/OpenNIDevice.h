@@ -9,9 +9,10 @@
 #ifndef KinectExtension_OpenNIDevice_h
 #define KinectExtension_OpenNIDevice_h
 
-#include <iostream>
 #include <Adobe AIR/Adobe AIR.h>
 #include <XnCppWrapper.h>
+#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include "IKinectDevice.h"
 #include "KinectSkeleton.h"
@@ -152,12 +153,12 @@ private:
     xn::Context             context;
     FREContext              freContext;
     
-    pthread_mutex_t         userMutex;
-    pthread_mutex_t         depthMutex;
-    pthread_mutex_t         rgbMutex;
-    pthread_mutex_t         userMaskMutex;
-    pthread_mutex_t         infraredMutex;
-    pthread_mutex_t         pointCloudMutex;
+    boost::mutex            userMutex;
+    boost::mutex            depthMutex;
+    boost::mutex            rgbMutex;
+    boost::mutex            userMaskMutex;
+    boost::mutex            infraredMutex;
+    boost::mutex            pointCloudMutex;
     
     kinectUserFrame         userFrame;
     uint32_t                *depthByteArray;
@@ -174,8 +175,8 @@ private:
     void                    run();
     
     static void             *deviceThread(void *ptr);
-    pthread_attr_t          attr;
-    pthread_t               posixThreadID;
+    boost::thread           mThread;
+    
     int                     returnVal;
     bool                    running;
     bool                    started;

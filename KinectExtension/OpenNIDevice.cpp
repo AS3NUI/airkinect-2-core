@@ -30,12 +30,14 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
     this->context = context;
     
     //initialize the mutexes
+    /*
     pthread_mutex_init(&userMutex, NULL);
     pthread_mutex_init(&depthMutex, NULL);
     pthread_mutex_init(&rgbMutex, NULL);
     pthread_mutex_init(&userMaskMutex, NULL);
     pthread_mutex_init(&infraredMutex, NULL);
     pthread_mutex_init(&pointCloudMutex, NULL);
+     */
     
     //set default values
     setDefaults();
@@ -268,62 +270,74 @@ unsigned int OpenNIDevice::getNumRegions(){
 
 void OpenNIDevice::lockUserMutex()
 {
-    pthread_mutex_lock(&userMutex);
+    userMutex.lock();
+    //pthread_mutex_lock(&userMutex);
 }
 
 void OpenNIDevice::unlockUserMutex()
 {
-    pthread_mutex_unlock(&userMutex);
+    userMutex.unlock();
+    //pthread_mutex_unlock(&userMutex);
 }
 
 void OpenNIDevice::lockDepthMutex()
 {
-    pthread_mutex_lock(&depthMutex);
+    depthMutex.lock();
+    //pthread_mutex_lock(&depthMutex);
 }
 
 void OpenNIDevice::unlockDepthMutex()
 {
-    pthread_mutex_unlock(&depthMutex);
+    depthMutex.unlock();
+    //pthread_mutex_unlock(&depthMutex);
 }
 
 void OpenNIDevice::lockRGBMutex()
 {
-    pthread_mutex_lock(&rgbMutex);
+    rgbMutex.lock();
+    //pthread_mutex_lock(&rgbMutex);
 }
 
 void OpenNIDevice::unlockRGBMutex()
 {
-    pthread_mutex_unlock(&rgbMutex);
+    rgbMutex.unlock();
+    //pthread_mutex_unlock(&rgbMutex);
 }
 
 void OpenNIDevice::lockUserMaskMutex()
 {
-    pthread_mutex_lock(&userMaskMutex);
+    userMaskMutex.lock();
+    //pthread_mutex_lock(&userMaskMutex);
 }
 
 void OpenNIDevice::unlockUserMaskMutex()
 {
-    pthread_mutex_unlock(&userMaskMutex);
+    userMaskMutex.unlock();
+    //pthread_mutex_unlock(&userMaskMutex);
 }
 
 void OpenNIDevice::lockInfraredMutex()
 {
-    pthread_mutex_lock(&infraredMutex);
+    infraredMutex.lock();
+    //pthread_mutex_lock(&infraredMutex);
 }
 
 void OpenNIDevice::unlockInfraredMutex()
 {
-    pthread_mutex_unlock(&infraredMutex);
+    infraredMutex.unlock();
+    //pthread_mutex_unlock(&infraredMutex);
 }
 
 void OpenNIDevice::lockPointCloudMutex()
 {
-    pthread_mutex_lock(&pointCloudMutex);
+    pointCloudMutex.lock();
+    //pthread_mutex_lock(&pointCloudMutex);
 }
 
 void OpenNIDevice::unlockPointCloudMutex()
 {
-    pthread_mutex_unlock(&pointCloudMutex);
+    pointCloudMutex.unlock();
+    //pthread_mutex_unlock(&pointCloudMutex);
 }
 
 void OpenNIDevice::start()
@@ -331,13 +345,14 @@ void OpenNIDevice::start()
     printf("OpenNIDevice::start()\n");
     if(!running)
     {
-        returnVal = pthread_attr_init(&attr);
-        returnVal = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+        //returnVal = pthread_attr_init(&attr);
+        //returnVal = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
         
         running = true;
         
-        int threadError = pthread_create(&posixThreadID, &attr, deviceThread, (void *) this);
-        printf("thread create code: %i\n", threadError);
+        //int threadError = pthread_create(&posixThreadID, &attr, deviceThread, (void *) this);
+        //printf("thread create code: %i\n", threadError);
+        mThread = boost::thread(&OpenNIDevice::deviceThread, this);
     }
 }
 
@@ -347,8 +362,9 @@ void OpenNIDevice::stop()
     if(running)
     {
         running = false;
-        int threadError = pthread_join(posixThreadID, NULL);
-        printf("thread join code: %d\n", threadError);
+        //int threadError = pthread_join(posixThreadID, NULL);
+        //printf("thread join code: %d\n", threadError);
+        mThread.join();
     }
     if(depthGenerator.IsValid())
     {
@@ -682,16 +698,16 @@ void OpenNIDevice::run()
             //rgb image
             if(asRGBEnabled)
             {
-                pthread_mutex_lock(&rgbMutex);
+                lockRGBMutex();
                 rgbFrameHandler();
-                pthread_mutex_unlock(&rgbMutex);
+                unlockRGBMutex();
                 FREDispatchStatusEventAsync(freContext, (const uint8_t*) "RGBFrame", (const uint8_t*) "");
             }
             
             //depth image
             if(asDepthEnabled)
             {
-                pthread_mutex_lock(&depthMutex);
+                lockDepthMutex();
                 if(asDepthShowUserColors)
                 {
                     depthFrameWithUserColorsHandler();
@@ -700,7 +716,7 @@ void OpenNIDevice::run()
                 {
                     depthFrameHandler();
                 }
-                pthread_mutex_unlock(&depthMutex);
+                unlockDepthMutex();
                 //dispatch depth frame event
                 FREDispatchStatusEventAsync(freContext, (const uint8_t*) "depthFrame", (const uint8_t*) "");
             }
@@ -708,9 +724,9 @@ void OpenNIDevice::run()
             //infrared image - not available when rgb is enabled
             if(asInfraredEnabled && !imageGenerator.IsGenerating())
             {
-                pthread_mutex_lock(&infraredMutex);
+                lockInfraredMutex();
                 infraredHandler();
-                pthread_mutex_unlock(&infraredMutex);
+                unlockInfraredMutex();
                 //dispatch infrared frame event
                 FREDispatchStatusEventAsync(freContext, (const uint8_t*) "infraredFrame", (const uint8_t*) "");
             }
@@ -718,7 +734,7 @@ void OpenNIDevice::run()
             //point cloud
             if(asPointCloudEnabled)
             {
-                pthread_mutex_lock(&pointCloudMutex);
+                lockPointCloudMutex();
                 if(asPointCloudIncludeRGB)
                 {
                     pointCloudWithRGBHandler();
@@ -727,25 +743,25 @@ void OpenNIDevice::run()
                 {
                     pointCloudHandler();
                 }
-                pthread_mutex_unlock(&pointCloudMutex);
+                unlockPointCloudMutex();
                 FREDispatchStatusEventAsync(freContext, (const uint8_t*) "pointCloudFrame", (const uint8_t*) "");
             }
             
             //user information
             if(asUserEnabled || asSkeletonEnabled || asUserMaskEnabled)
             {
-                pthread_mutex_lock(&userMutex);
+                lockUserMutex();
                 userHandler();
-                pthread_mutex_unlock(&userMutex);
+                unlockUserMutex();
                 FREDispatchStatusEventAsync(freContext, (const uint8_t*) "userFrame", (const uint8_t*) "");
             }
             
             //user mask image
             if(asUserMaskEnabled)
             {
-                pthread_mutex_lock(&userMaskMutex);
+                lockUserMaskMutex();
                 userMaskHandler();
-                pthread_mutex_unlock(&userMaskMutex);
+                unlockUserMaskMutex();
                 //dispatch user mask frame event
                 FREDispatchStatusEventAsync(freContext, (const uint8_t*) "userMaskFrame", (const uint8_t*) "");
             }
@@ -1260,7 +1276,7 @@ void OpenNIDevice::setDepthMode(unsigned int width, unsigned int height, bool mi
 {
     //printf("OpenNIDevice::setDepthMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
     
-    pthread_mutex_lock(&depthMutex);
+    lockDepthMutex();
     
     asDepthWidth = width;
     asDepthHeight = height;
@@ -1272,7 +1288,7 @@ void OpenNIDevice::setDepthMode(unsigned int width, unsigned int height, bool mi
     if(depthByteArray != 0) delete [] depthByteArray;
     depthByteArray = new uint32_t[asDepthPixelCount];
     
-    pthread_mutex_unlock(&depthMutex);
+    unlockDepthMutex();
 }
 
 void OpenNIDevice::setDepthEnabled(bool enabled)
@@ -1291,7 +1307,7 @@ void OpenNIDevice::setRGBMode(unsigned int width, unsigned int height, bool mirr
 {
     //printf("OpenNIDevice::setRGBMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
     
-    pthread_mutex_lock(&rgbMutex);
+    lockRGBMutex();
     
     asRGBWidth = width;
     asRGBHeight = height;
@@ -1303,7 +1319,7 @@ void OpenNIDevice::setRGBMode(unsigned int width, unsigned int height, bool mirr
     if(RGBByteArray != 0) delete [] RGBByteArray;
     RGBByteArray = new uint32_t[asRGBPixelCount];
     
-    pthread_mutex_unlock(&rgbMutex);
+    unlockRGBMutex();
 }
 
 void OpenNIDevice::setRGBEnabled(bool enabled)
@@ -1316,7 +1332,7 @@ void OpenNIDevice::setUserMaskMode(unsigned int width, unsigned int height, bool
 {
     //printf("OpenNIDevice::setUserMaskMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
     
-    pthread_mutex_lock(&userMaskMutex);
+    lockUserMaskMutex();
     
     asUserMaskWidth = width;
     asUserMaskHeight = height;
@@ -1339,7 +1355,7 @@ void OpenNIDevice::setUserMaskMode(unsigned int width, unsigned int height, bool
         userMaskByteArray[i] = new uint32_t[asUserMaskPixelCount];
     }
     
-    pthread_mutex_unlock(&userMaskMutex);
+    unlockUserMaskMutex();
 }
 
 void OpenNIDevice::setUserMaskEnabled(bool enabled)
@@ -1352,7 +1368,7 @@ void OpenNIDevice::setInfraredMode(unsigned int width, unsigned int height, bool
 {
     //printf("OpenNIDevice::setInfraredMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
     
-    pthread_mutex_lock(&infraredMutex);
+    lockInfraredMutex();
     
     asInfraredWidth = width;
     asInfraredHeight = height;
@@ -1363,7 +1379,7 @@ void OpenNIDevice::setInfraredMode(unsigned int width, unsigned int height, bool
     if(infraredByteArray != 0) delete [] infraredByteArray;
     infraredByteArray = new uint32_t[asInfraredPixelCount];
     
-    pthread_mutex_unlock(&infraredMutex);
+    unlockInfraredMutex();
 }
 
 void OpenNIDevice::setInfraredEnabled(bool enabled)
@@ -1376,7 +1392,7 @@ void OpenNIDevice::setPointCloudMode(unsigned int width, unsigned int height, bo
 {
     //printf("OpenNIDevice::setPointCloudMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
     
-    pthread_mutex_lock(&pointCloudMutex);
+    lockPointCloudMutex();
     
     asPointCloudWidth = width;
     asPointCloudHeight = height;
@@ -1396,7 +1412,7 @@ void OpenNIDevice::setPointCloudMode(unsigned int width, unsigned int height, bo
         pointCloudByteArray = new short[asPointCloudPixelCount * 3];
     }
     
-    pthread_mutex_unlock(&pointCloudMutex);
+    unlockPointCloudMutex();
 }
 
 void OpenNIDevice::setPointCloudEnabled(bool enabled)

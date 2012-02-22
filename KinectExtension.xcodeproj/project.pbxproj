@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6C01D67E14F54CB10015948C /* IKinectDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C01D67D14F54CB10015948C /* IKinectDevice.h */; };
+		6C01D68014F56BE10015948C /* libboost_thread.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C01D67F14F56BE10015948C /* libboost_thread.a */; };
 		6C0AAC1514CEA1670034797C /* KinectDeviceManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C0AAC1414CEA1670034797C /* KinectDeviceManager.h */; };
 		6C0AAC1814CEA2910034797C /* OpenNIDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C0AAC1714CEA2910034797C /* OpenNIDevice.h */; };
 		6C0AAC1C14CEA4450034797C /* KinectDeviceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C0AAC1B14CEA4450034797C /* KinectDeviceManager.cpp */; };
@@ -25,6 +26,7 @@
 
 /* Begin PBXFileReference section */
 		6C01D67D14F54CB10015948C /* IKinectDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IKinectDevice.h; sourceTree = "<group>"; };
+		6C01D67F14F56BE10015948C /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libboost_thread.a; sourceTree = "<group>"; };
 		6C0AAC1414CEA1670034797C /* KinectDeviceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectDeviceManager.h; sourceTree = "<group>"; };
 		6C0AAC1714CEA2910034797C /* OpenNIDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenNIDevice.h; sourceTree = "<group>"; };
 		6C0AAC1B14CEA4450034797C /* KinectDeviceManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KinectDeviceManager.cpp; sourceTree = "<group>"; };
@@ -55,6 +57,7 @@
 				6CD9764114C85B990061A00B /* Cocoa.framework in Frameworks */,
 				6CD9765714C85BF80061A00B /* libOpenNI.dylib in Frameworks */,
 				6CD9765914C85C2B0061A00B /* Adobe AIR.framework in Frameworks */,
+				6C01D68014F56BE10015948C /* libboost_thread.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,6 +134,7 @@
 		6CD9765514C85BB70061A00B /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				6C01D67F14F56BE10015948C /* libboost_thread.a */,
 				6CD9765614C85BF80061A00B /* libOpenNI.dylib */,
 			);
 			name = Libraries;
@@ -294,7 +298,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KinectExtension/KinectExtension-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				HEADER_SEARCH_PATHS = "/usr/include/ni/**";
+				HEADER_SEARCH_PATHS = (
+					/Users/wouter/Documents/experiments/boost_1_48_0,
+					"/usr/include/ni/**",
+				);
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../runtimes/air/mac @executable_path/../Frameworks /Library/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -323,7 +330,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KinectExtension/KinectExtension-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
-				HEADER_SEARCH_PATHS = "/usr/include/ni/**";
+				HEADER_SEARCH_PATHS = (
+					/Users/wouter/Documents/experiments/boost_1_48_0,
+					"/usr/include/ni/**",
+				);
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../runtimes/air/mac @executable_path/../Frameworks /Library/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
