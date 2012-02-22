@@ -19,6 +19,7 @@ typedef struct {
 	bool			hasUserMaskSupport;
 	bool			hasInfraredSupport;
 	bool			hasSkeletonSupport;
+	bool			hasAdvancedJointSupport;
 	bool			hasJointOrientationSupport;
 	bool			hasJointOrientationConfidenceSupport;
 	bool			hasPositionConfidenceSupport;
@@ -32,8 +33,6 @@ typedef struct {
         FREObject capabilities;
         
         FREObject freObject;
-        
-        
         
         FRENewObject((const uint8_t*)"Object", 0, NULL, &capabilities, NULL);
         
@@ -64,6 +63,9 @@ typedef struct {
         
         FRENewObjectFromBool(hasSkeletonSupport, &freObject);
         FRESetObjectProperty(capabilities, (const uint8_t*)"hasSkeletonSupport", freObject, NULL);
+        
+        FRENewObjectFromBool(hasAdvancedJointSupport, &freObject);
+        FRESetObjectProperty(capabilities, (const uint8_t*)"hasAdvancedJointSupport", freObject, NULL);
         
         FRENewObjectFromBool(hasJointOrientationSupport, &freObject);
         FRESetObjectProperty(capabilities, (const uint8_t*)"hasJointOrientationSupport", freObject, NULL);

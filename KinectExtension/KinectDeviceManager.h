@@ -12,7 +12,7 @@
 #include <map>
 #include <Adobe AIR/Adobe AIR.h>
 #include <XnCppWrapper.h>
-#include "KinectDevice.h"
+#include "IKinectDevice.h"
 
 class KinectDeviceManager
 {
@@ -25,7 +25,7 @@ public:
     void                            startUp();
     void                            shutDown();
     FREObject						getCapabilities();
-    KinectDevice                    *getDevice(int nr, FREContext freContext);
+    IKinectDevice                    *getDevice(int nr, FREContext freContext);
     
 private:
     xn::Context                     context;
@@ -33,7 +33,7 @@ private:
     bool                            started;
     
     int                             numDevices;
-    std::map<int, KinectDevice*>    deviceMap;
+    std::map<int, IKinectDevice*>    deviceMap;
 };
 
 #endif

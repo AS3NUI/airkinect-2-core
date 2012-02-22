@@ -1,5 +1,5 @@
 //
-//  KinectDevice.cpp
+//  OpenNIDevice.cpp
 //  KinectExtension
 //
 //  Created by Wouter Verweirder on 24/01/12.
@@ -8,26 +8,7 @@
 
 #include <iostream>
 #include <math.h>
-#include "KinectDevice.h"
-
-//colors for depth image
-/*
-const XnFloat Colors[][3] =
-{
-	{0.0f,1.0f,1.0f},
-	{0.0f,0.0f,1.0f},
-	{0.0f,1.0f,0.0f},
-	{1.0f,1.0f,0.0f},
-	{1.0f,0.0f,0.0f},
-	{1.0f,0.5f,0.0f},
-	{0.5f,1.0f,0.0f},
-	{0.0f,0.5f,1.0f},
-	{0.5f,0.0f,1.0f},
-	{1.0f,1.0f,0.5f},
-	{1.0f,1.0f,1.0f}
-};
-const XnUInt32 nColors = 10;
-*/
+#include "OpenNIDevice.h"
 
 XnBool needPose = FALSE;
 XnChar strPose[20] = "";
@@ -41,9 +22,9 @@ void XN_CALLBACK_TYPE outOfPoseCallback(xn::PoseDetectionCapability& rCapability
 void XN_CALLBACK_TYPE calibrationStartCallback(xn::SkeletonCapability& rCapability, XnUserID nID, void* pCookie);
 void XN_CALLBACK_TYPE calibrationCompleteCallback(xn::SkeletonCapability& rCapability, XnUserID nID, XnCalibrationStatus calibrationError, void* pCookie);
 
-KinectDevice::KinectDevice(int nr, xn::Context context)
+OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
 {
-    printf("KinectDevice::KinectDevice(%i)\n", nr);
+    printf("OpenNIDevice::OpenNIDevice(%i)\n", nr);
     this->nr = nr;
     this->freContext = freContext;
     this->context = context;
@@ -60,7 +41,17 @@ KinectDevice::KinectDevice(int nr, xn::Context context)
     setDefaults();
 }
 
-void KinectDevice::setDefaults()
+void OpenNIDevice::setFreContext(FREContext pFreContext)
+{
+	freContext = pFreContext;
+}
+
+FREContext OpenNIDevice::getFreContext()
+{
+	return freContext;
+}
+
+void OpenNIDevice::setDefaults()
 {
     //set some default values
     running = false;
@@ -169,71 +160,175 @@ void KinectDevice::setDefaults()
 	setUserColor(15, 0x0000ff, 1);
 }
 
-int KinectDevice::getAsDepthWidth()
+kinectUserFrame OpenNIDevice::getUserFrameBuffer(){
+	return userFrame;
+}
+
+int OpenNIDevice::getAsDepthWidth()
 {
     return asDepthWidth;
 }
 
-int KinectDevice::getAsDepthHeight()
+int OpenNIDevice::getAsDepthHeight()
 {
     return asDepthHeight;
 }
 
-int KinectDevice::getAsRGBWidth()
+uint32_t* OpenNIDevice::getAsDepthByteArray(){
+	return depthByteArray;
+}
+
+int OpenNIDevice::getAsRGBWidth()
 {
     return asRGBWidth;
 }
 
-int KinectDevice::getAsRGBHeight()
+uint32_t* OpenNIDevice::getAsRGBByteArray(){
+	return RGBByteArray;
+}
+
+int OpenNIDevice::getAsRGBHeight()
 {
     return asRGBHeight;
 }
 
-int KinectDevice::getAsUserMaskWidth()
-{
-    return asUserMaskWidth;
-}
-
-int KinectDevice::getAsUserMaskHeight()
-{
-    return asUserMaskHeight;
-}
-
-int KinectDevice::getAsInfraredWidth()
+int OpenNIDevice::getAsInfraredWidth()
 {
     return asInfraredWidth;
 }
 
-int KinectDevice::getAsInfraredHeight()
+int OpenNIDevice::getAsInfraredHeight()
 {
     return asInfraredHeight;
 }
 
-int KinectDevice::getAsPointCloudWidth()
+uint32_t* OpenNIDevice::getAsInfraredByteArray(){
+	return infraredByteArray;
+}
+
+int OpenNIDevice::getAsUserMaskWidth()
+{
+    return asUserMaskWidth;
+}
+
+int OpenNIDevice::getAsUserMaskHeight()
+{
+    return asUserMaskHeight;
+}
+
+uint32_t* OpenNIDevice::getAsUserMaskByteArray(int userID){
+	return userMaskByteArray[userID];
+}
+
+int OpenNIDevice::getAsPointCloudWidth()
 {
     return asPointCloudWidth;
 }
 
-int KinectDevice::getAsPointCloudHeight()
+int OpenNIDevice::getAsPointCloudHeight()
 {
     return asPointCloudHeight;
 }
 
-int KinectDevice::getAsPointCloudByteArrayLength()
+bool OpenNIDevice::getASPointCloudMirror(){
+	return asPointCloudMirrored;
+}
+
+int OpenNIDevice::getASPointCloudDensity(){
+	return asPointCloudDensity;
+}
+
+bool OpenNIDevice::getASPointCloudIncludeRGB(){
+	return asPointCloudIncludeRGB;
+}
+
+int OpenNIDevice::getAsPointCloudByteArrayLength()
 {
     if(asPointCloudIncludeRGB)
     {
-        return (asPointCloudPixelCount * sizeof(ushort) * 6);
+        return (asPointCloudWidth * asPointCloudHeight * sizeof(short) * 6) / asPointCloudDensity;
     }
     else
     {
-        return (asPointCloudPixelCount * sizeof(ushort) * 3);
+        return (asPointCloudWidth * asPointCloudHeight * sizeof(short) * 3) / asPointCloudDensity;
     }
 }
 
-void KinectDevice::start()
+short* OpenNIDevice::getAsPointCloudByteArray(){
+	return pointCloudByteArray;
+}
+
+PointCloudRegion* OpenNIDevice::getPointCloudRegions(){
+	return pointCloudRegions;
+}
+
+unsigned int OpenNIDevice::getNumRegions(){
+	return numRegions;
+}
+
+void OpenNIDevice::lockUserMutex()
 {
-    printf("KinectDevice::start()\n");
+    pthread_mutex_lock(&userMutex);
+}
+
+void OpenNIDevice::unlockUserMutex()
+{
+    pthread_mutex_unlock(&userMutex);
+}
+
+void OpenNIDevice::lockDepthMutex()
+{
+    pthread_mutex_lock(&depthMutex);
+}
+
+void OpenNIDevice::unlockDepthMutex()
+{
+    pthread_mutex_unlock(&depthMutex);
+}
+
+void OpenNIDevice::lockRGBMutex()
+{
+    pthread_mutex_lock(&rgbMutex);
+}
+
+void OpenNIDevice::unlockRGBMutex()
+{
+    pthread_mutex_unlock(&rgbMutex);
+}
+
+void OpenNIDevice::lockUserMaskMutex()
+{
+    pthread_mutex_lock(&userMaskMutex);
+}
+
+void OpenNIDevice::unlockUserMaskMutex()
+{
+    pthread_mutex_unlock(&userMaskMutex);
+}
+
+void OpenNIDevice::lockInfraredMutex()
+{
+    pthread_mutex_lock(&infraredMutex);
+}
+
+void OpenNIDevice::unlockInfraredMutex()
+{
+    pthread_mutex_unlock(&infraredMutex);
+}
+
+void OpenNIDevice::lockPointCloudMutex()
+{
+    pthread_mutex_lock(&pointCloudMutex);
+}
+
+void OpenNIDevice::unlockPointCloudMutex()
+{
+    pthread_mutex_unlock(&pointCloudMutex);
+}
+
+void OpenNIDevice::start()
+{
+    printf("OpenNIDevice::start()\n");
     if(!running)
     {
         returnVal = pthread_attr_init(&attr);
@@ -246,9 +341,9 @@ void KinectDevice::start()
     }
 }
 
-void KinectDevice::stop()
+void OpenNIDevice::stop()
 {
-    printf("KinectDevice::stop()\n");
+    printf("OpenNIDevice::stop()\n");
     if(running)
     {
         running = false;
@@ -332,16 +427,16 @@ void KinectDevice::stop()
     }
 }
 
-void * KinectDevice::deviceThread(void *self)
+void * OpenNIDevice::deviceThread(void *self)
 {
-    KinectDevice *adapter = (KinectDevice *) self;
+    OpenNIDevice *adapter = (OpenNIDevice *) self;
     adapter->run();
     return NULL;
 }
 
-void KinectDevice::run()
+void OpenNIDevice::run()
 {
-    printf("KinectDevice::run(), %s\n", (running) ? "true" : "false");
+    printf("OpenNIDevice::run(), %s\n", (running) ? "true" : "false");
     if(running)
     {  
         XnStatus rc;
@@ -354,7 +449,7 @@ void KinectDevice::run()
         rc = depthGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
-            printf("KinectDevice create depthGenerator failed: %s\n", xnGetStatusString(rc));
+            printf("OpenNIDevice create depthGenerator failed: %s\n", xnGetStatusString(rc));
             stop();
             return;
         }
@@ -376,7 +471,7 @@ void KinectDevice::run()
         rc = imageGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
-            printf("KinectDevice create imageGenerator failed: %s\n", xnGetStatusString(rc));
+            printf("OpenNIDevice create imageGenerator failed: %s\n", xnGetStatusString(rc));
             stop();
             return;
         }
@@ -398,7 +493,7 @@ void KinectDevice::run()
         rc = infraredGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
-            printf("KinectDevice create infraredGenerator failed: %s\n", xnGetStatusString(rc));
+            printf("OpenNIDevice create infraredGenerator failed: %s\n", xnGetStatusString(rc));
             stop();
             return;
         }
@@ -419,7 +514,7 @@ void KinectDevice::run()
         rc = userGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
-            printf("KinectDevice create userGenerator failed: %s\n", xnGetStatusString(rc));
+            printf("OpenNIDevice create userGenerator failed: %s\n", xnGetStatusString(rc));
             stop();
             return;
         }
@@ -479,7 +574,7 @@ void KinectDevice::run()
             rc = depthGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
-                printf("KinectDevice start depthGenerator failed: %s\n", xnGetStatusString(rc));
+                printf("OpenNIDevice start depthGenerator failed: %s\n", xnGetStatusString(rc));
                 stop();
                 return;
             }
@@ -489,7 +584,7 @@ void KinectDevice::run()
             rc = imageGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
-                printf("KinectDevice start imageGenerator failed: %s\n", xnGetStatusString(rc));
+                printf("OpenNIDevice start imageGenerator failed: %s\n", xnGetStatusString(rc));
                 stop();
                 return;
             }
@@ -499,7 +594,7 @@ void KinectDevice::run()
             rc = userGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
-                printf("KinectDevice start userGenerator failed: %s\n", xnGetStatusString(rc));
+                printf("OpenNIDevice start userGenerator failed: %s\n", xnGetStatusString(rc));
                 stop();
                 return;
             }
@@ -510,7 +605,7 @@ void KinectDevice::run()
             rc = infraredGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
-                printf("KinectDevice start infraredGenerator failed: %s\n", xnGetStatusString(rc));
+                printf("OpenNIDevice start infraredGenerator failed: %s\n", xnGetStatusString(rc));
                 stop();
                 return;
             }
@@ -658,7 +753,7 @@ void KinectDevice::run()
     }
 }
 
-void KinectDevice::rgbFrameHandler()
+void OpenNIDevice::rgbFrameHandler()
 {
     RGBFrameBuffer = imageMetaData.RGB24Data();
     
@@ -679,7 +774,7 @@ void KinectDevice::rgbFrameHandler()
     }
 }
 
-void KinectDevice::depthFrameHandler()
+void OpenNIDevice::depthFrameHandler()
 {
     depthFrameBuffer = depthMetaData.Data();
     
@@ -716,7 +811,7 @@ void KinectDevice::depthFrameHandler()
     }
 }
 
-void KinectDevice::depthFrameWithUserColorsHandler()
+void OpenNIDevice::depthFrameWithUserColorsHandler()
 {
     depthFrameBuffer = depthMetaData.Data();
     sceneFrameBuffer = sceneMetaData.Data();
@@ -777,7 +872,7 @@ void KinectDevice::depthFrameWithUserColorsHandler()
     }
 }
 
-void KinectDevice::userMaskHandler()
+void OpenNIDevice::userMaskHandler()
 {
     //we need depth, rgb & scene info
     RGBFrameBuffer = imageMetaData.RGB24Data();
@@ -812,7 +907,7 @@ void KinectDevice::userMaskHandler()
     
 }
 
-void KinectDevice::infraredHandler()
+void OpenNIDevice::infraredHandler()
 {
     infraredFrameBuffer = infraredMetaData.Data();
     
@@ -843,11 +938,11 @@ void KinectDevice::infraredHandler()
     }
 }
 
-void KinectDevice::pointCloudHandler()
+void OpenNIDevice::pointCloudHandler()
 {
     depthFrameBuffer = depthMetaData.Data();
     
-    ushort *pointCloudRun = pointCloudByteArray;
+    short *pointCloudRun = pointCloudByteArray;
     int direction = asPointCloudMirrored ? -1 : 1;
     int directionFactor = asPointCloudMirrored ? 1 : 0;
     
@@ -891,12 +986,12 @@ void KinectDevice::pointCloudHandler()
     }
 }
 
-void KinectDevice::pointCloudWithRGBHandler()
+void OpenNIDevice::pointCloudWithRGBHandler()
 {
     RGBFrameBuffer = imageMetaData.RGB24Data();
     depthFrameBuffer = depthMetaData.Data();
     
-    ushort *pointCloudRun = pointCloudByteArray;
+    short *pointCloudRun = pointCloudByteArray;
     int direction = asPointCloudMirrored ? -1 : 1;
     int directionFactor = asPointCloudMirrored ? 1 : 0;
     
@@ -948,7 +1043,7 @@ void KinectDevice::pointCloudWithRGBHandler()
     }
 }
 
-void KinectDevice::userHandler()
+void OpenNIDevice::userHandler()
 {
     //clear the current users
     memset(&userFrame.users[0], 0, sizeof(userFrame.users));
@@ -1041,7 +1136,7 @@ void KinectDevice::userHandler()
     
 }
 
-void KinectDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex)
+void OpenNIDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex)
 {
     float jointPositionX, jointPositionY, jointPositionZ, jointW, jointPositionConfidence;
     
@@ -1094,7 +1189,7 @@ void KinectDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJ
     kUser.joints[targetIndex].depthY = (int) (kUser.joints[targetIndex].depthRelativeY * asDepthHeight);
 }
 
-void KinectDevice::calculateHistogram()
+void OpenNIDevice::calculateHistogram()
 {
     depthFrameBuffer = depthMetaData.Data();
     
@@ -1127,13 +1222,13 @@ void KinectDevice::calculateHistogram()
     }
 }
 
-void KinectDevice::setUserMode(bool mirrored)
+void OpenNIDevice::setUserMode(bool mirrored)
 {
-    //printf("KinectDevice::setUserMode(%s)\n", (mirrored) ? "true" : "false");
+    //printf("OpenNIDevice::setUserMode(%s)\n", (mirrored) ? "true" : "false");
     asUserMirrored = mirrored;
 }
 
-void KinectDevice::setUserColor(int userID, int color, bool useIntensity)
+void OpenNIDevice::setUserColor(int userID, int color, bool useIntensity)
 {
 	if(userID > MAX_SKELETONS) return;
 	
@@ -1143,27 +1238,27 @@ void KinectDevice::setUserColor(int userID, int color, bool useIntensity)
     userIndexColors[userID - 1][3] = useIntensity ? 1 : 0;
 }
 
-void KinectDevice::setUserEnabled(bool enabled)
+void OpenNIDevice::setUserEnabled(bool enabled)
 {
-    //printf("KinectDevice::setSkeletonEnabled(%s)\n", (enabled) ? "true" : "false");
+    //printf("OpenNIDevice::setSkeletonEnabled(%s)\n", (enabled) ? "true" : "false");
     asUserEnabled = enabled;
 }
 
-void KinectDevice::setSkeletonMode(bool mirrored)
+void OpenNIDevice::setSkeletonMode(bool mirrored)
 {
-    //printf("KinectDevice::setSkeletonMode(%s)\n", (mirrored) ? "true" : "false");
+    //printf("OpenNIDevice::setSkeletonMode(%s)\n", (mirrored) ? "true" : "false");
     asSkeletonMirrored = mirrored;
 }
 
-void KinectDevice::setSkeletonEnabled(bool enabled)
+void OpenNIDevice::setSkeletonEnabled(bool enabled)
 {
-    //printf("KinectDevice::setSkeletonEnabled(%s)\n", (enabled) ? "true" : "false");
+    //printf("OpenNIDevice::setSkeletonEnabled(%s)\n", (enabled) ? "true" : "false");
     asSkeletonEnabled = enabled;
 }
 
-void KinectDevice::setDepthMode(unsigned int width, unsigned int height, bool mirrored)
+void OpenNIDevice::setDepthMode(unsigned int width, unsigned int height, bool mirrored)
 {
-    //printf("KinectDevice::setDepthMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
+    //printf("OpenNIDevice::setDepthMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
     
     pthread_mutex_lock(&depthMutex);
     
@@ -1180,21 +1275,21 @@ void KinectDevice::setDepthMode(unsigned int width, unsigned int height, bool mi
     pthread_mutex_unlock(&depthMutex);
 }
 
-void KinectDevice::setDepthEnabled(bool enabled)
+void OpenNIDevice::setDepthEnabled(bool enabled)
 {
-    //printf("KinectDevice::setDepthEnabled(%s)\n", (enabled) ? "true" : "false");
+    //printf("OpenNIDevice::setDepthEnabled(%s)\n", (enabled) ? "true" : "false");
     asDepthEnabled = enabled;
 }
 
-void KinectDevice::setDepthShowUserColors(bool show)
+void OpenNIDevice::setDepthShowUserColors(bool show)
 {
-    //printf("KinectDevice::setDepthShowUserColors(%s)\n", (show) ? "true" : "false");
+    //printf("OpenNIDevice::setDepthShowUserColors(%s)\n", (show) ? "true" : "false");
     asDepthShowUserColors = show;
 }
 
-void KinectDevice::setRGBMode(unsigned int width, unsigned int height, bool mirrored)
+void OpenNIDevice::setRGBMode(unsigned int width, unsigned int height, bool mirrored)
 {
-    //printf("KinectDevice::setRGBMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
+    //printf("OpenNIDevice::setRGBMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
     
     pthread_mutex_lock(&rgbMutex);
     
@@ -1211,15 +1306,15 @@ void KinectDevice::setRGBMode(unsigned int width, unsigned int height, bool mirr
     pthread_mutex_unlock(&rgbMutex);
 }
 
-void KinectDevice::setRGBEnabled(bool enabled)
+void OpenNIDevice::setRGBEnabled(bool enabled)
 {
-    //printf("KinectDevice::setRGBEnabled(%s)\n", (enabled) ? "true" : "false");
+    //printf("OpenNIDevice::setRGBEnabled(%s)\n", (enabled) ? "true" : "false");
     asRGBEnabled = enabled;
 }
 
-void KinectDevice::setUserMaskMode(unsigned int width, unsigned int height, bool mirrored)
+void OpenNIDevice::setUserMaskMode(unsigned int width, unsigned int height, bool mirrored)
 {
-    //printf("KinectDevice::setUserMaskMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
+    //printf("OpenNIDevice::setUserMaskMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
     
     pthread_mutex_lock(&userMaskMutex);
     
@@ -1247,15 +1342,15 @@ void KinectDevice::setUserMaskMode(unsigned int width, unsigned int height, bool
     pthread_mutex_unlock(&userMaskMutex);
 }
 
-void KinectDevice::setUserMaskEnabled(bool enabled)
+void OpenNIDevice::setUserMaskEnabled(bool enabled)
 {
-    //printf("KinectDevice::setUserMaskEnabled(%s)\n", (enabled) ? "true" : "false");
+    //printf("OpenNIDevice::setUserMaskEnabled(%s)\n", (enabled) ? "true" : "false");
     asUserMaskEnabled = enabled;
 }
 
-void KinectDevice::setInfraredMode(unsigned int width, unsigned int height, bool mirrored)
+void OpenNIDevice::setInfraredMode(unsigned int width, unsigned int height, bool mirrored)
 {
-    //printf("KinectDevice::setInfraredMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
+    //printf("OpenNIDevice::setInfraredMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
     
     pthread_mutex_lock(&infraredMutex);
     
@@ -1271,15 +1366,15 @@ void KinectDevice::setInfraredMode(unsigned int width, unsigned int height, bool
     pthread_mutex_unlock(&infraredMutex);
 }
 
-void KinectDevice::setInfraredEnabled(bool enabled)
+void OpenNIDevice::setInfraredEnabled(bool enabled)
 {
-    //printf("KinectDevice::setInfraredEnabled(%s)\n", (enabled) ? "true" : "false");
+    //printf("OpenNIDevice::setInfraredEnabled(%s)\n", (enabled) ? "true" : "false");
     asInfraredEnabled = enabled;
 }
 
-void KinectDevice::setPointCloudMode(unsigned int width, unsigned int height, bool mirrored, unsigned int density, bool includeRGB)
+void OpenNIDevice::setPointCloudMode(unsigned int width, unsigned int height, bool mirrored, unsigned int density, bool includeRGB)
 {
-    //printf("KinectDevice::setPointCloudMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
+    //printf("OpenNIDevice::setPointCloudMode(%i, %i, %s)\n", width, height, (mirrored) ? "true" : "false");
     
     pthread_mutex_lock(&pointCloudMutex);
     
@@ -1294,31 +1389,31 @@ void KinectDevice::setPointCloudMode(unsigned int width, unsigned int height, bo
     if(pointCloudByteArray != 0) delete [] pointCloudByteArray;
     if(asPointCloudIncludeRGB)
     {
-        pointCloudByteArray = new ushort[asPointCloudPixelCount * 6];
+        pointCloudByteArray = new short[asPointCloudPixelCount * 6];
     }
     else
     {
-        pointCloudByteArray = new ushort[asPointCloudPixelCount * 3];
+        pointCloudByteArray = new short[asPointCloudPixelCount * 3];
     }
     
     pthread_mutex_unlock(&pointCloudMutex);
 }
 
-void KinectDevice::setPointCloudEnabled(bool enabled)
+void OpenNIDevice::setPointCloudEnabled(bool enabled)
 {
-    //printf("KinectDevice::setPointCloudEnabled(%s)\n", (enabled) ? "true" : "false");
+    //printf("OpenNIDevice::setPointCloudEnabled(%s)\n", (enabled) ? "true" : "false");
     asPointCloudEnabled = enabled;
 }
 
-void KinectDevice::setPointCloudRegions(PointCloudRegion *pointCloudRegions, unsigned int numRegions)
+void OpenNIDevice::setPointCloudRegions(PointCloudRegion *pointCloudRegions, unsigned int numRegions)
 {
     this->pointCloudRegions = pointCloudRegions;
     this->numRegions = numRegions;
 }
 
-void KinectDevice::dispose()
+void OpenNIDevice::dispose()
 {
-    printf("KinectDevice::dispose()\n");
+    printf("OpenNIDevice::dispose()\n");
     //make sure threads are stopped
     stop();
     //the context of this instance will be destroyed, cleanup everything of this instance

@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include "KinectDeviceManager.h"
+#include "OpenNIDevice.h"
 
 KinectDeviceManager::KinectDeviceManager()
 {
@@ -42,7 +43,7 @@ FREObject KinectDeviceManager::getCapabilities()
 {
     KinectCapabilities kinectCapabilities;
     
-	kinectCapabilities = KinectDevice::getCapabilities();
+	kinectCapabilities = OpenNIDevice::getCapabilities();
     
 	return kinectCapabilities.asFREObject();
 }
@@ -87,23 +88,23 @@ void KinectDeviceManager::shutDown()
     }
 }
 
-KinectDevice *KinectDeviceManager::getDevice(int nr, FREContext freContext)
+IKinectDevice *KinectDeviceManager::getDevice(int nr, FREContext freContext)
 {
     //printf("KinectDeviceManager::getDevice()\n");
-    KinectDevice* instance = NULL;
-    std::map<int, KinectDevice*>::iterator it = deviceMap.find(nr);
+    IKinectDevice* instance = NULL;
+    std::map<int, IKinectDevice*>::iterator it = deviceMap.find(nr);
     
     if (it != deviceMap.end())
     {
-        instance = (KinectDevice*)(it->second);
+        instance = (IKinectDevice*)(it->second);
     }
     else
     {
-        instance = new KinectDevice(nr, context);
+        instance = (IKinectDevice *) (new OpenNIDevice(nr, context));
         deviceMap[nr] = instance;
     }
     
-    instance->freContext = freContext;
+    instance->setFreContext(freContext);
     
     return instance;
 }

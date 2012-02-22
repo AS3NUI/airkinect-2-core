@@ -7,10 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6C01D67E14F54CB10015948C /* IKinectDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C01D67D14F54CB10015948C /* IKinectDevice.h */; };
 		6C0AAC1514CEA1670034797C /* KinectDeviceManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C0AAC1414CEA1670034797C /* KinectDeviceManager.h */; };
-		6C0AAC1814CEA2910034797C /* KinectDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C0AAC1714CEA2910034797C /* KinectDevice.h */; };
+		6C0AAC1814CEA2910034797C /* OpenNIDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C0AAC1714CEA2910034797C /* OpenNIDevice.h */; };
 		6C0AAC1C14CEA4450034797C /* KinectDeviceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C0AAC1B14CEA4450034797C /* KinectDeviceManager.cpp */; };
-		6C0AAC1E14CEA46A0034797C /* KinectDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C0AAC1D14CEA46A0034797C /* KinectDevice.cpp */; };
+		6C0AAC1E14CEA46A0034797C /* OpenNIDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C0AAC1D14CEA46A0034797C /* OpenNIDevice.cpp */; };
 		6C3CEAA014CC245F00A00A5C /* KinectSkeleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C3CEA9F14CC245F00A00A5C /* KinectSkeleton.h */; };
 		6C89350514E1A73900121F8F /* PointCloudRegion.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C89350414E1A73900121F8F /* PointCloudRegion.h */; };
 		6C89350814E1A78000121F8F /* PointCloudRegion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C89350714E1A77F00121F8F /* PointCloudRegion.cpp */; };
@@ -23,10 +24,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6C01D67D14F54CB10015948C /* IKinectDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IKinectDevice.h; sourceTree = "<group>"; };
 		6C0AAC1414CEA1670034797C /* KinectDeviceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectDeviceManager.h; sourceTree = "<group>"; };
-		6C0AAC1714CEA2910034797C /* KinectDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectDevice.h; sourceTree = "<group>"; };
+		6C0AAC1714CEA2910034797C /* OpenNIDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenNIDevice.h; sourceTree = "<group>"; };
 		6C0AAC1B14CEA4450034797C /* KinectDeviceManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KinectDeviceManager.cpp; sourceTree = "<group>"; };
-		6C0AAC1D14CEA46A0034797C /* KinectDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KinectDevice.cpp; sourceTree = "<group>"; };
+		6C0AAC1D14CEA46A0034797C /* OpenNIDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenNIDevice.cpp; sourceTree = "<group>"; };
 		6C3CEA9F14CC245F00A00A5C /* KinectSkeleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectSkeleton.h; sourceTree = "<group>"; };
 		6C89350414E1A73900121F8F /* PointCloudRegion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointCloudRegion.h; sourceTree = "<group>"; };
 		6C89350714E1A77F00121F8F /* PointCloudRegion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointCloudRegion.cpp; sourceTree = "<group>"; };
@@ -105,12 +107,13 @@
 				6CD9764714C85B990061A00B /* Supporting Files */,
 				6C3CEA9F14CC245F00A00A5C /* KinectSkeleton.h */,
 				6C0AAC1414CEA1670034797C /* KinectDeviceManager.h */,
-				6C0AAC1714CEA2910034797C /* KinectDevice.h */,
+				6C0AAC1714CEA2910034797C /* OpenNIDevice.h */,
 				6C0AAC1B14CEA4450034797C /* KinectDeviceManager.cpp */,
-				6C0AAC1D14CEA46A0034797C /* KinectDevice.cpp */,
+				6C0AAC1D14CEA46A0034797C /* OpenNIDevice.cpp */,
 				6C89350414E1A73900121F8F /* PointCloudRegion.h */,
 				6C89350714E1A77F00121F8F /* PointCloudRegion.cpp */,
 				6CF82D9214F398B700924B14 /* KinectCapabilities.h */,
+				6C01D67D14F54CB10015948C /* IKinectDevice.h */,
 			);
 			path = KinectExtension;
 			sourceTree = "<group>";
@@ -142,9 +145,10 @@
 			files = (
 				6C3CEAA014CC245F00A00A5C /* KinectSkeleton.h in Headers */,
 				6C0AAC1514CEA1670034797C /* KinectDeviceManager.h in Headers */,
-				6C0AAC1814CEA2910034797C /* KinectDevice.h in Headers */,
+				6C0AAC1814CEA2910034797C /* OpenNIDevice.h in Headers */,
 				6C89350514E1A73900121F8F /* PointCloudRegion.h in Headers */,
 				6CF82D9314F398B700924B14 /* KinectCapabilities.h in Headers */,
+				6C01D67E14F54CB10015948C /* IKinectDevice.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,7 +216,7 @@
 			files = (
 				6CD9764F14C85B990061A00B /* KinectExtension.cpp in Sources */,
 				6C0AAC1C14CEA4450034797C /* KinectDeviceManager.cpp in Sources */,
-				6C0AAC1E14CEA46A0034797C /* KinectDevice.cpp in Sources */,
+				6C0AAC1E14CEA46A0034797C /* OpenNIDevice.cpp in Sources */,
 				6C89350814E1A78000121F8F /* PointCloudRegion.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -292,11 +296,14 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "/usr/include/ni/**";
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../runtimes/air/mac @executable_path/../Frameworks /Library/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.6;
 				VALID_ARCHS = i386;
 				WRAPPER_EXTENSION = framework;
 			};
@@ -318,11 +325,14 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "/usr/include/ni/**";
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../runtimes/air/mac @executable_path/../Frameworks /Library/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx10.6;
 				VALID_ARCHS = i386;
 				WRAPPER_EXTENSION = framework;
 			};

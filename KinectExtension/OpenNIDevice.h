@@ -1,22 +1,24 @@
 //
-//  KinectDevice.h
+//  OpenNIDevice.h
 //  KinectExtension
 //
 //  Created by Wouter Verweirder on 24/01/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#ifndef KinectExtension_KinectDevice_h
-#define KinectExtension_KinectDevice_h
+#ifndef KinectExtension_OpenNIDevice_h
+#define KinectExtension_OpenNIDevice_h
 
 #include <iostream>
 #include <Adobe AIR/Adobe AIR.h>
 #include <XnCppWrapper.h>
+
+#include "IKinectDevice.h"
 #include "KinectSkeleton.h"
 #include "KinectCapabilities.h"
 #include "PointCloudRegion.h"
 
-class KinectDevice
+class OpenNIDevice : IKinectDevice
 {
     static const int        MAX_DEPTH = 10000;
 public:
@@ -42,73 +44,130 @@ public:
 		return kinectCapabilities;
 	};
     
-    KinectDevice(int nr, xn::Context context);
+    OpenNIDevice(int nr, xn::Context context);
     
-    FREContext              freContext;
+    //Getter/Setters for FREContext
+    FREContext			getFreContext();
+	void				setFreContext(FREContext pFreContext);
     
-    void                    start();
-    void                    stop();
+	//Starts and Sotp the Kinect Device
+    void				start();
+    void				stop();
     
-    void                    dispose();
+	//Dispose the Device form memory
+    void				dispose();
     
-    void                    setUserMode(bool mirrored);
-    void                    setUserColor(int userID, int color, bool useIntensity);
-    void                    setUserEnabled(bool enabled);
-    void                    setSkeletonMode(bool mirrored);
-    void                    setSkeletonEnabled(bool enabled);
+	//Sets the color of the player for Depth + Player index image
+	void				setUserColor(int userID, int color, bool useIntensity);
     
-    void                    setDepthMode(unsigned int width, unsigned int height, bool mirrored);
-    void                    setDepthEnabled(bool enabled);
-    void                    setDepthShowUserColors(bool show);
+	//User and Skeleton Feature Setters
+    void				setUserMode(bool mirrored);
+    void				setUserEnabled(bool enabled);
+    void				setSkeletonMode(bool mirrored);
+    void				setSkeletonEnabled(bool enabled);
+	
+	//Should return the current User Frame Data
+	kinectUserFrame		getUserFrameBuffer();
     
-    void                    setRGBMode(unsigned int width, unsigned int height, bool mirrored);
-    void                    setRGBEnabled(bool enabled);
+	//Depth Image Feature Setters
+    void				setDepthMode(unsigned int width, unsigned int height, bool mirrored);
+    void				setDepthEnabled(bool enabled);
+    void				setDepthShowUserColors(bool show);
     
-    void                    setUserMaskMode(unsigned int width, unsigned int height, bool mirrored);
-    void                    setUserMaskEnabled(bool enabled);
+	//RGB Image Feature Setters
+    void				setRGBMode(unsigned int width, unsigned int height, bool mirrored);
+    void				setRGBEnabled(bool enabled);
     
-    void                    setInfraredMode(unsigned int width, unsigned int height, bool mirrored);
-    void                    setInfraredEnabled(bool enabled);
+	//IR Camera Feature Setters
+	void				setInfraredMode(unsigned int width, unsigned int height, bool mirrored);
+	void				setInfraredEnabled(bool enabled);
     
-    void                    setPointCloudMode(unsigned int width, unsigned int height, bool mirrored, unsigned int density, bool includeRGB);
-    void                    setPointCloudEnabled(bool enabled);
-    void                    setPointCloudRegions(PointCloudRegion *pointCloudRegions, unsigned int numRegions);
+	//User Mask Image Feature Setters
+    void				setUserMaskMode(unsigned int width, unsigned int height, bool mirrored);
+    void				setUserMaskEnabled(bool enabled);
     
-    kinectUserFrame         userFrame;
-    pthread_mutex_t         userMutex;
+	//Point Cloud Feature Setters
+    void				setPointCloudMode(unsigned int width, unsigned int height, bool mirrored, unsigned int density, bool includeRGB);
+    void				setPointCloudEnabled(bool enabled);
+    void				setPointCloudRegions(PointCloudRegion *pointCloudRegions, unsigned int numRegions);
+	
+	//Depth Image Accessors
+	int					getAsDepthWidth();
+    int					getAsDepthHeight();
+	//Returns the current Depth Frame as a byte array
+	uint32_t*			getAsDepthByteArray();
     
-    int                     getAsDepthWidth();
-    int                     getAsDepthHeight();
-    uint32_t                *depthByteArray;
-    pthread_mutex_t         depthMutex;
+	//RGB Image Accessors
+    int					getAsRGBWidth();
+    int					getAsRGBHeight();
+	//Returns the current RGB Frame as a byte array
+    uint32_t*			getAsRGBByteArray();
     
-    int                     getAsRGBWidth();
-    int                     getAsRGBHeight();
-    uint32_t                *RGBByteArray;
-    pthread_mutex_t         rgbMutex;
+	//User Mask Image Accessors
+    int					getAsUserMaskWidth();
+    int					getAsUserMaskHeight();
+	//Returns the current Player Mask Frame as a byte array
+    uint32_t*			getAsUserMaskByteArray(int userID);
     
-    int                     getAsUserMaskWidth();
-    int                     getAsUserMaskHeight();
-    uint32_t                **userMaskByteArray;
-    pthread_mutex_t         userMaskMutex;
+	//IR Image Accessors
+	int					getAsInfraredWidth();
+	int					getAsInfraredHeight();
+	uint32_t*           getAsInfraredByteArray();
     
-    int                     getAsInfraredWidth();
-    int                     getAsInfraredHeight();
-    uint32_t                *infraredByteArray;
-    pthread_mutex_t         infraredMutex;
+	//Point Cloud Accessors
+    int					getAsPointCloudWidth();
+    int					getAsPointCloudHeight();
+    bool				getASPointCloudMirror();
+    int					getASPointCloudDensity();
+    bool				getASPointCloudIncludeRGB();
+    int					getAsPointCloudByteArrayLength();
+	//Returns the current Point cloud data as byte array (x,y,z) format
+    short*             getAsPointCloudByteArray();
     
-    int                     getAsPointCloudWidth();
-    int                     getAsPointCloudHeight();
-    int                     getAsPointCloudByteArrayLength();
-    ushort                  *pointCloudByteArray;
-    pthread_mutex_t         pointCloudMutex;
+	//Region Accessors
+	//Returns the current poinbt cloud regions
+    PointCloudRegion*	getPointCloudRegions();
+    unsigned int		getNumRegions();
+        
+    void                    lockUserMutex();
+    void                    unlockUserMutex();
     
-    PointCloudRegion        *pointCloudRegions;
-    unsigned int            numRegions;
+    void                    lockDepthMutex();
+    void                    unlockDepthMutex();
+    
+    void                    lockRGBMutex();
+    void                    unlockRGBMutex();
+    
+    void                    lockUserMaskMutex();
+    void                    unlockUserMaskMutex();
+    
+    void                    lockInfraredMutex();
+    void                    unlockInfraredMutex();
+    
+    void                    lockPointCloudMutex();
+    void                    unlockPointCloudMutex();
     
 private:
     int                     nr;
     xn::Context             context;
+    FREContext              freContext;
+    
+    pthread_mutex_t         userMutex;
+    pthread_mutex_t         depthMutex;
+    pthread_mutex_t         rgbMutex;
+    pthread_mutex_t         userMaskMutex;
+    pthread_mutex_t         infraredMutex;
+    pthread_mutex_t         pointCloudMutex;
+    
+    kinectUserFrame         userFrame;
+    uint32_t                *depthByteArray;
+    uint32_t                *RGBByteArray;
+    uint32_t                **userMaskByteArray;
+    uint32_t                *infraredByteArray;
+    short                   *pointCloudByteArray;
+    PointCloudRegion        *pointCloudRegions;
+    unsigned int            numRegions;
+    
     
     void                    setDefaults();
     
