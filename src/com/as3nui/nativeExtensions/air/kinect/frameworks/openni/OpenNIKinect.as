@@ -7,7 +7,7 @@
 package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 	import com.as3nui.nativeExtensions.air.kinect.Kinect;
 	import com.as3nui.nativeExtensions.air.kinect.KinectSettings;
-	import com.as3nui.nativeExtensions.air.kinect.frameworks.openni.OpenNISettings;
+	import com.as3nui.nativeExtensions.air.kinect.frameworks.openni.OpenNIKinectSettings;
 	import com.as3nui.nativeExtensions.air.kinect.frameworks.openni.events.OpenNICameraImageEvent;
 	
 	import flash.display.BitmapData;
@@ -26,8 +26,8 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 		protected var infraredImageBytes:ByteArray;
 		protected var infraredImageData:BitmapData;
 
-		public function get openNISettings():OpenNISettings {
-			return _settings as OpenNISettings;
+		public function get openNISettings():OpenNIKinectSettings {
+			return _settings as OpenNIKinectSettings;
 		}
 
 		public function OpenNIKinect(nr:uint = 0) {
@@ -36,7 +36,7 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 		
 		override protected function parseSettings(deviceSettings:Object):KinectSettings
 		{
-			return OpenNISettings.create(deviceSettings);
+			return OpenNIKinectSettings.create(deviceSettings);
 		}
 
 		override protected function initSettings():void {

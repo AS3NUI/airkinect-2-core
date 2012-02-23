@@ -26,8 +26,8 @@ package com.as3nui.nativeExtensions.air.kinect {
 	import com.as3nui.nativeExtensions.air.kinect.events.PointCloudEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.UserEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.UserFrameEvent;
-	import com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.MSDevice;
-	import com.as3nui.nativeExtensions.air.kinect.frameworks.openni.OpenNIDevice;
+	import com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.MSKinect;
+	import com.as3nui.nativeExtensions.air.kinect.frameworks.openni.OpenNIKinect;
 	import com.as3nui.nativeExtensions.air.kinect.namespaces.as3nui;
 	
 	import flash.desktop.NativeApplication;
@@ -181,7 +181,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 * @return
 		 */
 		public static function getDeviceByFramework(framework:String, nr:uint = 0):Kinect {
-			var deviceClass:Class = Framework.MSSDK ? MSDevice : OpenNIDevice;
+			var deviceClass:Class = Framework.MSSDK ? MSKinect : OpenNIKinect;
 			return getDeviceByClass(deviceClass, nr);
 		}
 
@@ -191,11 +191,10 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 * @param nr    Device number to get
 		 * @return
 		 */
-		public static function getDeviceByOS(nr:uint = 0):Kinect {
-			var deviceClass:Class = OS.isWindows() ? MSDevice : OpenNIDevice;
+		public static function getDevice(nr:uint = 0):Kinect {
+			var deviceClass:Class = OS.isWindows() ? MSKinect : OpenNIKinect;
 			return getDeviceByClass(deviceClass);
 		}
-
 
 		protected var _nr:uint;
 
@@ -220,7 +219,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		}
 
 		protected var context:ExtensionContext;
-		protected var _settings:DeviceSettings;
+		protected var _settings:KinectSettings;
 		protected var _userSimulationMode:Boolean;
 
 
@@ -275,7 +274,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		/**
 		 * Starts the kinect sensor, with the given configuration.
 		 *
-		 * @see com.as3nui.nativeExtensions.air.kinect.DeviceSettings
+		 * @see com.as3nui.nativeExtensions.air.kinect.KinectSettings
 		 */
 		public function start(deviceSettings:Object):void {
 			if (_state == DeviceState.STOPPED) {
@@ -293,7 +292,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 			}
 		}
 		
-		protected function parseSettings(deviceSettings:Object):DeviceSettings
+		protected function parseSettings(deviceSettings:Object):KinectSettings
 		{
 			throw new Error("You need to implement the parseSettings method inside your device implementation");
 			return null;

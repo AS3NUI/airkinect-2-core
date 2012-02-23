@@ -10,14 +10,14 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk {
 
 	public class MSKinect extends Kinect {
 
-		public function get msSettings():MSSettings { return _settings as MSSettings; }
+		public function get msSettings():MSKinectSettings { return _settings as MSKinectSettings; }
 		public function MSKinect(nr:uint) {
 			super(nr);
 		}
 		
 		override protected function parseSettings(deviceSettings:Object):KinectSettings
 		{
-			return MSSettings.create(deviceSettings);
+			return MSKinectSettings.create(deviceSettings);
 		}
 	}
 }
