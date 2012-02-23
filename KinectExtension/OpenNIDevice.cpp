@@ -437,9 +437,7 @@ void OpenNIDevice::stop()
     {
         started = false;
         //send stopped event
-        const uint8_t* statusCode = (const uint8_t*) "status";
-        const uint8_t* level = (const uint8_t*) "stopped";
-        FREDispatchStatusEventAsync(freContext, statusCode, level);
+        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "stopped");
     }
 }
 
@@ -636,9 +634,7 @@ void OpenNIDevice::run()
         
         //send started event
         started = true;
-        const uint8_t* statusCode = (const uint8_t*) "status";
-        const uint8_t* level = (const uint8_t*) "started";
-        FREDispatchStatusEventAsync(freContext, statusCode, level);
+        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "started");
         while(running)
         {
             XnStatus rc = XN_STATUS_OK;
