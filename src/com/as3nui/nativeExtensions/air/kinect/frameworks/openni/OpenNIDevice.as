@@ -6,15 +6,16 @@
  */
 package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 	import com.as3nui.nativeExtensions.air.kinect.Device;
+	import com.as3nui.nativeExtensions.air.kinect.DeviceSettings;
 	import com.as3nui.nativeExtensions.air.kinect.frameworks.openni.OpenNISettings;
 	import com.as3nui.nativeExtensions.air.kinect.frameworks.openni.events.OpenNICameraImageEvent;
-
+	
 	import flash.display.BitmapData;
 	import flash.events.StatusEvent;
 	import flash.utils.ByteArray;
 	import flash.utils.Endian;
 
-	[Event(name="infraredImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent")]
+	[Event(name="infraredImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.frameworks.openni.events.OpenNICameraImageEvent")]
 	public class OpenNIDevice extends Device {
 		protected static const EXTENSION_EVENT_INFRARED_FRAME_AVAILABLE:String = 'infraredFrame';
 
@@ -31,6 +32,11 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 
 		public function OpenNIDevice(nr:uint = 0) {
 			super(nr);
+		}
+		
+		override protected function parseSettings(deviceSettings:Object):DeviceSettings
+		{
+			return OpenNISettings.create(deviceSettings);
 		}
 
 		override protected function initSettings():void {
@@ -65,7 +71,7 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 
 		override protected function contextStatusHandler(event:StatusEvent):void {
 			super.contextStatusHandler(event);
-			switch (event.code) {
+			switch (event.level) {
 				case EXTENSION_EVENT_INFRARED_FRAME_AVAILABLE:
 					handleInfraredFrame();
 					break;

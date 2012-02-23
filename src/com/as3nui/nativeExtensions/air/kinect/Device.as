@@ -29,7 +29,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 	import com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.MSDevice;
 	import com.as3nui.nativeExtensions.air.kinect.frameworks.openni.OpenNIDevice;
 	import com.as3nui.nativeExtensions.air.kinect.namespaces.as3nui;
-
+	
 	import flash.desktop.NativeApplication;
 	import flash.display.BitmapData;
 	import flash.events.Event;
@@ -277,9 +277,9 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 *
 		 * @see com.as3nui.nativeExtensions.air.kinect.DeviceSettings
 		 */
-		public function start(deviceSettings:DeviceSettings):void {
+		public function start(deviceSettings:Object):void {
 			if (_state == DeviceState.STOPPED) {
-				_settings = deviceSettings;
+				_settings = parseSettings(deviceSettings);
 				_state = DeviceState.STARTING;
 				//create the extension _context
 				context = ExtensionContext.createExtensionContext("com.as3nui.nativeExtensions.air.kinect", null);
@@ -291,6 +291,12 @@ package com.as3nui.nativeExtensions.air.kinect {
 				context.call(EXTENSION_REQUEST_START, _nr);
 				//the started event will be dispatched from the _context, as this can take a while
 			}
+		}
+		
+		protected function parseSettings(deviceSettings:Object):DeviceSettings
+		{
+			throw new Error("You need to implement the parseSettings method inside your device implementation");
+			return null;
 		}
 
 		/**
