@@ -284,7 +284,7 @@ FREObject OpenNIDevice::freGetUserFrame(FREObject argv[])
                 FRENewObject( (const uint8_t*) "flash.geom.Point", 2, depthRelativePositionParams, &depthRelativePosition, NULL);
                 //create the joint
                 FREObject jointParams[] = {jointName, position, positionRelative, positionConfidence, orientation, orientationConfidence, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition};
-                FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.data.SkeletonJoint", 10, jointParams, &joint, NULL);
+                FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNISkeletonJoint", 10, jointParams, &joint, NULL);
                 FRESetArrayElementAt(joints, j, joint);
             }
             
@@ -329,7 +329,7 @@ FREObject OpenNIDevice::freGetUserFrame(FREObject argv[])
             FRENewObjectFromBool((userFrame.users[i].hasSkeleton) ? 1 : 0, &hasSkeleton);
             FREObject skeletonParams[] = {userType, userID, trackingID, position, positionRelative, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition, hasSkeleton, joints};
             
-            FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.data.User", 11, skeletonParams, &user, NULL);
+            FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUser", 11, skeletonParams, &user, NULL);
             
             FRESetArrayElementAt(users, trackedSkeletons, user);
             trackedSkeletons++;
@@ -340,7 +340,7 @@ FREObject OpenNIDevice::freGetUserFrame(FREObject argv[])
     FRENewObjectFromUint32(userFrame.timeStamp, &timestamp);
     
     FREObject skeletonFrameParams[] = {frameNumber, timestamp, users};
-    FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.data.UserFrame", 3, skeletonFrameParams, &freUserFrame, NULL);
+    FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUserFrame", 3, skeletonFrameParams, &freUserFrame, NULL);
     
     unlockUserMutex();
     
