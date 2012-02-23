@@ -7,7 +7,7 @@
 package com.as3nui.nativeExtensions.air.kinect.data {
 	import com.as3nui.nativeExtensions.air.kinect.constants.Framework;
 
-	public class KinectCapabilities {
+	public class DeviceCapabiltiies {
 		private var _hasCameraElevationSupport:Boolean					= false;
 		private var _hasRGBCameraSupport:Boolean						= false;
 		private var _hasDepthCameraSupport:Boolean						= false;
@@ -26,7 +26,7 @@ package com.as3nui.nativeExtensions.air.kinect.data {
 
 		private var _framework:String									= Framework.NONE;
 
-		function KinectCapabilities(capabilities:Object) {
+		function DeviceCapabiltiies(capabilities:Object) {
 			for (var capability:String in capabilities) {
 				var hasProperty:Boolean = this.hasOwnProperty(capability);
 				if (hasProperty) this["_" + capability] = capabilities[capability];

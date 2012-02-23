@@ -13,24 +13,13 @@
 *    See the License for the specific language governing permissions and
 *    limitations under the License.
 */
-package com.as3nui.nativeExtensions.air.kinect.events
+package com.as3nui.nativeExtensions.air.kinect.constants
 {
-	import flash.events.Event;
-	
-	public class KinectEvent extends Event
+	public class DeviceState
 	{
 		
-		public static const STARTED:String = "started";
 		public static const STOPPED:String = "stopped";
-		
-		public function KinectEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
-		{
-			super(type, bubbles, cancelable);
-		}
-		
-		override public function clone():Event
-		{
-			return new KinectEvent(type, bubbles, cancelable);
-		}
+		public static const STARTING:String = "starting";
+		public static const STARTED:String = "started";
 	}
 }

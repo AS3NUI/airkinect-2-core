@@ -15,6 +15,7 @@
 */
 package com.as3nui.nativeExtensions.air.kinect.constants
 {
+	import com.as3nui.nativeExtensions.air.kinect.constants.*;
 	/**
 	 * Indices of joints, which are available on both platform.
 	 * 

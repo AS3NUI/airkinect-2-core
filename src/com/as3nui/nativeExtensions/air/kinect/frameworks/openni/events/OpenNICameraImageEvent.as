@@ -13,20 +13,19 @@
 *    See the License for the specific language governing permissions and
 *    limitations under the License.
 */
-package com.as3nui.nativeExtensions.air.kinect.events
+package com.as3nui.nativeExtensions.air.kinect.frameworks.openni.events
 {
 	import flash.display.BitmapData;
 	import flash.events.Event;
-	
-	public class CameraImageEvent extends Event
+
+	public class OpenNICameraImageEvent extends Event
 	{
 		
-		public static const DEPTH_IMAGE_UPDATE:String = "depthImageUpdate";
-		public static const RGB_IMAGE_UPDATE:String = "rgbImageUpdate";
-
+		public static const INFRARED_IMAGE_UPDATE:String = "infraredImageUpdate";
+		
 		public var imageData:BitmapData;
 		
-		public function CameraImageEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false, imageData:BitmapData = null)
+		public function OpenNICameraImageEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false, imageData:BitmapData = null)
 		{
 			super(type, bubbles, cancelable);
 			this.imageData = imageData;
@@ -34,7 +33,7 @@ package com.as3nui.nativeExtensions.air.kinect.events
 		
 		override public function clone():Event
 		{
-			return new CameraImageEvent(type, bubbles, cancelable, imageData);
+			return new OpenNICameraImageEvent(type, bubbles, cancelable, imageData);
 		}
 	}
 }
