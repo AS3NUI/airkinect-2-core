@@ -58,78 +58,44 @@ public:
 	//Dispose the Device form memory
     void				dispose();
     
-	//Sets the color of the player for Depth + Player index image
-	void				setUserColor(int userID, int color, bool useIntensity);
+    FREObject           freSetUserMode(FREObject argv[]);
+    FREObject           freSetUserColor(FREObject argv[]);
+    FREObject           freSetUserEnabled(FREObject argv[]);
+    FREObject           freSetSkeletonMode(FREObject argv[]);
+    FREObject           freSetSkeletonEnabled(FREObject argv[]);
+    FREObject           freGetUserFrame(FREObject argv[]);
+    FREObject           freGetSkeletonJointNameIndices(FREObject argv[]);
+    FREObject           freGetSkeletonJointNames(FREObject argv[]);
+    FREObject           freSetUserMaskMode(FREObject argv[]);
+    FREObject           freSetUserMaskEnabled(FREObject argv[]);
+    FREObject           freGetUserMaskFrame(FREObject argv[]);
+    FREObject           freSetDepthMode(FREObject argv[]);
+    FREObject           freSetDepthEnabled(FREObject argv[]);
+    FREObject           freGetDepthFrame(FREObject argv[]);
+    FREObject           freSetDepthShowUserColors(FREObject argv[]);
+    FREObject           freSetRGBMode(FREObject argv[]);
+    FREObject           freSetRGBEnabled(FREObject argv[]);
+    FREObject           freGetRGBFrame(FREObject argv[]);
+    FREObject           freSetInfraredMode(FREObject argv[]);
+    FREObject           freSetInfraredEnabled(FREObject argv[]);
+    FREObject           freGetInfraredFrame(FREObject argv[]);
+    FREObject           freSetPointCloudMode(FREObject argv[]);
+    FREObject           freSetPointCloudEnabled(FREObject argv[]);
+    FREObject           freGetPointCloudFrame(FREObject argv[]);
+    FREObject           freSetPointCloudRegions(FREObject argv[]);
     
-	//User and Skeleton Feature Setters
-    void				setUserMode(bool mirrored);
-    void				setUserEnabled(bool enabled);
-    void				setSkeletonMode(bool mirrored);
-    void				setSkeletonEnabled(bool enabled);
-	
-	//Should return the current User Frame Data
-	kinectUserFrame		getUserFrameBuffer();
+private:
+    int                     nr;
+    xn::Context             context;
+    FREContext              freContext;
     
-	//Depth Image Feature Setters
-    void				setDepthMode(unsigned int width, unsigned int height, bool mirrored);
-    void				setDepthEnabled(bool enabled);
-    void				setDepthShowUserColors(bool show);
+    boost::mutex            userMutex;
+    boost::mutex            depthMutex;
+    boost::mutex            rgbMutex;
+    boost::mutex            userMaskMutex;
+    boost::mutex            infraredMutex;
+    boost::mutex            pointCloudMutex;
     
-	//RGB Image Feature Setters
-    void				setRGBMode(unsigned int width, unsigned int height, bool mirrored);
-    void				setRGBEnabled(bool enabled);
-    
-	//IR Camera Feature Setters
-	void				setInfraredMode(unsigned int width, unsigned int height, bool mirrored);
-	void				setInfraredEnabled(bool enabled);
-    
-	//User Mask Image Feature Setters
-    void				setUserMaskMode(unsigned int width, unsigned int height, bool mirrored);
-    void				setUserMaskEnabled(bool enabled);
-    
-	//Point Cloud Feature Setters
-    void				setPointCloudMode(unsigned int width, unsigned int height, bool mirrored, unsigned int density, bool includeRGB);
-    void				setPointCloudEnabled(bool enabled);
-    void				setPointCloudRegions(PointCloudRegion *pointCloudRegions, unsigned int numRegions);
-	
-	//Depth Image Accessors
-	int					getAsDepthWidth();
-    int					getAsDepthHeight();
-	//Returns the current Depth Frame as a byte array
-	uint32_t*			getAsDepthByteArray();
-    
-	//RGB Image Accessors
-    int					getAsRGBWidth();
-    int					getAsRGBHeight();
-	//Returns the current RGB Frame as a byte array
-    uint32_t*			getAsRGBByteArray();
-    
-	//User Mask Image Accessors
-    int					getAsUserMaskWidth();
-    int					getAsUserMaskHeight();
-	//Returns the current Player Mask Frame as a byte array
-    uint32_t*			getAsUserMaskByteArray(int userID);
-    
-	//IR Image Accessors
-	int					getAsInfraredWidth();
-	int					getAsInfraredHeight();
-	uint32_t*           getAsInfraredByteArray();
-    
-	//Point Cloud Accessors
-    int					getAsPointCloudWidth();
-    int					getAsPointCloudHeight();
-    bool				getASPointCloudMirror();
-    int					getASPointCloudDensity();
-    bool				getASPointCloudIncludeRGB();
-    int					getAsPointCloudByteArrayLength();
-	//Returns the current Point cloud data as byte array (x,y,z) format
-    short*             getAsPointCloudByteArray();
-    
-	//Region Accessors
-	//Returns the current poinbt cloud regions
-    PointCloudRegion*	getPointCloudRegions();
-    unsigned int		getNumRegions();
-        
     void                    lockUserMutex();
     void                    unlockUserMutex();
     
@@ -148,17 +114,8 @@ public:
     void                    lockPointCloudMutex();
     void                    unlockPointCloudMutex();
     
-private:
-    int                     nr;
-    xn::Context             context;
-    FREContext              freContext;
-    
-    boost::mutex            userMutex;
-    boost::mutex            depthMutex;
-    boost::mutex            rgbMutex;
-    boost::mutex            userMaskMutex;
-    boost::mutex            infraredMutex;
-    boost::mutex            pointCloudMutex;
+    void                    setUserColor(int userID, int color, bool useIntensity);
+    int                     getAsPointCloudByteArrayLength();
     
     kinectUserFrame         userFrame;
     uint32_t                *depthByteArray;

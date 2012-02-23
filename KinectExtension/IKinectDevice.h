@@ -26,6 +26,33 @@ public:
 	//Dispose the Device form memory
     virtual void				dispose() {};
     
+    virtual FREObject           freSetUserMode(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetUserColor(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetUserEnabled(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetSkeletonMode(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetSkeletonEnabled(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freGetUserFrame(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freGetSkeletonJointNameIndices(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freGetSkeletonJointNames(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetUserMaskMode(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetUserMaskEnabled(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freGetUserMaskFrame(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetDepthMode(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetDepthEnabled(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freGetDepthFrame(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetDepthShowUserColors(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetRGBMode(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetRGBEnabled(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freGetRGBFrame(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetInfraredMode(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetInfraredEnabled(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freGetInfraredFrame(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetPointCloudMode(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetPointCloudEnabled(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freGetPointCloudFrame(FREObject argv[]) { FREObject o; return o; };
+    virtual FREObject           freSetPointCloudRegions(FREObject argv[]) { FREObject o; return o; };
+    
+    /*
 	//Sets the color of the player for Depth + Player index image
 	virtual void				setUserColor(int userID, int color, bool useIntensity){ };
     
@@ -91,7 +118,7 @@ public:
 	virtual bool				getASPointCloudIncludeRGB() {return false;}; 
     virtual int					getAsPointCloudByteArrayLength() {return 0;};
 	//Returns the current Point cloud data as byte array (x,y,z) format
-	virtual short*             getAsPointCloudByteArray() {return 0;};
+	virtual short*              getAsPointCloudByteArray() {return 0;};
     
 	//Region Accessors
 	//Returns the current poinbt cloud regions
@@ -115,6 +142,7 @@ public:
     
     virtual void                    lockPointCloudMutex(){};
     virtual void                    unlockPointCloudMutex(){};
+     */
 };
 
 #endif
