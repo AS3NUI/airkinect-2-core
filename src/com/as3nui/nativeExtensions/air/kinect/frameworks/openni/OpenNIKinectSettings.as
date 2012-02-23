@@ -5,13 +5,13 @@
  * Time: 12:08 PM
  */
 package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
-	import com.as3nui.nativeExtensions.air.kinect.DeviceSettings;
+	import com.as3nui.nativeExtensions.air.kinect.KinectSettings;
 	import com.as3nui.nativeExtensions.air.kinect.constants.CameraResolution;
 	
 	import flash.geom.Point;
 	import flash.utils.describeType;
 
-	public class OpenNISettings extends DeviceSettings {
+	public class OpenNIKinectSettings extends KinectSettings {
 
 		private var _infraredEnabled:Boolean				= false;
 		private var _infraredResolution:Point				= CameraResolution.RESOLUTION_320_240;
@@ -45,9 +45,9 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 		 * Factory method to create an instance of OpenNISettings, based on an
 		 * anonymously typed object
 		 */ 
-		public static function create(deviceSettings:Object):OpenNISettings
+		public static function create(deviceSettings:Object):OpenNIKinectSettings
 		{
-			var settings:OpenNISettings = new OpenNISettings();
+			var settings:OpenNIKinectSettings = new OpenNIKinectSettings();
 			//automatic copying-in properties from the object
 			var def:XML = describeType(deviceSettings);
 			var props:XMLList = def..variable.@name;

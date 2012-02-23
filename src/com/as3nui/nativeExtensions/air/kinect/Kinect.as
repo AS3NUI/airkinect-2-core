@@ -65,7 +65,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 	 * @includeExample BasicSkeletonExample.as
 	 * @includeExample BasicCameraExample.as
 	 */
-	public class Device extends EventDispatcher {
+	public class Kinect extends EventDispatcher {
 		protected static const EXTENSION_EVENT_DEVICE_STARTED:String = 'started';
 		protected static const EXTENSION_EVENT_DEVICE_STOPPED:String = 'stopped';
 
@@ -164,7 +164,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 * @param nr
 		 * @return
 		 */
-		public static function getDeviceByClass(deviceClass:Class, nr:uint = 0):Device {
+		public static function getDeviceByClass(deviceClass:Class, nr:uint = 0):Kinect {
 			if (_deviceInstanceMap == null) _deviceInstanceMap = new Dictionary();
 			if (_deviceInstanceMap[deviceClass] == null)  _deviceInstanceMap[deviceClass] = new Dictionary();
 			if (_deviceInstanceMap[deviceClass][nr] == null) {
@@ -180,7 +180,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 * @param nr        DeviceId to get
 		 * @return
 		 */
-		public static function getDeviceByFramework(framework:String, nr:uint = 0):Device {
+		public static function getDeviceByFramework(framework:String, nr:uint = 0):Kinect {
 			var deviceClass:Class = Framework.MSSDK ? MSDevice : OpenNIDevice;
 			return getDeviceByClass(deviceClass, nr);
 		}
@@ -191,7 +191,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 * @param nr    Device number to get
 		 * @return
 		 */
-		public static function getDeviceByOS(nr:uint = 0):Device {
+		public static function getDeviceByOS(nr:uint = 0):Kinect {
 			var deviceClass:Class = OS.isWindows() ? MSDevice : OpenNIDevice;
 			return getDeviceByClass(deviceClass);
 		}
@@ -248,15 +248,15 @@ package com.as3nui.nativeExtensions.air.kinect {
 		/**
 		 * Private constructor of the Device class. Use Device.getDevice() instead of calling this method.
 		 */
-		public function Device(nr:uint) {
+		public function Kinect(nr:uint) {
 			var className:String = getQualifiedClassName(this);
 			var managementClass:Class = getDefinitionByName(className) as Class;
 
-			if (managementClass == Device) {
+			if (managementClass == Kinect) {
 				throw(CLASS_MUST_EXTEND_DEVICE);
 			}
 
-			var instance:Device = _deviceInstanceMap[managementClass][nr];
+			var instance:Kinect = _deviceInstanceMap[managementClass][nr];
 			if (instance != null) {
 				throw(USE_GET_INSTANCE);
 			}

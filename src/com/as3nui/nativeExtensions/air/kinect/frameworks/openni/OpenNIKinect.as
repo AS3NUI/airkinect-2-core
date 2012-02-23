@@ -5,8 +5,8 @@
  * Time: 12:32 PM
  */
 package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
-	import com.as3nui.nativeExtensions.air.kinect.Device;
-	import com.as3nui.nativeExtensions.air.kinect.DeviceSettings;
+	import com.as3nui.nativeExtensions.air.kinect.Kinect;
+	import com.as3nui.nativeExtensions.air.kinect.KinectSettings;
 	import com.as3nui.nativeExtensions.air.kinect.frameworks.openni.OpenNISettings;
 	import com.as3nui.nativeExtensions.air.kinect.frameworks.openni.events.OpenNICameraImageEvent;
 	
@@ -16,7 +16,7 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 	import flash.utils.Endian;
 
 	[Event(name="infraredImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.frameworks.openni.events.OpenNICameraImageEvent")]
-	public class OpenNIDevice extends Device {
+	public class OpenNIKinect extends Kinect {
 		protected static const EXTENSION_EVENT_INFRARED_FRAME_AVAILABLE:String = 'infraredFrame';
 
 		protected static const EXTENSION_REQUEST_SET_INFRARED_MODE:String = "setInfraredMode";
@@ -30,11 +30,11 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 			return _settings as OpenNISettings;
 		}
 
-		public function OpenNIDevice(nr:uint = 0) {
+		public function OpenNIKinect(nr:uint = 0) {
 			super(nr);
 		}
 		
-		override protected function parseSettings(deviceSettings:Object):DeviceSettings
+		override protected function parseSettings(deviceSettings:Object):KinectSettings
 		{
 			return OpenNISettings.create(deviceSettings);
 		}

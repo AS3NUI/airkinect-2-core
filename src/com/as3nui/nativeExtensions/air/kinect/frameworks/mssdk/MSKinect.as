@@ -5,17 +5,17 @@
  * Time: 12:32 PM
  */
 package com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk {
-	import com.as3nui.nativeExtensions.air.kinect.Device;
-	import com.as3nui.nativeExtensions.air.kinect.DeviceSettings;
+	import com.as3nui.nativeExtensions.air.kinect.Kinect;
+	import com.as3nui.nativeExtensions.air.kinect.KinectSettings;
 
-	public class MSDevice extends Device {
+	public class MSKinect extends Kinect {
 
 		public function get msSettings():MSSettings { return _settings as MSSettings; }
-		public function MSDevice(nr:uint) {
+		public function MSKinect(nr:uint) {
 			super(nr);
 		}
 		
-		override protected function parseSettings(deviceSettings:Object):DeviceSettings
+		override protected function parseSettings(deviceSettings:Object):KinectSettings
 		{
 			return MSSettings.create(deviceSettings);
 		}
