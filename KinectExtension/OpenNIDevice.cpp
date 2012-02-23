@@ -701,7 +701,7 @@ void OpenNIDevice::run()
                 lockRGBMutex();
                 rgbFrameHandler();
                 unlockRGBMutex();
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "RGBFrame", (const uint8_t*) "");
+                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "RGBFrame");
             }
             
             //depth image
@@ -718,7 +718,7 @@ void OpenNIDevice::run()
                 }
                 unlockDepthMutex();
                 //dispatch depth frame event
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "depthFrame", (const uint8_t*) "");
+                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "depthFrame");
             }
             
             //infrared image - not available when rgb is enabled
@@ -728,7 +728,7 @@ void OpenNIDevice::run()
                 infraredHandler();
                 unlockInfraredMutex();
                 //dispatch infrared frame event
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "infraredFrame", (const uint8_t*) "");
+                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "infraredFrame");
             }
             
             //point cloud
@@ -744,7 +744,7 @@ void OpenNIDevice::run()
                     pointCloudHandler();
                 }
                 unlockPointCloudMutex();
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "pointCloudFrame", (const uint8_t*) "");
+                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "pointCloudFrame");
             }
             
             //user information
@@ -753,7 +753,7 @@ void OpenNIDevice::run()
                 lockUserMutex();
                 userHandler();
                 unlockUserMutex();
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "userFrame", (const uint8_t*) "");
+                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "userFrame");
             }
             
             //user mask image
@@ -763,7 +763,7 @@ void OpenNIDevice::run()
                 userMaskHandler();
                 unlockUserMaskMutex();
                 //dispatch user mask frame event
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "userMaskFrame", (const uint8_t*) "");
+                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "userMaskFrame");
             }
         }
     }
