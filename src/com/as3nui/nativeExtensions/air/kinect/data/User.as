@@ -15,7 +15,6 @@
 */
 package com.as3nui.nativeExtensions.air.kinect.data
 {
-	import com.as3nui.nativeExtensions.air.kinect.constants.JointNames;
 	import com.as3nui.nativeExtensions.air.kinect.namespaces.as3nui;
 	
 	import flash.display.BitmapData;
@@ -117,25 +116,25 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			return _skeletonJoints;
 		}
 		
-		public function get head():SkeletonJoint { return getJointByName(JointNames.HEAD); }
-		public function get neck():SkeletonJoint { return getJointByName(JointNames.NECK); }
-		public function get torso():SkeletonJoint { return getJointByName(JointNames.TORSO); }
+		public function get head():SkeletonJoint { return getJointByName(SkeletonJoint.HEAD); }
+		public function get neck():SkeletonJoint { return getJointByName(SkeletonJoint.NECK); }
+		public function get torso():SkeletonJoint { return getJointByName(SkeletonJoint.TORSO); }
 		
-		public function get leftShoulder():SkeletonJoint { return getJointByName(JointNames.LEFT_SHOULDER); }
-		public function get leftElbow():SkeletonJoint { return getJointByName(JointNames.LEFT_ELBOW); }
-		public function get leftHand():SkeletonJoint { return getJointByName(JointNames.LEFT_HAND); }
+		public function get leftShoulder():SkeletonJoint { return getJointByName(SkeletonJoint.LEFT_SHOULDER); }
+		public function get leftElbow():SkeletonJoint { return getJointByName(SkeletonJoint.LEFT_ELBOW); }
+		public function get leftHand():SkeletonJoint { return getJointByName(SkeletonJoint.LEFT_HAND); }
 		
-		public function get rightShoulder():SkeletonJoint { return getJointByName(JointNames.RIGHT_SHOULDER); }
-		public function get rightElbow():SkeletonJoint { return getJointByName(JointNames.RIGHT_ELBOW); }
-		public function get rightHand():SkeletonJoint { return getJointByName(JointNames.RIGHT_HAND); }
+		public function get rightShoulder():SkeletonJoint { return getJointByName(SkeletonJoint.RIGHT_SHOULDER); }
+		public function get rightElbow():SkeletonJoint { return getJointByName(SkeletonJoint.RIGHT_ELBOW); }
+		public function get rightHand():SkeletonJoint { return getJointByName(SkeletonJoint.RIGHT_HAND); }
 		
-		public function get leftHip():SkeletonJoint { return getJointByName(JointNames.LEFT_HIP); }
-		public function get leftKnee():SkeletonJoint { return getJointByName(JointNames.LEFT_KNEE); }
-		public function get leftFoot():SkeletonJoint { return getJointByName(JointNames.LEFT_FOOT); }
+		public function get leftHip():SkeletonJoint { return getJointByName(SkeletonJoint.LEFT_HIP); }
+		public function get leftKnee():SkeletonJoint { return getJointByName(SkeletonJoint.LEFT_KNEE); }
+		public function get leftFoot():SkeletonJoint { return getJointByName(SkeletonJoint.LEFT_FOOT); }
 		
-		public function get rightHip():SkeletonJoint { return getJointByName(JointNames.RIGHT_HIP); }
-		public function get rightKnee():SkeletonJoint { return getJointByName(JointNames.RIGHT_KNEE); }
-		public function get rightFoot():SkeletonJoint { return getJointByName(JointNames.RIGHT_FOOT); }
+		public function get rightHip():SkeletonJoint { return getJointByName(SkeletonJoint.RIGHT_HIP); }
+		public function get rightKnee():SkeletonJoint { return getJointByName(SkeletonJoint.RIGHT_KNEE); }
+		public function get rightFoot():SkeletonJoint { return getJointByName(SkeletonJoint.RIGHT_FOOT); }
 		
 		/**
 		 * Framework used to generate this skeleton

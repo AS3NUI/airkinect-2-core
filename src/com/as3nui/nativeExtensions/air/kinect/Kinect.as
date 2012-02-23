@@ -240,8 +240,8 @@ package com.as3nui.nativeExtensions.air.kinect {
 		protected var usersByTrackingId:Dictionary;
 		protected var _usersWithSkeleton:Vector.<User>;
 		protected var usersWithSkeletonByTrackingId:Dictionary;
-		protected var skeletonJointNameIndices:Dictionary;
-		protected var skeletonJointNames:Vector.<String>;
+		protected var _skeletonJointNameIndices:Dictionary;
+		protected var _skeletonJointNames:Vector.<String>;
 		protected var userMaskByteArrays:Vector.<ByteArray>;
 
 		/**
@@ -430,8 +430,8 @@ package com.as3nui.nativeExtensions.air.kinect {
 				usersByTrackingId = new Dictionary();
 				_usersWithSkeleton = new Vector.<User>();
 				usersWithSkeletonByTrackingId = new Dictionary();
-				skeletonJointNameIndices = context.call(EXTENSION_REQUEST_GET_SKELETON_JOINT_NAME_INDICIES, _nr) as Dictionary;
-				skeletonJointNames = context.call(EXTENSION_REQUEST_GET_SKELETON_JOINT_NAMES, _nr) as Vector.<String>;
+				_skeletonJointNameIndices = context.call(EXTENSION_REQUEST_GET_SKELETON_JOINT_NAME_INDICIES, _nr) as Dictionary;
+				_skeletonJointNames = context.call(EXTENSION_REQUEST_GET_SKELETON_JOINT_NAMES, _nr) as Vector.<String>;
 			}
 			applyUserSettings()
 		}
@@ -661,8 +661,8 @@ package com.as3nui.nativeExtensions.air.kinect {
 					addedUsers.push(user);
 				}
 
-				user.as3nui::skeletonJointNameIndices = skeletonJointNameIndices;
-				user.as3nui::_skeletonJointNames = skeletonJointNames;
+				user.as3nui::skeletonJointNameIndices = _skeletonJointNameIndices;
+				user.as3nui::_skeletonJointNames = _skeletonJointNames;
 				currentUsers.push(user);
 				if (user.hasSkeleton) {
 					currentUsersWithSkeleton.push(user);
@@ -727,7 +727,14 @@ package com.as3nui.nativeExtensions.air.kinect {
 		public function get usersWithSkeleton():Vector.<User> {
 			return _usersWithSkeleton;
 		}
-
+		
+		/**
+		 * Get a list of the supported skeleton joints
+		 */ 
+		public function get skeletonJointNames():Vector.<String>
+		{
+			return _skeletonJointNames;
+		}
 
 		//----------------------------------
 		// User Frame Simulation Code

@@ -27,6 +27,25 @@ package com.as3nui.nativeExtensions.air.kinect.data
 	 */ 
 	public class SkeletonJoint extends Object
 	{
+		public static const HEAD:String = "head";
+		public static const NECK:String = "neck";
+		public static const TORSO:String = "torso";
+		
+		public static const LEFT_SHOULDER:String = "left_shoulder";
+		public static const LEFT_ELBOW:String = "left_elbow";
+		public static const LEFT_HAND:String = "left_hand";
+		
+		public static const RIGHT_SHOULDER:String = "right_shoulder";
+		public static const RIGHT_ELBOW:String = "right_elbow";
+		public static const RIGHT_HAND:String = "right_hand";
+		
+		public static const LEFT_HIP:String = "left_hip";
+		public static const LEFT_KNEE:String = "left_knee";
+		public static const LEFT_FOOT:String = "left_foot";
+		
+		public static const RIGHT_HIP:String = "right_hip";
+		public static const RIGHT_KNEE:String = "right_knee";
+		public static const RIGHT_FOOT:String = "right_foot";
 		
 		/**
 		 * Name of the joint
@@ -42,21 +61,6 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 * Relative position of the joint
 		 */ 
 		public var positionRelative:Vector3D;
-		
-		/**
-		 * Accuracy of the joint position
-		 */ 
-		public var positionConfidence:Number;
-		
-		/**
-		 * Orientation of the joint as euler coordinates (radians), mapped in world space
-		 */ 
-		public var orientation:Vector3D;
-		
-		/**
-		 * Accuracy of the joint orientation
-		 */ 
-		public var orientationConfidence:Number;
 		
 		/**
 		 * Absolute 2D position of the joint, mapped in RGB space
@@ -78,14 +82,11 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 */ 
 		public var depthRelativePosition:Point;
 		
-		public function SkeletonJoint(name:String, position:Vector3D, positionRelative:Vector3D, positionConfidence:Number, orientation:Vector3D, orientationConfidence:Number, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point)
+		public function SkeletonJoint(name:String, position:Vector3D, positionRelative:Vector3D, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point)
 		{
 			this.name = name;
 			this.position = position;
 			this.positionRelative = positionRelative;
-			this.positionConfidence = positionConfidence;
-			this.orientation = orientation;
-			this.orientationConfidence = orientationConfidence;
 			this.rgbPosition = rgbPosition;
 			this.rgbRelativePosition = rgbRelativePosition;
 			this.depthPosition = depthPosition;
@@ -97,7 +98,7 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 */ 
 		public function cloneJoint():SkeletonJoint
 		{
-			return new SkeletonJoint(name, position.clone(), positionRelative.clone(), positionConfidence, orientation.clone(), orientationConfidence, rgbPosition.clone(), rgbRelativePosition.clone(), depthPosition.clone(), depthRelativePosition.clone());
+			return new SkeletonJoint(name, position.clone(), positionRelative.clone(), rgbPosition.clone(), rgbRelativePosition.clone(), depthPosition.clone(), depthRelativePosition.clone());
 		}
 		
 		/**
@@ -108,9 +109,6 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			name = otherJoint.name;
 			position.copyFrom(otherJoint.position);
 			positionRelative.copyFrom(otherJoint.positionRelative);
-			positionConfidence = otherJoint.positionConfidence;
-			orientation.copyFrom(otherJoint.orientation);
-			orientationConfidence = otherJoint.orientationConfidence;
 			rgbPosition.copyFrom(otherJoint.rgbPosition);
 			rgbRelativePosition.copyFrom(otherJoint.rgbRelativePosition);
 			depthPosition.copyFrom(otherJoint.depthPosition);
