@@ -7,17 +7,9 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data
 	
 	public class MSSkeletonJoint extends SkeletonJoint
 	{
-		public function MSSkeletonJoint(name:String, position:Vector3D, positionRelative:Vector3D, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point)
+		public function MSSkeletonJoint(name:String, position:Vector3D, positionRelative:Vector3D, positionConfidence:Number, orientation:Vector3D, orientationConfidence:Number, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point)
 		{
-			super(name, position, positionRelative, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition);
-		}
-		
-		/**
-		 * Creates a copy of the joint
-		 */ 
-		override public function cloneJoint():SkeletonJoint
-		{
-			return new MSSkeletonJoint(name, position.clone(), positionRelative.clone(), rgbPosition.clone(), rgbRelativePosition.clone(), depthPosition.clone(), depthRelativePosition.clone());
+			super(name, position, positionRelative, positionConfidence, orientation, orientationConfidence, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition);
 		}
 	}
 }

@@ -81,8 +81,24 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 * Relative 2D position of the joint, mapped in depth space
 		 */ 
 		public var depthRelativePosition:Point;
-		
-		public function SkeletonJoint(name:String, position:Vector3D, positionRelative:Vector3D, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point)
+
+		/**
+		 * Accuracy of the joint position
+		 */
+		public var positionConfidence:Number;
+
+		/**
+		 * Orientation of the joint as euler coordinates (radians), mapped in world space
+		 */
+		public var orientation:Vector3D;
+
+		/**
+		 * Accuracy of the joint orientation
+		 */
+		public var orientationConfidence:Number;
+
+
+		public function SkeletonJoint(name:String, position:Vector3D, positionRelative:Vector3D, positionConfidence:Number, orientation:Vector3D, orientationConfidence:Number, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point)
 		{
 			this.name = name;
 			this.position = position;
@@ -91,6 +107,9 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			this.rgbRelativePosition = rgbRelativePosition;
 			this.depthPosition = depthPosition;
 			this.depthRelativePosition = depthRelativePosition;
+			this.positionConfidence = positionConfidence;
+			this.orientation = orientation;
+			this.orientationConfidence = orientationConfidence;
 		}
 		
 		/**
@@ -98,7 +117,7 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 */ 
 		public function cloneJoint():SkeletonJoint
 		{
-			return new SkeletonJoint(name, position.clone(), positionRelative.clone(), rgbPosition.clone(), rgbRelativePosition.clone(), depthPosition.clone(), depthRelativePosition.clone());
+			return new SkeletonJoint(name, position.clone(), positionRelative.clone(), positionConfidence, orientation.clone(), orientationConfidence, rgbPosition.clone(), rgbRelativePosition.clone(), depthPosition.clone(), depthRelativePosition.clone());
 		}
 		
 		/**
@@ -113,6 +132,9 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			rgbRelativePosition.copyFrom(otherJoint.rgbRelativePosition);
 			depthPosition.copyFrom(otherJoint.depthPosition);
 			depthRelativePosition.copyFrom(otherJoint.depthRelativePosition);
+			positionConfidence = otherJoint.positionConfidence;
+			orientation.copyFrom(otherJoint.orientation);
+			orientationConfidence = otherJoint.orientationConfidence;
 		}
 	}
 }
