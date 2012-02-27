@@ -193,7 +193,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 */
 		public static function getDevice(nr:uint = 0):Kinect {
 			var deviceClass:Class = OS.isWindows() ? MSKinect : OpenNIKinect;
-			return getDeviceByClass(deviceClass);
+			return getDeviceByClass(deviceClass, nr);
 		}
 
 		protected var _nr:uint;
