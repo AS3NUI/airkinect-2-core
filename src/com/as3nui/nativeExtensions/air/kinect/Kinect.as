@@ -606,7 +606,9 @@ package com.as3nui.nativeExtensions.air.kinect {
 		// UserMask Frame Event Handling
 		// -------------------------------------------
 		protected function handleUserMaskFrame():void {
-			if (!hasEventListener(UserEvent.USERS_MASK_IMAGE_UPDATE)) return;
+			//we should also enable user masks on enter frame, so
+			//don't check for the specific event listener
+			//if (!hasEventListener(UserEvent.USERS_MASK_IMAGE_UPDATE)) return;
 			if(users == null) return;
 
 			var i:uint = 0;
