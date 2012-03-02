@@ -17,7 +17,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 	import com.as3nui.nativeExtensions.air.kinect.constants.DeviceState;
 	import com.as3nui.nativeExtensions.air.kinect.constants.Framework;
 	import com.as3nui.nativeExtensions.air.kinect.constants.OS;
-	import com.as3nui.nativeExtensions.air.kinect.data.DeviceCapabiltiies;
+	import com.as3nui.nativeExtensions.air.kinect.data.DeviceCapabilities;
 	import com.as3nui.nativeExtensions.air.kinect.data.PointCloudRegion;
 	import com.as3nui.nativeExtensions.air.kinect.data.User;
 	import com.as3nui.nativeExtensions.air.kinect.data.UserFrame;
@@ -44,8 +44,8 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 	use namespace as3nui;
 
-	[Event(name="started", type="com.as3nui.nativeExtensions.air.kinect.events.KinectEvent")]
-	[Event(name="stopped", type="com.as3nui.nativeExtensions.air.kinect.events.KinectEvent")]
+	[Event(name="started", type="com.as3nui.nativeExtensions.air.kinect.events.DeviceEvent")]
+	[Event(name="stopped", type="com.as3nui.nativeExtensions.air.kinect.events.DeviceEvent")]
 	[Event(name="depthImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent")]
 	[Event(name="rgbImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent")]
 	[Event(name="usersAdded", type="com.as3nui.nativeExtensions.air.kinect.events.UserEvent")]
@@ -123,7 +123,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 */
 		private static var _deviceInstanceMap:Dictionary;
 		private static var _sharedContext:ExtensionContext;
-		private static var _deviceCapabilities:DeviceCapabiltiies;
+		private static var _deviceCapabilities:DeviceCapabilities;
 
 
 		private static function get sharedContext():ExtensionContext {
@@ -149,10 +149,10 @@ package com.as3nui.nativeExtensions.air.kinect {
 			return (sharedContext.call(EXTENSION_REQUEST_GET_DEVICE_COUNT) as uint);
 		}
 
-		public static function get Capabilities():DeviceCapabiltiies {
+		public static function get Capabilities():DeviceCapabilities {
 			if (!_deviceCapabilities) {
 				var nativeCapabilities:Object = sharedContext.call(EXTENSION_REQUEST_GET_CAPABILITIES) as Object;
-				_deviceCapabilities = new DeviceCapabiltiies(nativeCapabilities);
+				_deviceCapabilities = new DeviceCapabilities(nativeCapabilities);
 			}
 			return _deviceCapabilities;
 		}
