@@ -5,7 +5,7 @@ You can find the compiled .ane file in the bin directory of this repository.
 Requirements:
 =============
 
-Adobe Flash Builder 4.6 IDE | Flash Develop | Intellij
+Actionscript IDE supporting AIR 3.0 projects. (Flash Builder 4.6, IntelliJ, FDT, ...)
 
 Windows:
 --------
@@ -14,9 +14,14 @@ Windows:
 
 OSX Lion:
 ---------
-1) Install Macports: http://www.macports.org
-2) Execute the following command in Terminal: sudo port install libtool
-3) Execute the following command in Terminal: sudo port install libusb-devel +universal
-4) Download & install OpenNI OSX binary (unstable): http://www.openni.org/
-5) Download & install Nite OSX binary (unstable): http://www.openni.org/
-6) Download & install SensorKinect: https://github.com/avin2/SensorKinect
+You can use the instructions "Install OpenNI the short way" of the SimpleOpenNI project to get OpenNI up and running on your OSX machine: http://code.google.com/p/simple-openni/wiki/Installation#OSX.
+
+Alternatively, you can follow the instructions below:
+
+1) Install XCode (required by Macports)
+2) Install Macports: http://www.macports.org
+3) Execute the following command in Terminal: sudo port install libtool
+4) Execute the following command in Terminal: sudo port install libusb-devel +universal
+5) Download & install OpenNI OSX binary (unstable): http://www.openni.org/
+6) Download & install Nite OSX binary (unstable): http://www.openni.org/
+7) Download & install SensorKinect: https://github.com/avin2/SensorKinect
