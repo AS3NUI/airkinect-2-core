@@ -10,18 +10,21 @@
       margin-top: 1.0em;
       background-color: #ffffff;
       font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #000000;
+      color: #aaaaaa;
+	  background-color: #000000;
+	  background-image: url(images/background.png);
+	  background-repeat: repeat;
     }
     #container {
       margin: 0 auto;
       width: 700px;
     }
-    h1 { font-size: 3.8em; color: #cc0f50; margin-bottom: 3px; }
+    h1 { font-size: 3.8em; color: #dddddd; margin-bottom: 3px; }
     h1 .small { font-size: 0.4em; }
     h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #cc0f50; }
-    h3 { font-size: 1.1em; color: #cc0f50; }
-    a { color: #cc0f50; }
+    h2 { font-size: 1.5em; color: #dddddd; }
+    h3 { font-size: 1.1em; color: #dddddd; }
+    a { color: #dddddd; }
     .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
     .download { float: right; }
     pre { background: #000; color: #fff; padding: 15px;}
@@ -58,20 +61,23 @@
     <h2>Documentation</h2>
       <p><a href="docs">View documentation online</a></p>
     <h2>Requirements</h2>
-      <p>Adobe Flash Builder 4.6 IDE | Flash Develop | Intellij</p>
+      <p>Actionscript IDE supporting AIR 3.0 projects. (Flash Builder 4.6, IntelliJ, FDT, ...)</p>
       <h3>Windows 7</h3>
       <ol>
-      	<li>Install Microsoft Kinect SDK: http://kinectforwindows.org/</li>
+      	<li>Install Microsoft Kinect SDK: <a href="http://kinectforwindows.org/" target="_blank">http://kinectforwindows.org/</a></li>
         <li>That's it</li>
       </ol>
-      <h3>OSX 10.7+</h3>
+      <h3>OSX 10.6+</h3>
+      <p>You can use the instructions "Install OpenNI the short way" of the SimpleOpenNI project to get OpenNI up and running on your OSX machine: <a href="http://code.google.com/p/simple-openni/wiki/Installation#OSX" target="_blank">http://code.google.com/p/simple-openni/wiki/Installation#OSX</a>.</p>
+      <p>Alternatively, you can follow the instructions below:</p>
       <ol>
-        <li>Install Macports: http://www.macports.org</li>
+      	<li>Install XCode (required by Macports)</li>
+        <li>Install Macports: <a href="http://www.macports.org" target="_blank">http://www.macports.org</a></li>
         <li>Execute the following command in Terminal: sudo port install libtool</li>
         <li>Execute the following command in Terminal: sudo port install libusb-devel +universal</li>
-        <li>Download & install OpenNI OSX binary (unstable): http://www.openni.org/</li>
-        <li>Download & install Nite OSX binary (unstable): http://www.openni.org/</li>
-        <li>Download & install SensorKinect: https://github.com/avin2/SensorKinect</li>
+        <li>Download & install OpenNI OSX binary (unstable): <a href="http://www.openni.org/" target="_blank">http://www.openni.org/</a></li>
+        <li>Download & install Nite OSX binary (unstable): <a href="http://www.openni.org/" target="_blank">http://www.openni.org/</a></li>
+        <li>Download & install SensorKinect: <a href="https://github.com/avin2/SensorKinect" target="_blank">https://github.com/avin2/SensorKinect</a></li>
       </ol>
 	<h2>Download</h2>
     <p>

@@ -1,0 +1,12 @@
+build/*
+cert/*
+examples/*
+extension/*
+.settings/*
+.actionScriptProperties
+
+.flexLibProperties
+
+.fxpProperties
+
+.project
