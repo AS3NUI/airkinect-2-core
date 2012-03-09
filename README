@@ -12,7 +12,7 @@ Windows:
 1) Install Microsoft Kinect SDK: http://kinectforwindows.org/
 2) That's it (*)
 
-(*) If the extension does not work, you might need to install Visual C++ express too: http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express
+(*) Make sure you install the kinect SDK dependencies (Visual Studio Express & .NET framework 4.0) too.
 
 OSX Lion:
 ---------
