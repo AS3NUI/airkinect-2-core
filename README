@@ -10,7 +10,9 @@ Actionscript IDE supporting AIR 3.0 projects. (Flash Builder 4.6, IntelliJ, FDT,
 Windows:
 --------
 1) Install Microsoft Kinect SDK: http://kinectforwindows.org/
-2) That's it
+2) That's it (*)
+
+(*) If the extension does not work, you might need to install Visual C++ express too: http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express
 
 OSX Lion:
 ---------
