@@ -23,6 +23,8 @@ package com.as3nui.nativeExtensions.air.kinect {
 	import com.as3nui.nativeExtensions.air.kinect.data.UserFrame;
 	import com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.DeviceEvent;
+	import com.as3nui.nativeExtensions.air.kinect.events.DeviceErrorEvent;
+	import com.as3nui.nativeExtensions.air.kinect.events.DeviceInfoEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.PointCloudEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.UserEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.UserFrameEvent;
@@ -680,6 +682,12 @@ package com.as3nui.nativeExtensions.air.kinect {
 					break;
 				case "trace":
 					trace(event.level);
+					break;
+				case "info":
+					this.dispatchEvent(new DeviceInfoEvent(event.level));
+					break;
+				case "error":
+					this.dispatchEvent(new DeviceErrorEvent(event.level));
 					break;
 			}
 		}
