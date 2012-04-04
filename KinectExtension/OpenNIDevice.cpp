@@ -29,15 +29,33 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
     this->freContext = freContext;
     this->context = context;
     
-    //initialize the mutexes
-    /*
-    pthread_mutex_init(&userMutex, NULL);
-    pthread_mutex_init(&depthMutex, NULL);
-    pthread_mutex_init(&rgbMutex, NULL);
-    pthread_mutex_init(&userMaskMutex, NULL);
-    pthread_mutex_init(&infraredMutex, NULL);
-    pthread_mutex_init(&pointCloudMutex, NULL);
-     */
+    //initialize the capabilities of this device
+    capabilities.hasCameraElevationSupport				= false;
+    capabilities.hasDepthCameraSupport					= true;
+    capabilities.hasDepthUserSupport					= true;
+    capabilities.hasInfraredSupport						= true;
+    capabilities.hasJointOrientationConfidenceSupport	= true;
+    capabilities.hasJointOrientationSupport				= true;
+    capabilities.hasMultipleSensorSupport				= false;
+    capabilities.hasPointCloudRegionSupport				= true;
+    capabilities.hasPointCloudSupport					= true;
+    capabilities.hasPositionConfidenceSupport			= true;
+    capabilities.hasRGBCameraSupport					= true;
+    capabilities.hasSkeletonSupport						= true;
+    capabilities.hasUserMaskSupport						= true;
+    
+    capabilities.maxSensors								= 1;
+    capabilities.framework								= "openni";
+    
+    //some sensors don't have an RGB camera (asus xtion pro)
+    XnStatus rc;
+    xn::NodeInfoList imageNodes;
+    rc = context.EnumerateProductionTrees(XN_NODE_TYPE_IMAGE, NULL, imageNodes, NULL );
+    if(rc != XN_STATUS_OK)
+    {
+        capabilities.hasRGBCameraSupport = false;
+        capabilities.hasUserMaskSupport = false;
+    }
     
     //set default values
     setDefaults();
@@ -174,6 +192,11 @@ void OpenNIDevice::setUserColor(int userID, int color, bool useIntensity)
 }
 
 //////////////// START FRE FUNCTIONS
+
+FREObject OpenNIDevice::freGetCapabilities()
+{
+    return capabilities.asFREObject();
+}
 
 FREObject OpenNIDevice::freSetUserMode(FREObject argv[])
 {
@@ -717,73 +740,61 @@ int OpenNIDevice::getAsPointCloudByteArrayLength()
 void OpenNIDevice::lockUserMutex()
 {
     userMutex.lock();
-    //pthread_mutex_lock(&userMutex);
 }
 
 void OpenNIDevice::unlockUserMutex()
 {
     userMutex.unlock();
-    //pthread_mutex_unlock(&userMutex);
 }
 
 void OpenNIDevice::lockDepthMutex()
 {
     depthMutex.lock();
-    //pthread_mutex_lock(&depthMutex);
 }
 
 void OpenNIDevice::unlockDepthMutex()
 {
     depthMutex.unlock();
-    //pthread_mutex_unlock(&depthMutex);
 }
 
 void OpenNIDevice::lockRGBMutex()
 {
     rgbMutex.lock();
-    //pthread_mutex_lock(&rgbMutex);
 }
 
 void OpenNIDevice::unlockRGBMutex()
 {
     rgbMutex.unlock();
-    //pthread_mutex_unlock(&rgbMutex);
 }
 
 void OpenNIDevice::lockUserMaskMutex()
 {
     userMaskMutex.lock();
-    //pthread_mutex_lock(&userMaskMutex);
 }
 
 void OpenNIDevice::unlockUserMaskMutex()
 {
     userMaskMutex.unlock();
-    //pthread_mutex_unlock(&userMaskMutex);
 }
 
 void OpenNIDevice::lockInfraredMutex()
 {
     infraredMutex.lock();
-    //pthread_mutex_lock(&infraredMutex);
 }
 
 void OpenNIDevice::unlockInfraredMutex()
 {
     infraredMutex.unlock();
-    //pthread_mutex_unlock(&infraredMutex);
 }
 
 void OpenNIDevice::lockPointCloudMutex()
 {
     pointCloudMutex.lock();
-    //pthread_mutex_lock(&pointCloudMutex);
 }
 
 void OpenNIDevice::unlockPointCloudMutex()
 {
     pointCloudMutex.unlock();
-    //pthread_mutex_unlock(&pointCloudMutex);
 }
 
 void OpenNIDevice::start()
@@ -791,13 +802,7 @@ void OpenNIDevice::start()
     printf("OpenNIDevice::start()\n");
     if(!running)
     {
-        //returnVal = pthread_attr_init(&attr);
-        //returnVal = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-        
         running = true;
-        
-        //int threadError = pthread_create(&posixThreadID, &attr, deviceThread, (void *) this);
-        //printf("thread create code: %i\n", threadError);
         mThread = boost::thread(&OpenNIDevice::deviceThread, this);
     }
 }
@@ -808,8 +813,6 @@ void OpenNIDevice::stop()
     if(running)
     {
         running = false;
-        //int threadError = pthread_join(posixThreadID, NULL);
-        //printf("thread join code: %d\n", threadError);
         mThread.join();
     }
     if(depthGenerator.IsValid())
@@ -906,15 +909,18 @@ void OpenNIDevice::run()
         depthMode.nYRes = depthHeight;
         depthMode.nFPS = 30;
         
+        bool depthGeneratorCreated = false;
         rc = depthGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
             printf("OpenNIDevice create depthGenerator failed: %s\n", xnGetStatusString(rc));
-            stop();
-            return;
         }
-        depthGenerator.SetMapOutputMode(depthMode);
-        depthGenerator.GetMirrorCap().SetMirror(false);
+        else
+        {
+            depthGeneratorCreated = true;
+            depthGenerator.SetMapOutputMode(depthMode);
+            depthGenerator.GetMirrorCap().SetMirror(false);
+        }
         
         //check if running is still true, as OpenNi takes a while to initialize
         if(!running)
@@ -928,15 +934,18 @@ void OpenNIDevice::run()
         rgbMode.nYRes = rgbHeight;
         rgbMode.nFPS = 30;
         
+        bool imageGeneratorCreated = false;
         rc = imageGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
             printf("OpenNIDevice create imageGenerator failed: %s\n", xnGetStatusString(rc));
-            stop();
-            return;
         }
-        imageGenerator.SetMapOutputMode(rgbMode);
-        imageGenerator.GetMirrorCap().SetMirror(false);
+        else
+        {
+            imageGeneratorCreated = true;
+            imageGenerator.SetMapOutputMode(rgbMode);
+            imageGenerator.GetMirrorCap().SetMirror(false);
+        }
         
         //check if running is still true, as OpenNi takes a while to initialize
         if(!running)
@@ -950,15 +959,18 @@ void OpenNIDevice::run()
         infraredMode.nYRes = infraredHeight;
         infraredMode.nFPS = 30;
         
+        bool infraredGeneratorCreated = false;
         rc = infraredGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
             printf("OpenNIDevice create infraredGenerator failed: %s\n", xnGetStatusString(rc));
-            stop();
-            return;
         }
-        infraredGenerator.SetMapOutputMode(infraredMode);
-        infraredGenerator.GetMirrorCap().SetMirror(false);
+        else
+        {
+            infraredGeneratorCreated = true;
+            infraredGenerator.SetMapOutputMode(infraredMode);
+            infraredGenerator.GetMirrorCap().SetMirror(false);
+        }
         
         //check if running is still true, as OpenNi takes a while to initialize
         if(!running)
@@ -968,15 +980,21 @@ void OpenNIDevice::run()
         }
         
         //map depth to rgb stream
-        depthGenerator.GetAlternativeViewPointCap().SetViewPoint(imageGenerator);
+        if(depthGeneratorCreated && imageGeneratorCreated && depthGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT))
+        {
+            depthGenerator.GetAlternativeViewPointCap().SetViewPoint(imageGenerator);
+        }
         
         //initialize the user generator
+        bool userGeneratorCreated = false;
         rc = userGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
             printf("OpenNIDevice create userGenerator failed: %s\n", xnGetStatusString(rc));
-            stop();
-            return;
+        }
+        else
+        {
+            userGeneratorCreated = true;
         }
         
         //check if running is still true, as OpenNi takes a while to initialize
@@ -1029,45 +1047,37 @@ void OpenNIDevice::run()
             return;
         }
         
-        if(asDepthEnabled || asPointCloudEnabled)
+        if(depthGeneratorCreated && (asDepthEnabled || asPointCloudEnabled))
         {
             rc = depthGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
                 printf("OpenNIDevice start depthGenerator failed: %s\n", xnGetStatusString(rc));
-                stop();
-                return;
             }
         }
-        if(asRGBEnabled || asUserMaskEnabled || asPointCloudEnabled)
+        if(imageGeneratorCreated && (asRGBEnabled || asUserMaskEnabled || asPointCloudEnabled))
         {
             rc = imageGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
                 printf("OpenNIDevice start imageGenerator failed: %s\n", xnGetStatusString(rc));
-                stop();
-                return;
             }
         }
-        if((asDepthEnabled && asDepthShowUserColors) || asUserMaskEnabled || asUserEnabled || asSkeletonEnabled)
+        if(userGeneratorCreated && ((asDepthEnabled && asDepthShowUserColors) || asUserMaskEnabled || asUserEnabled || asSkeletonEnabled))
         {
             rc = userGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
                 printf("OpenNIDevice start userGenerator failed: %s\n", xnGetStatusString(rc));
-                stop();
-                return;
             }
         }
         //you cant have both infrared and rgb
-        if(asInfraredEnabled && !imageGenerator.IsGenerating())
+        if(infraredGeneratorCreated && (asInfraredEnabled && !(imageGeneratorCreated && imageGenerator.IsGenerating())))
         {
             rc = infraredGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
                 printf("OpenNIDevice start infraredGenerator failed: %s\n", xnGetStatusString(rc));
-                stop();
-                return;
             }
         }
         
@@ -1085,7 +1095,7 @@ void OpenNIDevice::run()
         {
             XnStatus rc = XN_STATUS_OK;
             
-            if(imageGenerator.IsGenerating())
+            if(imageGeneratorCreated && imageGenerator.IsGenerating())
             {
                 //read a new RGB frame
                 rc = imageGenerator.WaitAndUpdateData();
@@ -1099,7 +1109,7 @@ void OpenNIDevice::run()
                 imageGenerator.GetMetaData(imageMetaData);
             }
             
-            if(depthGenerator.IsGenerating())
+            if(depthGeneratorCreated && depthGenerator.IsGenerating())
             {
                 //read a new Depth frame
                 rc = depthGenerator.WaitAndUpdateData();
@@ -1115,7 +1125,7 @@ void OpenNIDevice::run()
                 calculateHistogram();
             }
             
-            if(infraredGenerator.IsGenerating())
+            if(infraredGeneratorCreated && infraredGenerator.IsGenerating())
             {
                 //read a new Infrared frame
                 rc = infraredGenerator.WaitAndUpdateData();
@@ -1129,7 +1139,7 @@ void OpenNIDevice::run()
                 infraredGenerator.GetMetaData(infraredMetaData);
             }
             
-            if(userGenerator.IsGenerating())
+            if(userGeneratorCreated && userGenerator.IsGenerating())
             {
                 //read a new User frame
                 userGenerator.WaitAndUpdateData();
@@ -1138,7 +1148,7 @@ void OpenNIDevice::run()
             }
             
             //rgb image
-            if(asRGBEnabled)
+            if(asRGBEnabled && imageGeneratorCreated)
             {
                 lockRGBMutex();
                 rgbFrameHandler();
@@ -1147,7 +1157,7 @@ void OpenNIDevice::run()
             }
             
             //depth image
-            if(asDepthEnabled)
+            if(asDepthEnabled && depthGeneratorCreated)
             {
                 lockDepthMutex();
                 if(asDepthShowUserColors)
@@ -1164,7 +1174,7 @@ void OpenNIDevice::run()
             }
             
             //infrared image - not available when rgb is enabled
-            if(asInfraredEnabled && !imageGenerator.IsGenerating())
+            if(asInfraredEnabled && infraredGeneratorCreated && !(imageGeneratorCreated && imageGenerator.IsGenerating()))
             {
                 lockInfraredMutex();
                 infraredHandler();
@@ -1190,7 +1200,7 @@ void OpenNIDevice::run()
             }
             
             //user information
-            if(asUserEnabled || asSkeletonEnabled || asUserMaskEnabled)
+            if((asUserEnabled || asSkeletonEnabled || asUserMaskEnabled) && userGeneratorCreated)
             {
                 lockUserMutex();
                 userHandler();

@@ -22,15 +22,16 @@ extern "C"
 		return retObj;
     }
     
-    FREObject Kinect_getCapabilities(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
-    {
-		return kinectDeviceManager.getCapabilities();
-    }
-    
     FREObject Kinect_applicationShutdown(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
         kinectDeviceManager.shutDown();
         return NULL;
+    }
+    
+    FREObject Kinect_getCapabilities(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+    {
+        unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+        return kinectDeviceManager.getDevice(nr, ctx)->freGetCapabilities();
     }
     
     FREObject Kinect_start(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
@@ -215,13 +216,13 @@ extern "C"
     
     FRENamedFunction _Static_methods[] = {
 		{ (const uint8_t*) "getDeviceCount", 0, Kinect_getDeviceCount},
-		{ (const uint8_t*) "getCapabilities", 0, Kinect_getCapabilities },
         { (const uint8_t*) "applicationShutdown", 0, Kinect_applicationShutdown}
     };
     
 	FRENamedFunction _Instance_methods[] = {
 		{ (const uint8_t*) "start", 0, Kinect_start },
 		{ (const uint8_t*) "stop", 0, Kinect_stop },
+   		{ (const uint8_t*) "getCapabilities", 0, Kinect_getCapabilities },
         { (const uint8_t*) "setUserMode", 0, Kinect_setUserMode },
 		{ (const uint8_t*) "setUserColor", 0, Kinect_setUserColor },
         { (const uint8_t*) "setUserEnabled", 0, Kinect_setUserEnabled },

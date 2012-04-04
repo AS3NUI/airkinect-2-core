@@ -39,15 +39,6 @@ int KinectDeviceManager::getNumDevices()
     return numDevices;
 }
 
-FREObject KinectDeviceManager::getCapabilities()
-{
-    KinectCapabilities kinectCapabilities;
-    
-	kinectCapabilities = OpenNIDevice::getCapabilities();
-    
-	return kinectCapabilities.asFREObject();
-}
-
 void KinectDeviceManager::startUp()
 {
     //printf("KinectDeviceManager::startUp()\n");

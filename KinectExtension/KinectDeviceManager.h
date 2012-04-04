@@ -24,8 +24,7 @@ public:
     bool                            isStarted();
     void                            startUp();
     void                            shutDown();
-    FREObject						getCapabilities();
-    IKinectDevice                    *getDevice(int nr, FREContext freContext);
+    IKinectDevice                   *getDevice(int nr, FREContext freContext);
     
 private:
     xn::Context                     context;
@@ -33,7 +32,7 @@ private:
     bool                            started;
     
     int                             numDevices;
-    std::map<int, IKinectDevice*>    deviceMap;
+    std::map<int, IKinectDevice*>   deviceMap;
 };
 
 #endif

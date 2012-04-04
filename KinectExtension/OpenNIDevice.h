@@ -23,27 +23,6 @@ class OpenNIDevice : IKinectDevice
 {
     static const int        MAX_DEPTH = 10000;
 public:
-    static KinectCapabilities	getCapabilities(){
-		KinectCapabilities kinectCapabilities;
-		
-		kinectCapabilities.hasCameraElevationSupport				= false;
-		kinectCapabilities.hasDepthCameraSupport					= true;
-		kinectCapabilities.hasDepthUserSupport						= true;
-		kinectCapabilities.hasInfraredSupport						= true;
-		kinectCapabilities.hasJointOrientationConfidenceSupport		= true;
-		kinectCapabilities.hasJointOrientationSupport				= true;
-		kinectCapabilities.hasMultipleSensorSupport					= false;
-		kinectCapabilities.hasPointCloudRegionSupport				= true;
-		kinectCapabilities.hasPointCloudSupport						= true;
-		kinectCapabilities.hasPositionConfidenceSupport				= true;
-		kinectCapabilities.hasRGBCameraSupport						= true;
-		kinectCapabilities.hasSkeletonSupport						= true;
-		kinectCapabilities.hasUserMaskSupport						= true;
-        
-		kinectCapabilities.maxSensors								= 1;
-		kinectCapabilities.framework								= "openni";
-		return kinectCapabilities;
-	};
     
     OpenNIDevice(int nr, xn::Context context);
     
@@ -51,13 +30,14 @@ public:
     FREContext			getFreContext();
 	void				setFreContext(FREContext pFreContext);
     
-	//Starts and Sotp the Kinect Device
+	//Starts and Stop the Kinect Device
     void				start();
     void				stop();
     
 	//Dispose the Device form memory
     void				dispose();
     
+    FREObject           freGetCapabilities();
     FREObject           freSetUserMode(FREObject argv[]);
     FREObject           freSetUserColor(FREObject argv[]);
     FREObject           freSetUserEnabled(FREObject argv[]);
@@ -88,6 +68,7 @@ private:
     int                     nr;
     xn::Context             context;
     FREContext              freContext;
+    KinectCapabilities      capabilities;
     
     boost::mutex            userMutex;
     boost::mutex            depthMutex;
