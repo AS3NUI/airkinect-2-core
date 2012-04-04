@@ -12,8 +12,8 @@ Windows:
 1) Install Microsoft Kinect SDK: http://kinectforwindows.org/
 2) That's it
 
-OSX Lion:
----------
+OSX 10.6+:
+----------
 You can use the instructions "Install OpenNI the short way" of the SimpleOpenNI project to get OpenNI up and running on your OSX machine: http://code.google.com/p/simple-openni/wiki/Installation#OSX.
 
 Alternatively, you can follow the instructions below:

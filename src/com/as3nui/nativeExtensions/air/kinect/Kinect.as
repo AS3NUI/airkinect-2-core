@@ -288,7 +288,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 */ 
 		public function get capabilities():DeviceCapabilities {
 			if (!_capabilities) {
-				var nativeCapabilities:Object = context.call(EXTENSION_REQUEST_GET_CAPABILITIES) as Object;
+				var nativeCapabilities:Object = context.call(EXTENSION_REQUEST_GET_CAPABILITIES, _nr) as Object;
 				_capabilities = new DeviceCapabilities(nativeCapabilities);
 			}
 			return _capabilities;
