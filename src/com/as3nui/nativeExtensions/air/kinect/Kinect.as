@@ -132,8 +132,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 		/** @private */
 		protected static const EXTENSION_REQUEST_GET_DEVICE_COUNT:String = "getDeviceCount";
 		/** @private */
-		protected static const EXTENSION_REQUEST_GET_CAPABILITIES:String = "getCapabilities";
-		/** @private */
 		protected static const EXTENSION_REQUEST_APPLICATION_SHUTDOWN:String = "applicationShutdown";
 
 		//Main Context Requests
@@ -141,7 +139,9 @@ package com.as3nui.nativeExtensions.air.kinect {
 		protected static const EXTENSION_REQUEST_START:String = "start";
 		/** @private */
 		protected static const EXTENSION_REQUEST_STOP:String = "stop";
-
+		
+		/** @private */
+		protected static const EXTENSION_REQUEST_GET_CAPABILITIES:String = "getCapabilities";
 		/** @private */
 		protected static const EXTENSION_REQUEST_SET_USER_MODE:String = "setUserMode";
 		/** @private */
@@ -207,7 +207,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 */
 		private static var _deviceInstanceMap:Dictionary;
 		private static var _sharedContext:ExtensionContext;
-		private static var _deviceCapabilities:DeviceCapabilities;
 
 
 		private static function get sharedContext():ExtensionContext {
@@ -231,14 +230,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 */
 		public static function numDevices():uint {
 			return (sharedContext.call(EXTENSION_REQUEST_GET_DEVICE_COUNT) as uint);
-		}
-
-		public static function get Capabilities():DeviceCapabilities {
-			if (!_deviceCapabilities) {
-				var nativeCapabilities:Object = sharedContext.call(EXTENSION_REQUEST_GET_CAPABILITIES) as Object;
-				_deviceCapabilities = new DeviceCapabilities(nativeCapabilities);
-			}
-			return _deviceCapabilities;
 		}
 
 		/**
@@ -288,6 +279,19 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 */
 		public function get nr():uint {
 			return _nr;
+		}
+		
+		private var _capabilities:DeviceCapabilities;
+		
+		/**
+		 * Get the capabilities of the Device.
+		 */ 
+		public function get capabilities():DeviceCapabilities {
+			if (!_capabilities) {
+				var nativeCapabilities:Object = context.call(EXTENSION_REQUEST_GET_CAPABILITIES) as Object;
+				_capabilities = new DeviceCapabilities(nativeCapabilities);
+			}
+			return _capabilities;
 		}
 
 		/** @private */
@@ -368,7 +372,9 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 			_nr = nr;
 			_state = DeviceState.STOPPED;
-
+			
+			//create the extension _context
+			context = ExtensionContext.createExtensionContext("com.as3nui.nativeExtensions.air.kinect", null);
 
 			//dispose the kinect on application exit
 			NativeApplication.nativeApplication.addEventListener("exiting", exitingHandler, false, 0, true);
@@ -383,8 +389,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 			if (_state == DeviceState.STOPPED) {
 				_settings = parseSettings(deviceSettings);
 				_state = DeviceState.STARTING;
-				//create the extension _context
-				context = ExtensionContext.createExtensionContext("com.as3nui.nativeExtensions.air.kinect", null);
 				//add status listener to the _context
 				context.addEventListener(StatusEvent.STATUS, contextStatusHandler, false, 0, true);
 				//Initialize all variales needed for settings requested
@@ -413,8 +417,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 				//stop the _context
 				context.call(EXTENSION_REQUEST_STOP, _nr);
 				disposeSettings();
-				//remove the _context
-				context = null;
 				//dispatch the stopped event
 				dispatchEvent(new DeviceEvent(DeviceEvent.STOPPED));
 			}
