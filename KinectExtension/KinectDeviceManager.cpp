@@ -79,19 +79,19 @@ void KinectDeviceManager::shutDown()
     }
 }
 
-IKinectDevice *KinectDeviceManager::getDevice(int nr, FREContext freContext)
+KinectDevice *KinectDeviceManager::getDevice(int nr, FREContext freContext)
 {
     //printf("KinectDeviceManager::getDevice()\n");
-    IKinectDevice* instance = NULL;
-    std::map<int, IKinectDevice*>::iterator it = deviceMap.find(nr);
+    KinectDevice* instance = NULL;
+    std::map<int, KinectDevice*>::iterator it = deviceMap.find(nr);
     
     if (it != deviceMap.end())
     {
-        instance = (IKinectDevice*)(it->second);
+        instance = (KinectDevice*)(it->second);
     }
     else
     {
-        instance = (IKinectDevice *) (new OpenNIDevice(nr, context));
+        instance = (KinectDevice *) (new OpenNIDevice(nr, context));
         deviceMap[nr] = instance;
     }
     

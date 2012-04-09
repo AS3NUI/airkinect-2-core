@@ -14,12 +14,12 @@
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "IKinectDevice.h"
+#include "KinectDevice.h"
 #include "KinectSkeleton.h"
 #include "KinectCapabilities.h"
 #include "PointCloudRegion.h"
 
-class OpenNIDevice : IKinectDevice
+class OpenNIDevice : KinectDevice
 {
     static const int        MAX_DEPTH = 10000;
 public:
@@ -37,47 +37,12 @@ public:
 	//Dispose the Device form memory
     void				dispose();
     
-    FREObject           freGetCapabilities();
-    FREObject           freSetUserMode(FREObject argv[]);
-    FREObject           freSetUserColor(FREObject argv[]);
-    FREObject           freSetUserEnabled(FREObject argv[]);
-    FREObject           freSetSkeletonMode(FREObject argv[]);
-    FREObject           freSetSkeletonEnabled(FREObject argv[]);
-    FREObject           freGetUserFrame(FREObject argv[]);
-    FREObject           freGetSkeletonJointNameIndices(FREObject argv[]);
-    FREObject           freGetSkeletonJointNames(FREObject argv[]);
-    FREObject           freSetUserMaskMode(FREObject argv[]);
-    FREObject           freSetUserMaskEnabled(FREObject argv[]);
-    FREObject           freGetUserMaskFrame(FREObject argv[]);
-    FREObject           freSetDepthMode(FREObject argv[]);
-    FREObject           freSetDepthEnabled(FREObject argv[]);
-    FREObject           freGetDepthFrame(FREObject argv[]);
-    FREObject           freSetDepthShowUserColors(FREObject argv[]);
-    FREObject           freSetRGBMode(FREObject argv[]);
-    FREObject           freSetRGBEnabled(FREObject argv[]);
-    FREObject           freGetRGBFrame(FREObject argv[]);
     FREObject           freSetInfraredMode(FREObject argv[]);
     FREObject           freSetInfraredEnabled(FREObject argv[]);
     FREObject           freGetInfraredFrame(FREObject argv[]);
-    FREObject           freSetPointCloudMode(FREObject argv[]);
-    FREObject           freSetPointCloudEnabled(FREObject argv[]);
-    FREObject           freGetPointCloudFrame(FREObject argv[]);
-    FREObject           freSetPointCloudRegions(FREObject argv[]);
     
-private:
-    int                     nr;
-    xn::Context             context;
-    FREContext              freContext;
-    KinectCapabilities      capabilities;
-    
-    boost::mutex            userMutex;
-    boost::mutex            depthMutex;
-    boost::mutex            rgbMutex;
-    boost::mutex            userMaskMutex;
-    boost::mutex            infraredMutex;
-    boost::mutex            pointCloudMutex;
-    
-    void                    lockUserMutex();
+protected:
+	void                    lockUserMutex();
     void                    unlockUserMutex();
     
     void                    lockDepthMutex();
@@ -95,20 +60,22 @@ private:
     void                    lockPointCloudMutex();
     void                    unlockPointCloudMutex();
     
-    void                    setUserColor(int userID, int color, bool useIntensity);
-    int                     getAsPointCloudByteArrayLength();
-    
-    kinectUserFrame         userFrame;
-    uint32_t                *depthByteArray;
-    uint32_t                *RGBByteArray;
-    uint32_t                **userMaskByteArray;
-    uint32_t                *infraredByteArray;
-    short                   *pointCloudByteArray;
-    PointCloudRegion        *pointCloudRegions;
-    unsigned int            numRegions;
-    
+	void                    setUserColor(int userID, int color, bool useIntensity);
     
     void                    setDefaults();
+    
+private:
+    int                     nr;
+    xn::Context             context;
+    
+    boost::mutex            userMutex;
+    boost::mutex            depthMutex;
+    boost::mutex            rgbMutex;
+    boost::mutex            userMaskMutex;
+    boost::mutex            infraredMutex;
+    boost::mutex            pointCloudMutex;
+    
+    int                     getAsPointCloudByteArrayLength();
     
     void                    run();
     
@@ -117,12 +84,6 @@ private:
     
     int                     returnVal;
     bool                    running;
-    bool                    started;
-    
-    bool                    asUserMirrored;
-    bool                    asUserEnabled;
-    bool                    asSkeletonMirrored;
-    bool                    asSkeletonEnabled;
     
     XnCallbackHandle        userHandle;
     XnCallbackHandle        userExitHandle;
@@ -137,43 +98,9 @@ private:
     void                    userHandler();
     void                    addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex);
     
-    int                     asDepthWidth;
-    int                     asDepthHeight;
-    int                     asDepthPixelCount;
-    bool                    asDepthMirrored;
-    bool                    asDepthEnabled;
-    bool                    asDepthShowUserColors;
-    
-    int                     depthWidth;
-    int                     depthHeight;
-    int                     depthPixelCount;
-    int                     depthScale;
-    
     float                   depthHistogram[MAX_DEPTH];
     
     float                   userIndexColors[MAX_SKELETONS][4];
-    
-    int                     asRGBWidth;
-    int                     asRGBHeight;
-    int                     asRGBPixelCount;
-    bool                    asRGBMirrored;
-    bool                    asRGBEnabled;
-    
-    int                     rgbWidth;
-    int                     rgbHeight;
-    int                     rgbPixelCount;
-    int                     rgbScale;
-    
-    int                     asUserMaskWidth;
-    int                     asUserMaskHeight;
-    int                     asUserMaskPixelCount;
-    bool                    asUserMaskMirrored;
-    bool                    asUserMaskEnabled;
-    
-    int                     userMaskWidth;
-    int                     userMaskHeight;
-    int                     userMaskPixelCount;
-    int                     userMaskScale;
     
     int                     asInfraredWidth;
     int                     asInfraredHeight;
@@ -186,18 +113,7 @@ private:
     int                     infraredPixelCount;
     int                     infraredScale;
     
-    int                     asPointCloudWidth;
-    int                     asPointCloudHeight;
-    int                     asPointCloudPixelCount;
-    bool                    asPointCloudMirrored;
-    bool                    asPointCloudEnabled;
-    int                     asPointCloudDensity;
-    bool                    asPointCloudIncludeRGB;
-    
-    int                     pointCloudWidth;
-    int                     pointCloudHeight;
-    int                     pointCloudPixelCount;
-    int                     pointCloudScale;
+    uint32_t                *asInfraredByteArray;
     
     xn::ImageGenerator      imageGenerator;
     xn::DepthGenerator      depthGenerator;

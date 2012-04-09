@@ -9,8 +9,7 @@
 #ifndef KinectExtension_KinectUser_h
 #define KinectExtension_KinectUser_h
 
-const int MAX_SKELETONS = 15;
-const int NUM_JOINTS = 24;
+#include "ExtensionConfig.h"
 
 const char JOINT_NAMES[][16] = {
     "head",

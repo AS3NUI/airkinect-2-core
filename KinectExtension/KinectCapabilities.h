@@ -9,6 +9,8 @@
 #ifndef KinectExtension_KinectCapabilities_h
 #define KinectExtension_KinectCapabilities_h
 
+#include <Adobe AIR/Adobe AIR.h>
+
 typedef struct {
 	bool			hasCameraElevationSupport;
 	bool			hasRGBCameraSupport;
@@ -24,6 +26,7 @@ typedef struct {
 	bool			hasJointOrientationConfidenceSupport;
 	bool			hasPositionConfidenceSupport;
 	bool			hasMultipleSensorSupport;
+	bool			hasNearModeSupport;
     
 	unsigned int	maxSensors;
     
@@ -78,6 +81,9 @@ typedef struct {
         
         FRENewObjectFromBool(hasMultipleSensorSupport, &freObject);
         FRESetObjectProperty(capabilities, (const uint8_t*)"hasMultipleSensorSupport", freObject, NULL);
+        
+		FRENewObjectFromBool(hasNearModeSupport, &freObject);
+        FRESetObjectProperty(capabilities, (const uint8_t*)"hasNearModeSupport", freObject, NULL);
         
         //Ints
         FRENewObjectFromUint32(maxSensors, &freObject);

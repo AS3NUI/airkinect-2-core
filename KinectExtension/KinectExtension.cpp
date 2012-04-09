@@ -2,7 +2,6 @@
 #include <stdio.h>
 
 #include "KinectExtension.h"
-#include "IKinectDevice.h"
 #include "KinectDeviceManager.h"
 #include "PointCloudRegion.h"
 
@@ -24,33 +23,33 @@ extern "C"
     
     FREObject Kinect_applicationShutdown(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
-        kinectDeviceManager.shutDown();
+		kinectDeviceManager.shutDown();
         return NULL;
-    }
-    
-    FREObject Kinect_getCapabilities(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
-    {
-        unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
-        return kinectDeviceManager.getDevice(nr, ctx)->freGetCapabilities();
     }
     
     FREObject Kinect_start(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
         unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
-        kinectDeviceManager.getDevice(nr, ctx)->start();
+		kinectDeviceManager.getDevice(nr, ctx)->start();
         return NULL;
     }
     
     FREObject Kinect_stop(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
         unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
-        kinectDeviceManager.getDevice(nr, ctx)->stop();
+		kinectDeviceManager.getDevice(nr, ctx)->stop();
         return NULL;
+    }
+    
+	FREObject Kinect_getCapabilities(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+    {
+		unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+        return kinectDeviceManager.getDevice(nr, ctx)->freGetCapabilities();
     }
     
     FREObject Kinect_setUserMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
-        unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+		unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
         return kinectDeviceManager.getDevice(nr, ctx)->freSetUserMode(argv);
     }
     
@@ -59,7 +58,7 @@ extern "C"
         unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
         return kinectDeviceManager.getDevice(nr, ctx)->freSetUserColor(argv);
     }
-    
+	
     FREObject Kinect_setUserEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
         unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
@@ -80,30 +79,14 @@ extern "C"
     
     FREObject Kinect_getSkeletonJointNameIndices(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
-        FREObject skeletonJointNameIndices, jointIndex;
-        FRENewObject( (const uint8_t*) "flash.utils.Dictionary", 0, NULL, &skeletonJointNameIndices, NULL);
-        
-        for(int i = 0; i < NUM_JOINTS; i++)
-        {
-            FRENewObjectFromUint32(i, &jointIndex);
-            FRESetObjectProperty(skeletonJointNameIndices, (const uint8_t*) JOINT_NAMES[i], jointIndex, NULL);
-        }
-        
-        return skeletonJointNameIndices;
+		unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+		return kinectDeviceManager.getDevice(nr, ctx)->freGetSkeletonJointNameIndices(argv);
     }
     
     FREObject Kinect_getSkeletonJointNames(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
-        FREObject skeletonJointNames, skeletonJointName;
-        FRENewObject( (const uint8_t*) "Vector.<String>", 0, NULL, &skeletonJointNames, NULL);
-        
-        for(int i = 0; i < NUM_JOINTS; i++)
-        {
-            FRENewObjectFromUTF8(strlen(JOINT_NAMES[i]), (const uint8_t*) JOINT_NAMES[i], &skeletonJointName);
-            FRESetArrayElementAt(skeletonJointNames, i, skeletonJointName);
-        }
-        
-        return skeletonJointNames;
+		unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+		return kinectDeviceManager.getDevice(nr, ctx)->freGetSkeletonJointNames(argv);
     }
     
     FREObject Kinect_getUserFrame(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
@@ -114,7 +97,7 @@ extern "C"
     
     FREObject Kinect_setUserMaskMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
-        unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+		unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
         return kinectDeviceManager.getDevice(nr, ctx)->freSetUserMaskMode(argv);
     }
     
@@ -153,6 +136,12 @@ extern "C"
         unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
         return kinectDeviceManager.getDevice(nr, ctx)->freSetDepthShowUserColors(argv);
     }
+    
+	FREObject Kinect_setDepthEnableNearMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+	{
+		unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+        return kinectDeviceManager.getDevice(nr, ctx)->freSetDepthEnableNearMode(argv);
+	}
     
     FREObject Kinect_setRGBMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
@@ -214,7 +203,23 @@ extern "C"
         return kinectDeviceManager.getDevice(nr, ctx)->freSetPointCloudRegions(argv);
     }
     
-    FRENamedFunction _Static_methods[] = {
+	FREObject Kinect_getCameraElevationAngle(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+	{
+		unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+        return kinectDeviceManager.getDevice(nr, ctx)->freCameraElevationGetAngle(argv);
+	}
+    
+	FREObject Kinect_setCameraElevationAngle(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+	{
+		unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+        return kinectDeviceManager.getDevice(nr, ctx)->freCameraElevationSetAngle(argv);
+	}
+    
+	/*-----------------------------------------
+     Start Native Extension Accessibility
+     ------------------------------------------*/
+    
+	FRENamedFunction _Static_methods[] = {
 		{ (const uint8_t*) "getDeviceCount", 0, Kinect_getDeviceCount},
         { (const uint8_t*) "applicationShutdown", 0, Kinect_applicationShutdown}
     };
@@ -222,7 +227,7 @@ extern "C"
 	FRENamedFunction _Instance_methods[] = {
 		{ (const uint8_t*) "start", 0, Kinect_start },
 		{ (const uint8_t*) "stop", 0, Kinect_stop },
-   		{ (const uint8_t*) "getCapabilities", 0, Kinect_getCapabilities },
+		{ (const uint8_t*) "getCapabilities", 0, Kinect_getCapabilities },
         { (const uint8_t*) "setUserMode", 0, Kinect_setUserMode },
 		{ (const uint8_t*) "setUserColor", 0, Kinect_setUserColor },
         { (const uint8_t*) "setUserEnabled", 0, Kinect_setUserEnabled },
@@ -238,6 +243,7 @@ extern "C"
         { (const uint8_t*) "setDepthEnabled", 0, Kinect_setDepthEnabled },
         { (const uint8_t*) "getDepthFrame", 0, Kinect_getDepthFrame },
         { (const uint8_t*) "setDepthShowUserColors", 0, Kinect_setDepthShowUserColors },
+		{ (const uint8_t*) "setDepthEnableNearMode", 0, Kinect_setDepthEnableNearMode },
         { (const uint8_t*) "setRGBMode", 0, Kinect_setRGBMode },
         { (const uint8_t*) "setRGBEnabled", 0, Kinect_setRGBEnabled },
         { (const uint8_t*) "getRGBFrame", 0, Kinect_getRGBFrame },
@@ -247,7 +253,10 @@ extern "C"
         { (const uint8_t*) "setPointCloudMode", 0, Kinect_setPointCloudMode },
         { (const uint8_t*) "setPointCloudEnabled", 0, Kinect_setPointCloudEnabled },
         { (const uint8_t*) "getPointCloudFrame", 0, Kinect_getPointCloudFrame },
-        { (const uint8_t*) "setPointCloudRegions", 0, Kinect_setPointCloudRegions }
+        { (const uint8_t*) "setPointCloudRegions", 0, Kinect_setPointCloudRegions },
+		{ (const uint8_t*) "getCameraElevationAngle", 0, Kinect_getCameraElevationAngle },
+		{ (const uint8_t*) "setCameraElevationAngle", 0, Kinect_setCameraElevationAngle }
+        
 	};
     
     void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, uint32_t* numFunctions, const FRENamedFunction** functions)

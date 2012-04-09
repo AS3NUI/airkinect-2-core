@@ -43,9 +43,15 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
     capabilities.hasRGBCameraSupport					= true;
     capabilities.hasSkeletonSupport						= true;
     capabilities.hasUserMaskSupport						= true;
+    capabilities.hasNearModeSupport                     = false;
     
     capabilities.maxSensors								= 1;
     capabilities.framework								= "openni";
+    
+    //set class names of actionscript equivalents
+	asJointClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNISkeletonJoint";
+	asUserClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUser";
+	asUserFrameClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUserFrame";
     
     //some sensors don't have an RGB camera (asus xtion pro)
     XnStatus rc;
@@ -73,61 +79,14 @@ FREContext OpenNIDevice::getFreContext()
 
 void OpenNIDevice::setDefaults()
 {
+    KinectDevice::setDefaults();
     //set some default values
     running = false;
-    started = false;
     userCallbacksRegistered = false;
     
-    asUserMirrored = false;
-    asUserEnabled = false;
-    asSkeletonMirrored = false;
-    asSkeletonEnabled = false;
-    
-    asDepthWidth = 320;
-    asDepthHeight = 240;
-    asDepthPixelCount = asDepthWidth * asDepthHeight;
-    asDepthMirrored = false;
-    asDepthEnabled = false;
-    asDepthShowUserColors = false;
-    
-    depthWidth = 640;
-    depthHeight = 480;
-    depthPixelCount = depthWidth * depthHeight;
-    depthScale = depthWidth / asDepthWidth;
-    
-    depthGenerator = NULL;
-    
-    depthByteArray = 0;
-    
-    asRGBWidth = 320;
-    asRGBHeight = 240;
-    asRGBPixelCount = asRGBWidth * asRGBHeight;
-    asRGBMirrored = false;
-    asRGBEnabled = false;
-    
-    rgbWidth = 640;
-    rgbHeight = 480;
-    rgbPixelCount = rgbWidth * rgbHeight;
-    rgbScale = rgbWidth / asRGBWidth;
-    
+    depthGenerator = NULL;    
     imageGenerator = NULL;
-    
-    RGBByteArray = 0;
-    
     userGenerator = NULL;
-    
-    asUserMaskWidth = 320;
-    asUserMaskHeight = 240;
-    asUserMaskPixelCount = asUserMaskWidth * asUserMaskHeight;
-    asUserMaskMirrored = false;
-    asUserMaskEnabled = false;
-    
-    userMaskWidth = 640;
-    userMaskHeight = 480;
-    userMaskPixelCount = userMaskWidth * userMaskHeight;
-    userMaskScale = userMaskWidth / asUserMaskWidth;
-    
-    userMaskByteArray = 0;
     
     asInfraredWidth = 320;
     asInfraredHeight = 240;
@@ -142,24 +101,7 @@ void OpenNIDevice::setDefaults()
     
     infraredGenerator = NULL;
     
-    infraredByteArray = 0;
-    
-    asPointCloudWidth = 320;
-    asPointCloudHeight = 240;
-    asPointCloudPixelCount = asPointCloudWidth * asPointCloudHeight;
-    asPointCloudMirrored = false;
-    asPointCloudEnabled = false;
-    asPointCloudDensity = 1;
-    asPointCloudIncludeRGB = false;
-    
-    pointCloudWidth = 640;
-    pointCloudHeight = 480;
-    pointCloudPixelCount = pointCloudWidth * pointCloudHeight;
-    pointCloudScale = pointCloudWidth / asPointCloudWidth;
-    
-    pointCloudByteArray = 0;
-    pointCloudRegions = 0;
-    numRegions = 0;
+    asInfraredByteArray = 0;
     
     //player index coloring
     setUserColor(1, 0xff0000, 1);
@@ -191,357 +133,7 @@ void OpenNIDevice::setUserColor(int userID, int color, bool useIntensity)
     userIndexColors[userID - 1][3] = useIntensity ? 1 : 0;
 }
 
-//////////////// START FRE FUNCTIONS
-
-FREObject OpenNIDevice::freGetCapabilities()
-{
-    return capabilities.asFREObject();
-}
-
-FREObject OpenNIDevice::freSetUserMode(FREObject argv[])
-{
-    unsigned int mirrored; FREGetObjectAsBool(argv[1], &mirrored);
-    asUserMirrored = (mirrored != 0);
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetUserColor(FREObject argv[])
-{
-    unsigned int userID; FREGetObjectAsUint32(argv[1], &userID);
-    unsigned int color; FREGetObjectAsUint32(argv[2], &color);
-    unsigned int useIntensity; FREGetObjectAsBool(argv[3], &useIntensity);
-    setUserColor(userID, color, (useIntensity != 0));
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetUserEnabled(FREObject argv[])
-{
-    unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asUserEnabled = (enabled != 0);
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetSkeletonMode(FREObject argv[])
-{
-    unsigned int mirrored; FREGetObjectAsBool(argv[1], &mirrored);
-    asSkeletonMirrored = (mirrored != 0);
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetSkeletonEnabled(FREObject argv[])
-{
-    unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asSkeletonEnabled = (enabled != 0);
-    return NULL;
-}
-
-FREObject OpenNIDevice::freGetUserFrame(FREObject argv[])
-{
-    lockUserMutex();
-    
-    short int trackedSkeletons = 0;
-    
-    FREObject freUserFrame, frameNumber, timestamp, users, user, userType, userID, trackingID, hasSkeleton, joints, joint, jointName;
-    FREObject position, positionRelative, positionConfidence, orientation, orientationConfidence, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition;
-    FREObject orientationX, orientationY, orientationZ;
-    FREObject positionX, positionY, positionZ, positionRelativeX, positionRelativeY, positionRelativeZ;
-    FREObject rgbPositionX, rgbPositionY, rgbRelativePositionX, rgbRelativePositionY, depthPositionX, depthPositionY, depthRelativePositionX, depthRelativePositionY;
-    
-    FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.User>", 0, NULL, &users, NULL);
-    
-    for(int i = 0; i < MAX_SKELETONS; i++)
-    {
-        if(userFrame.users[i].isTracking)
-        {   
-            //create the joints vector
-            FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.SkeletonJoint>", 0, NULL, &joints, NULL);
-            
-            for(int j = 0; j < NUM_JOINTS; j++)
-            {
-                //name
-                FRENewObjectFromUTF8(strlen(JOINT_NAMES[j]), (const uint8_t*) JOINT_NAMES[j], &jointName);
-                //position
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].worldX, &positionX);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].worldY, &positionY);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].worldZ, &positionZ);
-                FREObject positionParams[] = {positionX, positionY, positionZ};
-                FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 3, positionParams, &position, NULL);
-                //position relative
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].worldRelativeX, &positionRelativeX);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].worldRelativeY, &positionRelativeY);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].worldRelativeZ, &positionRelativeZ);
-                FREObject positionRelativeParams[] = {positionRelativeX, positionRelativeY, positionRelativeZ};
-                FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 3, positionRelativeParams, &positionRelative, NULL);
-                //position confidence
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].positionConfidence, &positionConfidence);
-                
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].orientationX, &orientationX);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].orientationY, &orientationY);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].orientationZ, &orientationZ);
-                
-                //orientation
-                FREObject orientationParams[] = {orientationX, orientationY, orientationZ};
-                FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 3, orientationParams, &orientation, NULL);
-                
-                //orientation confidence
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].orientationConfidence, &orientationConfidence);
-                //rgb position
-                FRENewObjectFromInt32(userFrame.users[i].joints[j].rgbX, &rgbPositionX);
-                FRENewObjectFromInt32(userFrame.users[i].joints[j].rgbY, &rgbPositionY);
-                FREObject rgbPositionParams[] = {rgbPositionX, rgbPositionY};
-                FRENewObject( (const uint8_t*) "flash.geom.Point", 2, rgbPositionParams, &rgbPosition, NULL);
-                //rgb relative position
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].rgbRelativeX, &rgbRelativePositionX);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].rgbRelativeY, &rgbRelativePositionY);
-                FREObject rgbRelativePositionParams[] = {rgbRelativePositionX, rgbRelativePositionY};
-                FRENewObject( (const uint8_t*) "flash.geom.Point", 2, rgbRelativePositionParams, &rgbRelativePosition, NULL);
-                //depth position
-                FRENewObjectFromInt32(userFrame.users[i].joints[j].depthX, &depthPositionX);
-                FRENewObjectFromInt32(userFrame.users[i].joints[j].depthY, &depthPositionY);
-                FREObject depthPositionParams[] = {depthPositionX, depthPositionY};
-                FRENewObject( (const uint8_t*) "flash.geom.Point", 2, depthPositionParams, &depthPosition, NULL);
-                //depth relative position
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].depthRelativeX, &depthRelativePositionX);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].depthRelativeY, &depthRelativePositionY);
-                FREObject depthRelativePositionParams[] = {depthRelativePositionX, depthRelativePositionY};
-                FRENewObject( (const uint8_t*) "flash.geom.Point", 2, depthRelativePositionParams, &depthRelativePosition, NULL);
-                //create the joint
-                FREObject jointParams[] = {jointName, position, positionRelative, positionConfidence, orientation, orientationConfidence, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition};
-                FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNISkeletonJoint", 10, jointParams, &joint, NULL);
-                FRESetArrayElementAt(joints, j, joint);
-            }
-            
-            //user position
-            FRENewObjectFromDouble(userFrame.users[i].worldX, &positionX);
-            FRENewObjectFromDouble(userFrame.users[i].worldY, &positionY);
-            FRENewObjectFromDouble(userFrame.users[i].worldZ, &positionZ);
-            FREObject positionParams[] = {positionX, positionY, positionZ};
-            FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 3, positionParams, &position, NULL);
-            
-            //user position relative
-            FRENewObjectFromDouble(userFrame.users[i].worldRelativeX, &positionRelativeX);
-            FRENewObjectFromDouble(userFrame.users[i].worldRelativeY, &positionRelativeY);
-            FRENewObjectFromDouble(userFrame.users[i].worldRelativeZ, &positionRelativeZ);
-            FREObject positionRelativeParams[] = {positionRelativeX, positionRelativeY, positionRelativeZ};
-            FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 3, positionRelativeParams, &positionRelative, NULL);
-            
-            //user rgb position
-            FRENewObjectFromInt32(userFrame.users[i].rgbX, &rgbPositionX);
-            FRENewObjectFromInt32(userFrame.users[i].rgbY, &rgbPositionY);
-            FREObject rgbPositionParams[] = {rgbPositionX, rgbPositionY};
-            FRENewObject( (const uint8_t*) "flash.geom.Point", 2, rgbPositionParams, &rgbPosition, NULL);
-            //user rgb relative position
-            FRENewObjectFromDouble(userFrame.users[i].rgbRelativeX, &rgbRelativePositionX);
-            FRENewObjectFromDouble(userFrame.users[i].rgbRelativeY, &rgbRelativePositionY);
-            FREObject rgbRelativePositionParams[] = {rgbRelativePositionX, rgbRelativePositionY};
-            FRENewObject( (const uint8_t*) "flash.geom.Point", 2, rgbRelativePositionParams, &rgbRelativePosition, NULL);
-            //user depth position
-            FRENewObjectFromInt32(userFrame.users[i].depthX, &depthPositionX);
-            FRENewObjectFromInt32(userFrame.users[i].depthY, &depthPositionY);
-            FREObject depthPositionParams[] = {depthPositionX, depthPositionY};
-            FRENewObject( (const uint8_t*) "flash.geom.Point", 2, depthPositionParams, &depthPosition, NULL);
-            //user depth relative position
-            FRENewObjectFromDouble(userFrame.users[i].depthRelativeX, &depthRelativePositionX);
-            FRENewObjectFromDouble(userFrame.users[i].depthRelativeY, &depthRelativePositionY);
-            FREObject depthRelativePositionParams[] = {depthRelativePositionX, depthRelativePositionY};
-            FRENewObject( (const uint8_t*) "flash.geom.Point", 2, depthRelativePositionParams, &depthRelativePosition, NULL);
-            
-            FRENewObjectFromUTF8(6, (const uint8_t*) "openni", &userType);
-            FRENewObjectFromUint32(userFrame.users[i].userID, &userID);
-            FRENewObjectFromUint32(userFrame.users[i].trackingID, &trackingID);
-            FRENewObjectFromBool((userFrame.users[i].hasSkeleton) ? 1 : 0, &hasSkeleton);
-            FREObject skeletonParams[] = {userType, userID, trackingID, position, positionRelative, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition, hasSkeleton, joints};
-            
-            FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUser", 11, skeletonParams, &user, NULL);
-            
-            FRESetArrayElementAt(users, trackedSkeletons, user);
-            trackedSkeletons++;
-        }
-    }
-    
-    FRENewObjectFromUint32(userFrame.frameNumber, &frameNumber);
-    FRENewObjectFromUint32(userFrame.timeStamp, &timestamp);
-    
-    FREObject skeletonFrameParams[] = {frameNumber, timestamp, users};
-    FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUserFrame", 3, skeletonFrameParams, &freUserFrame, NULL);
-    
-    unlockUserMutex();
-    
-    return freUserFrame;
-}
-
-FREObject OpenNIDevice::freGetSkeletonJointNameIndices(FREObject argv[])
-{
-    return NULL;
-}
-
-FREObject OpenNIDevice::freGetSkeletonJointNames(FREObject argv[])
-{
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetUserMaskMode(FREObject argv[])
-{
-    unsigned int width; FREGetObjectAsUint32(argv[1], &width);
-    unsigned int height; FREGetObjectAsUint32(argv[2], &height);
-    unsigned int mirrored; FREGetObjectAsBool(argv[3], &mirrored);
-    
-    lockUserMaskMutex();
-    
-    asUserMaskWidth = width;
-    asUserMaskHeight = height;
-    asUserMaskPixelCount = asUserMaskWidth * asUserMaskHeight;
-    asUserMaskMirrored = (mirrored != 0);
-    userMaskScale = userMaskWidth / asUserMaskWidth;
-    
-    //reset bytearray
-    if(userMaskByteArray != 0)
-    {
-        for(int i = 0; i < MAX_SKELETONS; i++)
-        {
-            delete [] userMaskByteArray[i];
-        }
-        delete [] userMaskByteArray;
-    }
-    userMaskByteArray = new uint32_t*[MAX_SKELETONS];
-    for(int i = 0; i < MAX_SKELETONS; i++)
-    {
-        userMaskByteArray[i] = new uint32_t[asUserMaskPixelCount];
-    }
-    
-    unlockUserMaskMutex();
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetUserMaskEnabled(FREObject argv[])
-{
-    unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asUserMaskEnabled = (enabled != 0);
-    return NULL;
-}
-
-FREObject OpenNIDevice::freGetUserMaskFrame(FREObject argv[])
-{
-    unsigned int trackingID; FREGetObjectAsUint32(argv[1], &trackingID);
-    
-    if(trackingID > 0) trackingID--;
-    
-    const unsigned int numUserMaskBytes = asUserMaskPixelCount * 4;
-    
-    FREObject objectByteArray = argv[2];
-    FREByteArray byteArray;			
-    FREObject length;
-    FRENewObjectFromUint32(numUserMaskBytes, &length);
-    FRESetObjectProperty(objectByteArray, (const uint8_t*) "length", length, NULL);
-    FREAcquireByteArray(objectByteArray, &byteArray);
-    lockUserMaskMutex();
-    memcpy(byteArray.bytes, userMaskByteArray[trackingID], numUserMaskBytes);
-    unlockUserMaskMutex();
-    FREReleaseByteArray(objectByteArray);
-    
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetDepthMode(FREObject argv[])
-{
-    unsigned int width; FREGetObjectAsUint32(argv[1], &width);
-    unsigned int height; FREGetObjectAsUint32(argv[2], &height);
-    unsigned int mirrored; FREGetObjectAsBool(argv[3], &mirrored);
-    
-    lockDepthMutex();
-    
-    asDepthWidth = width;
-    asDepthHeight = height;
-    asDepthPixelCount = asDepthWidth * asDepthHeight;
-    asDepthMirrored = (mirrored != 0);
-    depthScale = depthWidth / asDepthWidth;
-    
-    //reset bytearray
-    if(depthByteArray != 0) delete [] depthByteArray;
-    depthByteArray = new uint32_t[asDepthPixelCount];
-    
-    unlockDepthMutex();
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetDepthEnabled(FREObject argv[])
-{
-    unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asDepthEnabled = (enabled != 0);
-    return NULL;
-}
-
-FREObject OpenNIDevice::freGetDepthFrame(FREObject argv[])
-{
-    const unsigned int numDepthBytes = depthPixelCount * 4;
-    
-    FREObject objectByteArray = argv[1];
-    FREByteArray byteArray;			
-    FREObject length;
-    FRENewObjectFromUint32(numDepthBytes, &length);
-    FRESetObjectProperty(objectByteArray, (const uint8_t*) "length", length, NULL);
-    FREAcquireByteArray(objectByteArray, &byteArray);
-    lockDepthMutex();
-    memcpy(byteArray.bytes, depthByteArray, numDepthBytes);
-    unlockDepthMutex();
-    FREReleaseByteArray(objectByteArray);
-    
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetDepthShowUserColors(FREObject argv[])
-{
-    unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asDepthShowUserColors = (enabled != 0);
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetRGBMode(FREObject argv[])
-{
-    unsigned int width; FREGetObjectAsUint32(argv[1], &width);
-    unsigned int height; FREGetObjectAsUint32(argv[2], &height);
-    unsigned int mirrored; FREGetObjectAsBool(argv[3], &mirrored);
-    
-    lockRGBMutex();
-    
-    asRGBWidth = width;
-    asRGBHeight = height;
-    asRGBPixelCount = asRGBWidth * asRGBHeight;
-    asRGBMirrored = (mirrored != 0);
-    rgbScale = rgbWidth / asRGBWidth;
-    
-    //reset bytearray
-    if(RGBByteArray != 0) delete [] RGBByteArray;
-    RGBByteArray = new uint32_t[asRGBPixelCount];
-    
-    unlockRGBMutex();
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetRGBEnabled(FREObject argv[])
-{
-    unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asRGBEnabled = (enabled != 0);
-    return NULL;
-}
-
-FREObject OpenNIDevice::freGetRGBFrame(FREObject argv[])
-{
-    const unsigned int numRGBBytes = asRGBPixelCount * 4;
-    
-    FREObject objectByteArray = argv[1];
-    FREByteArray byteArray;			
-    FREObject length;
-    FRENewObjectFromUint32(numRGBBytes, &length);
-    FRESetObjectProperty(objectByteArray, (const uint8_t*) "length", length, NULL);
-    FREAcquireByteArray(objectByteArray, &byteArray);
-    lockRGBMutex();
-    memcpy(byteArray.bytes, RGBByteArray, numRGBBytes);
-    unlockRGBMutex();
-    FREReleaseByteArray(objectByteArray);
-    
-    return NULL;
-}
+//START FRE FUNCTIONS
 
 FREObject OpenNIDevice::freSetInfraredMode(FREObject argv[])
 {
@@ -557,8 +149,8 @@ FREObject OpenNIDevice::freSetInfraredMode(FREObject argv[])
     asInfraredMirrored = (mirrored != 0);
     infraredScale = infraredWidth / asInfraredWidth;
     
-    if(infraredByteArray != 0) delete [] infraredByteArray;
-    infraredByteArray = new uint32_t[asInfraredPixelCount];
+    if(asInfraredByteArray != 0) delete [] asInfraredByteArray;
+    asInfraredByteArray = new uint32_t[asInfraredPixelCount];
     
     unlockInfraredMutex();
     return NULL;
@@ -582,143 +174,9 @@ FREObject OpenNIDevice::freGetInfraredFrame(FREObject argv[])
     FRESetObjectProperty(objectByteArray, (const uint8_t*) "length", length, NULL);
     FREAcquireByteArray(objectByteArray, &byteArray);
     lockInfraredMutex();
-    memcpy(byteArray.bytes, infraredByteArray, numInfraredBytes);
+    memcpy(byteArray.bytes, asInfraredByteArray, numInfraredBytes);
     unlockInfraredMutex();
     FREReleaseByteArray(objectByteArray);
-    
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetPointCloudMode(FREObject argv[])
-{
-    lockPointCloudMutex();
-    
-    unsigned int width; FREGetObjectAsUint32(argv[1], &width);
-    unsigned int height; FREGetObjectAsUint32(argv[2], &height);
-    unsigned int mirrored; FREGetObjectAsBool(argv[3], &mirrored);
-    unsigned int density; FREGetObjectAsUint32(argv[4], &density);
-    unsigned int includeRGB; FREGetObjectAsBool(argv[5], &includeRGB);
-    
-    asPointCloudWidth = width;
-    asPointCloudHeight = height;
-    asPointCloudDensity = density;
-    asPointCloudIncludeRGB = includeRGB;
-    asPointCloudPixelCount = (asPointCloudWidth * asPointCloudHeight) / asPointCloudDensity;
-    asPointCloudMirrored = mirrored;
-    pointCloudScale = pointCloudWidth / asPointCloudWidth;
-    
-    if(pointCloudByteArray != 0) delete [] pointCloudByteArray;
-    if(asPointCloudIncludeRGB)
-    {
-        pointCloudByteArray = new short[asPointCloudPixelCount * 6];
-    }
-    else
-    {
-        pointCloudByteArray = new short[asPointCloudPixelCount * 3];
-    }
-    
-    unlockPointCloudMutex();
-    
-    //kinectDeviceManager.getDevice(nr, ctx)->setPointCloudMode(width, height, (mirrored != 0), density, includeRGB);
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetPointCloudEnabled(FREObject argv[])
-{
-    unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asPointCloudEnabled = (enabled != 0);
-    return NULL;
-}
-
-FREObject OpenNIDevice::freGetPointCloudFrame(FREObject argv[])
-{
-    FREObject objectPointsByteArray = argv[1];
-    
-    const unsigned int numPointBytes = getAsPointCloudByteArrayLength();
-    
-    lockPointCloudMutex();
-    
-    FREByteArray pointsByteArray;			
-    FREObject pointsLength;
-    FRENewObjectFromUint32(numPointBytes, &pointsLength);
-    FRESetObjectProperty(objectPointsByteArray, (const uint8_t*) "length", pointsLength, NULL);
-    FREAcquireByteArray(objectPointsByteArray, &pointsByteArray);
-    memcpy(pointsByteArray.bytes, pointCloudByteArray, numPointBytes);
-    FREReleaseByteArray(objectPointsByteArray);
-    
-    //set the region information?
-    FREObject asPointCloudRegions = argv[2];
-    if(asPointCloudRegions != NULL && &pointCloudRegions != 0)
-    {
-        //loop through these actionscript regions and get the native info back
-        FREObject asPointCloudRegion, asRegionId;
-        FREObject asNumPoints;
-        unsigned int regionId;
-        
-        uint32_t freNumRegions;
-        FREGetArrayLength(asPointCloudRegions, &freNumRegions);
-        
-        for(int i = 0; i < freNumRegions; i++)
-        {
-            FREGetArrayElementAt(asPointCloudRegions, i, &asPointCloudRegion);
-            FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "regionId", &asRegionId, NULL);
-            FREGetObjectAsUint32(asRegionId, &regionId);
-            //get the region with this id from the device memory
-            for(int j = 0; j < numRegions; j++)
-            {
-                PointCloudRegion *nativeRegion = &pointCloudRegions[j];
-                if(nativeRegion->regionId == regionId)
-                {
-                    //update the actionscript properties
-                    FRENewObjectFromUint32(nativeRegion->numPoints, &asNumPoints);
-                    FRESetObjectProperty(asPointCloudRegion, (const uint8_t *) "numPoints", asNumPoints, NULL);
-                    break;
-                }
-            }
-        }
-    }
-    
-    unlockPointCloudMutex();
-    
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetPointCloudRegions(FREObject argv[])
-{
-    FREObject asPointCloudRegions = argv[1];
-    FREObject asPointCloudRegion, asRegionId, asX, asY, asZ, asWidth, asHeight, asDepth;
-    unsigned int regionId;
-    double x, y, z, width, height, depth;
-    
-    uint32_t freNumRegions;
-    FREGetArrayLength(asPointCloudRegions, &freNumRegions);
-    
-    PointCloudRegion *nativeRegions = new PointCloudRegion[freNumRegions];
-    
-    for(int i = 0; i < freNumRegions; i++)
-    {
-        FREGetArrayElementAt(asPointCloudRegions, i, &asPointCloudRegion);
-        FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "regionId", &asRegionId, NULL);
-        FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "x", &asX, NULL);
-        FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "y", &asY, NULL);
-        FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "z", &asZ, NULL);
-        FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "width", &asWidth, NULL);
-        FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "height", &asHeight, NULL);
-        FREGetObjectProperty(asPointCloudRegion, (const uint8_t *) "depth", &asDepth, NULL);
-        FREGetObjectAsUint32(asRegionId, &regionId);
-        FREGetObjectAsDouble(asX, &x);
-        FREGetObjectAsDouble(asY, &y);
-        FREGetObjectAsDouble(asZ, &z);
-        FREGetObjectAsDouble(asWidth, &width);
-        FREGetObjectAsDouble(asHeight, &height);
-        FREGetObjectAsDouble(asDepth, &depth);
-        PointCloudRegion *nativeRegion = new PointCloudRegion();
-        nativeRegion->setProperties(regionId, x, y, z, width, height, depth);
-        nativeRegions[i] = *nativeRegion;
-    }
-    
-    this->pointCloudRegions = nativeRegions;
-    this->numRegions = freNumRegions;
     
     return NULL;
 }
@@ -864,17 +322,17 @@ void OpenNIDevice::stop()
         infraredGenerator = NULL;
     }
     //cleanup bytearrays
-    if(depthByteArray != 0) delete [] depthByteArray;
-    if(RGBByteArray != 0) delete [] RGBByteArray;
-    if(infraredByteArray != 0) delete [] infraredByteArray;
-    if(pointCloudByteArray != 0) delete [] pointCloudByteArray;
-    if(userMaskByteArray != 0)
+    if(asDepthByteArray != 0) delete [] asDepthByteArray;
+    if(asRGBByteArray != 0) delete [] asRGBByteArray;
+    if(asInfraredByteArray != 0) delete [] asInfraredByteArray;
+    if(asPointCloudByteArray != 0) delete [] asPointCloudByteArray;
+    if(asUserMaskByteArray != 0)
     {
         for(int i = 0; i < MAX_SKELETONS; i++)
         {
-            delete [] userMaskByteArray[i];
+            delete [] asUserMaskByteArray[i];
         }
-        delete [] userMaskByteArray;
+        delete [] asUserMaskByteArray;
     }
     if(pointCloudRegions != 0)
     {
@@ -1225,7 +683,7 @@ void OpenNIDevice::rgbFrameHandler()
 {
     RGBFrameBuffer = imageMetaData.RGB24Data();
     
-    uint32_t *rgbRun = RGBByteArray;
+    uint32_t *rgbRun = asRGBByteArray;
     int direction = asRGBMirrored ? -1 : 1;
     int directionFactor = asRGBMirrored ? 1 : 0;
     
@@ -1246,7 +704,7 @@ void OpenNIDevice::depthFrameHandler()
 {
     depthFrameBuffer = depthMetaData.Data();
     
-    uint32_t *depthRun = depthByteArray;
+    uint32_t *depthRun = asDepthByteArray;
     int direction = asDepthMirrored ? -1 : 1;
     int directionFactor = asDepthMirrored ? 1 : 0;
     
@@ -1284,7 +742,7 @@ void OpenNIDevice::depthFrameWithUserColorsHandler()
     depthFrameBuffer = depthMetaData.Data();
     sceneFrameBuffer = sceneMetaData.Data();
     
-    uint32_t *depthRun = depthByteArray;
+    uint32_t *depthRun = asDepthByteArray;
     int direction = asDepthMirrored ? -1 : 1;
     int directionFactor = asDepthMirrored ? 1 : 0;
     
@@ -1360,11 +818,11 @@ void OpenNIDevice::userMaskHandler()
             
             for(int i = 0; i < MAX_SKELETONS; i++)
             {
-                userMaskByteArray[i][pixelNr] = 0;
+                asUserMaskByteArray[i][pixelNr] = 0;
             }
             if(label > 0)
             {
-                userMaskByteArray[label - 1][pixelNr] = 0xff << 24 | ((*pRGBBuffer).nBlue + ((*pRGBBuffer).nGreen << 8) + ((*pRGBBuffer).nRed << 16));
+                asUserMaskByteArray[label - 1][pixelNr] = 0xff << 24 | ((*pRGBBuffer).nBlue + ((*pRGBBuffer).nGreen << 8) + ((*pRGBBuffer).nRed << 16));
             }
             
             pRGBBuffer += (userMaskScale * direction);
@@ -1379,7 +837,7 @@ void OpenNIDevice::infraredHandler()
 {
     infraredFrameBuffer = infraredMetaData.Data();
     
-    uint32_t *depthRun = infraredByteArray;
+    uint32_t *depthRun = asInfraredByteArray;
     int direction = asInfraredMirrored ? -1 : 1;
     int directionFactor = asInfraredMirrored ? 1 : 0;
     
@@ -1410,7 +868,7 @@ void OpenNIDevice::pointCloudHandler()
 {
     depthFrameBuffer = depthMetaData.Data();
     
-    short *pointCloudRun = pointCloudByteArray;
+    short *pointCloudRun = asPointCloudByteArray;
     int direction = asPointCloudMirrored ? -1 : 1;
     int directionFactor = asPointCloudMirrored ? 1 : 0;
     
@@ -1463,7 +921,7 @@ void OpenNIDevice::pointCloudWithRGBHandler()
     RGBFrameBuffer = imageMetaData.RGB24Data();
     depthFrameBuffer = depthMetaData.Data();
     
-    short *pointCloudRun = pointCloudByteArray;
+    short *pointCloudRun = asPointCloudByteArray;
     int direction = asPointCloudMirrored ? -1 : 1;
     int directionFactor = asPointCloudMirrored ? 1 : 0;
     
