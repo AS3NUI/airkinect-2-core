@@ -22,8 +22,8 @@ package com.as3nui.nativeExtensions.air.kinect {
 	import com.as3nui.nativeExtensions.air.kinect.data.User;
 	import com.as3nui.nativeExtensions.air.kinect.data.UserFrame;
 	import com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent;
-	import com.as3nui.nativeExtensions.air.kinect.events.DeviceEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.DeviceErrorEvent;
+	import com.as3nui.nativeExtensions.air.kinect.events.DeviceEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.DeviceInfoEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.PointCloudEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.UserEvent;
@@ -173,6 +173,8 @@ package com.as3nui.nativeExtensions.air.kinect {
 		/** @private */
 		protected static const EXTENSION_REQUEST_SET_DEPTH_SHOW_USER_COLORS:String = "setDepthShowUserColors";
 		/** @private */
+		protected static const EXTENSION_REQUEST_SET_DEPTH_ENABLE_NEAR_MODE:String = "setDepthEnableNearMode";
+		/** @private */
 		protected static const EXTENSION_REQUEST_SET_RGB_MODE:String = "setRGBMode";
 		/** @private */
 		protected static const EXTENSION_REQUEST_SET_RGB_ENABLED:String = "setRGBEnabled";
@@ -186,6 +188,10 @@ package com.as3nui.nativeExtensions.air.kinect {
 		protected static const EXTENSION_REQUEST_GET_POINTCLOUD_FRAME:String = "getPointCloudFrame";
 		/** @private */
 		protected static const EXTENSION_REQUEST_SET_POINTCLOUD_REGIONS:String = "setPointCloudRegions";
+		/** @private */
+		protected static const EXTENSION_REQUEST_GET_CAMERA_ELEVATION_ANGLE:String = "getCameraElevationAngle";
+		/** @private */
+		protected static const EXTENSION_REQUEST_SET_CAMERA_ELEVATION_ANGLE:String = "setCameraElevationAngle";
 
 		/** @private */
 		protected static const EXTENSION_EVENT_DISCONNECT:String = 'deviceDisconnected';
@@ -306,6 +312,26 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 */
 		public function get state():String {
 			return _state;
+		}
+		
+		/**
+		 * Gets the current angle of the Device.
+		 * 
+		 * Not all devices / drivers support this option.
+		 * Check capabilities.hasCameraElevationSupport
+		 */ 
+		public function get cameraElevationAngle():int {
+			return context.call(EXTENSION_REQUEST_GET_CAMERA_ELEVATION_ANGLE, _nr) as int;
+		}
+		
+		/**
+		 * Sets the current angle of the Device
+		 * 
+		 * Not all devices / drivers support this option.
+		 * Check capabilities.hasCameraElevationSupport
+		 */ 
+		public function set cameraElevationAngle(value:int):void {
+			context.call(EXTENSION_REQUEST_SET_CAMERA_ELEVATION_ANGLE, _nr, value);
 		}
 
 		/** @private */
@@ -499,6 +525,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 			context.call(EXTENSION_REQUEST_SET_DEPTH_ENABLED, _nr, _settings.depthEnabled);
 			context.call(EXTENSION_REQUEST_SET_DEPTH_MODE, _nr, _settings.depthResolution.x, _settings.depthResolution.y, _settings.depthMirrored);
 			context.call(EXTENSION_REQUEST_SET_DEPTH_SHOW_USER_COLORS, _nr, _settings.depthShowUserColors);
+			context.call(EXTENSION_REQUEST_SET_DEPTH_ENABLE_NEAR_MODE, _nr, _settings.depthEnableNearMode);
 		}
 
 		/** @private */

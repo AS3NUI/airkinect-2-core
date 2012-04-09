@@ -14,6 +14,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		private var _depthEnabled:Boolean 					= false;
 		private var _depthResolution:Point 					= CameraResolution.RESOLUTION_320_240;
 		private var _depthShowUserColors:Boolean 			= false;
+		private var _depthEnableNearMode:Boolean			= false;
 		private var _depthMirrored:Boolean 					= true;
 
 		private var _rgbEnabled:Boolean 					= false;
@@ -61,6 +62,14 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 		public function set depthShowUserColors(value:Boolean):void {
 			_depthShowUserColors = value;
+		}
+		
+		public function get depthEnableNearMode():Boolean {
+			return _depthEnableNearMode;
+		}
+		
+		public function set depthEnableNearMode(value:Boolean):void {
+			_depthEnableNearMode = value;
 		}
 
 		public function get depthMirrored():Boolean {

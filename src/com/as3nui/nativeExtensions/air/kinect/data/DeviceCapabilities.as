@@ -21,6 +21,7 @@ package com.as3nui.nativeExtensions.air.kinect.data {
 		private var _hasJointOrientationConfidenceSupport:Boolean		= false;
 		private var _hasPositionConfidenceSupport:Boolean				= false;
 		private var _hasMultipleSensorSupport:Boolean					= false;
+		private var _hasNearModeSupport:Boolean							= false;
 
 		private var _maxSensors:uint									= 0;
 
@@ -83,6 +84,10 @@ package com.as3nui.nativeExtensions.air.kinect.data {
 
 		public function get hasMultipleSensorSupport():Boolean {
 			return _hasMultipleSensorSupport;
+		}
+		
+		public function get hasNearModeSupport():Boolean {
+			return _hasNearModeSupport;
 		}
 
 		public function get maxSensors():uint {
