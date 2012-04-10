@@ -6,3 +6,6 @@ Release/
 win-visualstudio/ipch/
 win-visualstudio/KinectExtension.sdf
 win-visualstudio/KinectExtension.suo
+/win-visualstudio/Debug
+/win-visualstudio/KinectExtension/Debug
+/win-visualstudio/KinectExtension.opensdf
