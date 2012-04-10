@@ -2,7 +2,10 @@
 #define KinectExtension_ExtensionConfig_h
 
 //this file contains extension specific config
-//we can use this to set platform / driver specific parameters
+//we can use this to set platform / driver specific parameters at compile time
+
+//#define AIRKINECT_OS_WINDOWS = 1;
+#define AIRKINECT_OS_OSX = 1;
 
 //#define AIRKINECT_TARGET_MSSDK = 1;
 #define AIRKINECT_TARGET_OPENNI = 1;

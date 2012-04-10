@@ -1,19 +1,17 @@
-//
-//  OpenNIDevice.h
-//  KinectExtension
-//
-//  Created by Wouter Verweirder on 24/01/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
-
 #ifndef KinectExtension_OpenNIDevice_h
 #define KinectExtension_OpenNIDevice_h
 
-#include <Adobe AIR/Adobe AIR.h>
-#include <XnCppWrapper.h>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+#include "ExtensionConfig.h"
 
+#ifdef AIRKINECT_OS_WINDOWS
+    #include "stdafx.h"
+#else
+    #include <Adobe AIR/Adobe AIR.h>
+    #include <boost/thread.hpp>
+    #include <boost/thread/mutex.hpp>
+#endif
+
+#include <XnCppWrapper.h>
 #include "KinectDevice.h"
 #include "KinectSkeleton.h"
 #include "KinectCapabilities.h"

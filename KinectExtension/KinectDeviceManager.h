@@ -1,17 +1,20 @@
-//
-//  KinectDeviceManager.h
-//  KinectExtension
-//
-//  Created by Wouter Verweirder on 24/01/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
-
 #ifndef KinectExtension_KinectDeviceManager_h
 #define KinectExtension_KinectDeviceManager_h
 
-#include <map>
-#include <Adobe AIR/Adobe AIR.h>
+#include "ExtensionConfig.h"
+
+#ifdef AIRKINECT_OS_WINDOWS
+    #include "FlashRuntimeExtensions.h"
+#else
+    #include <Adobe AIR/Adobe AIR.h>
+    #include <map>
+#endif
+
+#ifdef AIRKINECT_TARGET_MSSDK
+#else
 #include <XnCppWrapper.h>
+#endif
+
 #include "KinectDevice.h"
 
 class KinectDeviceManager
@@ -27,11 +30,11 @@ public:
     KinectDevice                    *getDevice(int nr, FREContext freContext);
     
 private:
+#ifdef AIRKINECT_TARGET_OPENNI
     xn::Context                     context;
+#endif
     
-    bool                            started;
-    
-    int                             numDevices;
+    bool                            started;    
     std::map<int, KinectDevice*>    deviceMap;
 };
 

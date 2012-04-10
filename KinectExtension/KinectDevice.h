@@ -1,11 +1,16 @@
 #ifndef KinectExtension_IKinectDevice_h
 #define KinectExtension_IKinectDevice_h
 
-#include <Adobe AIR/Adobe AIR.h>
-#include <stdlib.h>
-#include <iostream>
-
 #include "ExtensionConfig.h"
+
+#ifdef AIRKINECT_OS_WINDOWS
+    #include "FlashRuntimeExtensions.h"
+#else
+    #include <Adobe AIR/Adobe AIR.h>
+    #include <stdlib.h>
+    #include <iostream>
+#endif
+
 #include "KinectCapabilities.h"
 #include "KinectSkeleton.h"
 #include "PointCloudRegion.h"

@@ -1,14 +1,11 @@
-//
-//  OpenNIDevice.cpp
-//  KinectExtension
-//
-//  Created by Wouter Verweirder on 24/01/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
-
-#include <iostream>
-#include <math.h>
 #include "OpenNIDevice.h"
+
+#ifdef AIRKINECT_OS_WINDOWS
+    #include "stdafx.h"
+#else
+    #include <iostream>
+    #include <math.h>
+#endif
 
 XnBool needPose = FALSE;
 XnChar strPose[20] = "";

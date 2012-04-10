@@ -1,15 +1,13 @@
-//
-//  KinectCapabilities.h
-//  KinectExtension
-//
-//  Created by Wouter Verweirder on 21/02/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
-
 #ifndef KinectExtension_KinectCapabilities_h
 #define KinectExtension_KinectCapabilities_h
 
-#include <Adobe AIR/Adobe AIR.h>
+#include "ExtensionConfig.h"
+
+#ifdef AIRKINECT_OS_WINDOWS
+    #include "FlashRuntimeExtensions.h"
+#else
+    #include <Adobe AIR/Adobe AIR.h>
+#endif
 
 typedef struct {
 	bool			hasCameraElevationSupport;

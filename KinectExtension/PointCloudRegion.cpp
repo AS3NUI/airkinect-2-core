@@ -1,13 +1,10 @@
-//
-//  PointCloudRegion.cpp
-//  KinectExtension
-//
-//  Created by Wouter Verweirder on 07/02/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
-
-#include <iostream>
 #include "PointCloudRegion.h"
+
+#ifdef AIRKINECT_OS_WINDOWS
+    #include "stdafx.h"
+#else
+    #include <iostream>
+#endif
 
 PointCloudRegion::PointCloudRegion()
 {

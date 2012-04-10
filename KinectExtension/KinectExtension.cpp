@@ -1,13 +1,14 @@
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "KinectExtension.h"
-#include "KinectDeviceManager.h"
-#include "PointCloudRegion.h"
 
-// Symbols tagged with EXPORT are externally visible.
-// Must use the -fvisibility=hidden gcc option.
-#define EXPORT __attribute__((visibility("default")))
+#ifdef AIRKINECT_OS_WINDOWS
+    #include "stdafx.h"
+    #include "KinectImageTypes.h"
+#else
+    #include <stdlib.h>
+    #include <stdio.h>
+#endif
+
+#include "KinectDeviceManager.h"
 
 extern "C"
 {
@@ -284,14 +285,12 @@ extern "C"
 		return;
 	}
     
-    EXPORT
 	void initializer(void** extData, FREContextInitializer* ctxInitializer, FREContextFinalizer* ctxFinalizer)
     {
 		*ctxInitializer = &contextInitializer;
 		*ctxFinalizer = &contextFinalizer;
 	}
     
-    EXPORT
 	void finalizer(void* extData)
     {
 		return;

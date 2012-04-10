@@ -1,52 +1,30 @@
-//
-//  KinectDeviceManager.cpp
-//  KinectExtension
-//
-//  Created by Wouter Verweirder on 24/01/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
-
-#include <iostream>
 #include "KinectDeviceManager.h"
-#include "OpenNIDevice.h"
+
+#ifdef AIRKINECT_OS_WINDOWS
+    #include "stdafx.h"
+#else
+    #include <iostream>
+#endif
+
+#ifdef AIRKINECT_TARGET_MSSDK
+    #include "MSKinectDevice.h"
+#else
+    #include "OpenNIDevice.h"
+#endif
 
 KinectDeviceManager::KinectDeviceManager()
 {
     printf("KinectDeviceManager::KinectDeviceManager()\n");
 }
 
-bool KinectDeviceManager::isStarted()
-{
-    return started;
-}
-
-int KinectDeviceManager::getNumDevices()
-{
-    //printf("KinectDeviceManager::getNumDevices()\n");
-    if(started)
-    {
-        XnStatus rc;
-        xn::NodeInfoList deviceNodes;
-        rc = context.EnumerateProductionTrees( XN_NODE_TYPE_DEVICE, NULL, deviceNodes, NULL );
-        
-        numDevices = 0;
-        
-        //get number of devices -------------------------------------------------------------------------------->
-        xn::NodeInfoList::Iterator deviceIter = deviceNodes.Begin();
-        for( ; deviceIter != deviceNodes.End(); ++deviceIter )
-            ++numDevices;
-    }
-    return numDevices;
-}
-
 void KinectDeviceManager::startUp()
 {
-    //printf("KinectDeviceManager::startUp()\n");
+#ifdef AIRKINECT_TARGET_MSSDK
+    started = true;
+#else
     if(!started)
     {
         started = true;
-        
-        numDevices = 0;
         
         XnStatus rc;
         xn::EnumerationErrors errors;
@@ -64,19 +42,50 @@ void KinectDeviceManager::startUp()
             started = false;
         }
     }
+#endif
 }
 
 void KinectDeviceManager::shutDown()
 {
-    //printf("KinectDeviceManager::shutDown()\n");
+#ifdef AIRKINECT_TARGET_MSSDK
+    started = false;
+#else
     if(started)
     {
         context.Release();
         
-        numDevices = 0;
-        
         started = false;
     }
+#endif
+}
+
+bool KinectDeviceManager::isStarted()
+{
+    return started;
+}
+
+int KinectDeviceManager::getNumDevices()
+{
+    //printf("KinectDeviceManager::getNumDevices()\n");
+    int numDevices = 0;
+    if(started)
+    {
+#ifdef AIRKINECT_TARGET_MSSDK
+        NuiGetSensorCount(&numDevices);
+#else
+        XnStatus rc;
+        xn::NodeInfoList deviceNodes;
+        rc = context.EnumerateProductionTrees( XN_NODE_TYPE_DEVICE, NULL, deviceNodes, NULL );
+        
+        numDevices = 0;
+        
+        //get number of devices -------------------------------------------------------------------------------->
+        xn::NodeInfoList::Iterator deviceIter = deviceNodes.Begin();
+        for( ; deviceIter != deviceNodes.End(); ++deviceIter )
+            ++numDevices;  
+#endif
+    }
+    return numDevices;
 }
 
 KinectDevice *KinectDeviceManager::getDevice(int nr, FREContext freContext)
@@ -91,7 +100,11 @@ KinectDevice *KinectDeviceManager::getDevice(int nr, FREContext freContext)
     }
     else
     {
-        instance = (KinectDevice *) (new OpenNIDevice(nr, context));
+#ifdef AIRKINECT_TARGET_MSSDK
+        instance = (KinectDevice *) (new MSKinectDevice(nr));
+#else
+        instance = (KinectDevice *) (new OpenNIDevice(nr, context));  
+#endif
         deviceMap[nr] = instance;
     }
     

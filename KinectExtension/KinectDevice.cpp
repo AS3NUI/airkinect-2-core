@@ -1,4 +1,9 @@
 #include "KinectDevice.h"
+
+#ifdef AIRKINECT_OS_WINDOWS
+    #include "stdafx.h"
+#endif
+
 #include "KinectSkeleton.h"
 
 void KinectDevice::setDefaults()

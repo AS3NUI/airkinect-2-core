@@ -1,11 +1,3 @@
-//
-//  KinectUser.h
-//  KinectExtension
-//
-//  Created by Wouter Verweirder on 22/01/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
-
 #ifndef KinectExtension_KinectUser_h
 #define KinectExtension_KinectUser_h
 

@@ -1,4 +1,16 @@
-#include <Adobe AIR/Adobe AIR.h>
+#include "ExtensionConfig.h"
+
+#ifdef AIRKINECT_OS_WINDOWS
+    #ifdef KINECTEXTENSION_EXPORTS
+        #define KINECTEXTENSION_API __declspec(dllexport)
+    #else
+        #define KINECTEXTENSION_API __declspec(dllimport)
+    #endif
+    #include "FlashRuntimeExtensions.h"
+#else
+    #define KINECTEXTENSION_API __attribute__((visibility("default")))
+    #include <Adobe AIR/Adobe AIR.h>
+#endif
 
 extern "C"
 {
@@ -49,6 +61,6 @@ extern "C"
     void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, uint32_t* numFunctions, const FRENamedFunction** functions);
     void contextFinalizer(FREContext ctx);
     
-    void initializer(void** extData, FREContextInitializer* ctxInitializer, FREContextFinalizer* ctxFinalizer);
-	void finalizer(void* extData);
+    KINECTEXTENSION_API void initializer(void** extData, FREContextInitializer* ctxInitializer, FREContextFinalizer* ctxFinalizer);
+	KINECTEXTENSION_API void finalizer(void* extData);
 }

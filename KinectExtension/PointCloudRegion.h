@@ -1,11 +1,3 @@
-//
-//  PointCloudRegion.h
-//  KinectExtension
-//
-//  Created by Wouter Verweirder on 07/02/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
-
 #ifndef KinectExtension_PointCloudRegion_h
 #define KinectExtension_PointCloudRegion_h
 
