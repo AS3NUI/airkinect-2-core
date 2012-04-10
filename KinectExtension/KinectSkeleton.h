@@ -11,37 +11,6 @@
 
 #include "ExtensionConfig.h"
 
-const char JOINT_NAMES[][16] = {
-    "head",
-    "neck",
-    "torso",
-    "waist",
-    
-    "left_collar",
-    "left_shoulder",
-    "left_elbow",
-    "left_wrist",
-    "left_hand",
-    "left_fingertip",
-    
-    "right_collar",
-    "right_shoulder",
-    "right_elbow",
-    "right_wrist",
-    "right_hand",
-    "right_fingertip",
-    
-    "left_hip",
-    "left_knee",
-    "left_ankle",
-    "left_foot",
-    
-    "right_hip",
-    "right_knee",
-    "right_ankle",
-    "right_foot"
-};
-
 struct kinectTransform {
 	double              worldX;
     double              worldY;
