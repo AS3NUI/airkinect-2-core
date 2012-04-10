@@ -1,10 +1,8 @@
-#include "PointCloudRegion.h"
+#include "stdafx.h"
 
-#ifdef AIRKINECT_OS_WINDOWS
-    #include "stdafx.h"
-#else
-    #include <iostream>
-#endif
+#include <iostream>
+
+#include "PointCloudRegion.h"
 
 PointCloudRegion::PointCloudRegion()
 {

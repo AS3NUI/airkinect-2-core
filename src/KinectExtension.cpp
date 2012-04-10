@@ -1,13 +1,9 @@
+#include "stdafx.h"
+
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "KinectExtension.h"
-
-#ifdef AIRKINECT_OS_WINDOWS
-    #include "stdafx.h"
-    #include "KinectImageTypes.h"
-#else
-    #include <stdlib.h>
-    #include <stdio.h>
-#endif
-
 #include "KinectDeviceManager.h"
 
 extern "C"

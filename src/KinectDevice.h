@@ -7,10 +7,10 @@
     #include "FlashRuntimeExtensions.h"
 #else
     #include <Adobe AIR/Adobe AIR.h>
-    #include <stdlib.h>
-    #include <iostream>
 #endif
 
+#include <stdlib.h>
+#include <iostream>
 #include "KinectCapabilities.h"
 #include "KinectSkeleton.h"
 #include "PointCloudRegion.h"

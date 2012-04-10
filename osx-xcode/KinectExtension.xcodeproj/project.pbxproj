@@ -43,6 +43,7 @@
 		6C039C32153446C20060F00E /* PointCloudRegion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointCloudRegion.cpp; sourceTree = "<group>"; };
 		6C039C33153446C20060F00E /* PointCloudRegion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointCloudRegion.h; sourceTree = "<group>"; };
 		6C039C43153447250060F00E /* Adobe AIR.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "Adobe AIR.framework"; path = "../../../../../../../Applications/Adobe Flash Builder 4.6/sdks/4.6.0/runtimes/air/mac/Adobe AIR.framework"; sourceTree = "<group>"; };
+		6C6E4561153473DB003AD1C5 /* stdafx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stdafx.h; sourceTree = "<group>"; };
 		6CD9763D14C85B990061A00B /* KinectExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KinectExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CD9764014C85B990061A00B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6CD9764314C85B990061A00B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -133,6 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				6CD9764714C85B990061A00B /* Supporting Files */,
+				6C6E4561153473DB003AD1C5 /* stdafx.h */,
 			);
 			path = KinectExtension;
 			sourceTree = "<group>";

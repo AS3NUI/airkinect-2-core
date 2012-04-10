@@ -11,6 +11,7 @@
 #define AIRKINECT_TARGET_OPENNI = 1;
 
 #ifdef AIRKINECT_TARGET_MSSDK
+	#include "NuiApi.h"
 	//MS SDK specific values
 	const int MAX_SKELETONS = NUI_SKELETON_COUNT;
 	const int NUM_JOINTS = 20;

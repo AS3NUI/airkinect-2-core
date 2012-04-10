@@ -4,7 +4,6 @@
 #include "ExtensionConfig.h"
 
 #ifdef AIRKINECT_OS_WINDOWS
-    #include "stdafx.h"
 #else
     #include <Adobe AIR/Adobe AIR.h>
     #include <boost/thread.hpp>

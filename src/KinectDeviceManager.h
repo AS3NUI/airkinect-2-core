@@ -7,7 +7,6 @@
     #include "FlashRuntimeExtensions.h"
 #else
     #include <Adobe AIR/Adobe AIR.h>
-    #include <map>
 #endif
 
 #ifdef AIRKINECT_TARGET_MSSDK
@@ -15,6 +14,7 @@
 #include <XnCppWrapper.h>
 #endif
 
+#include <map>
 #include "KinectDevice.h"
 
 class KinectDeviceManager

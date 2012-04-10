@@ -1,7 +1,7 @@
+#include "stdafx.h"
 #include "OpenNIDevice.h"
 
 #ifdef AIRKINECT_OS_WINDOWS
-    #include "stdafx.h"
 #else
     #include <iostream>
     #include <math.h>

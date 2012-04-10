@@ -1,16 +1,13 @@
+#include "stdafx.h"
 #include "KinectDeviceManager.h"
-
-#ifdef AIRKINECT_OS_WINDOWS
-    #include "stdafx.h"
-#else
-    #include <iostream>
-#endif
 
 #ifdef AIRKINECT_TARGET_MSSDK
     #include "MSKinectDevice.h"
 #else
     #include "OpenNIDevice.h"
 #endif
+
+#include <iostream>
 
 KinectDeviceManager::KinectDeviceManager()
 {
