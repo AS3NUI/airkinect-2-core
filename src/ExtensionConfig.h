@@ -3,12 +3,9 @@
 
 //this file contains extension specific config
 //we can use this to set platform / driver specific parameters at compile time
-
-//#define AIRKINECT_OS_WINDOWS = 1;
-#define AIRKINECT_OS_OSX = 1;
-
-//#define AIRKINECT_TARGET_MSSDK = 1;
-#define AIRKINECT_TARGET_OPENNI = 1;
+//You can define the Operating System (AIRKINECT_OS_WINDOWS / AIRKINECT_OS_OSX)
+//and the framework (AIRKINECT_TARGET_MSSDK / AIRKINECT_TARGET_OPENNI)
+//normally, you will define these in your preprocessor definitions
 
 #ifdef AIRKINECT_TARGET_MSSDK
 	#include "NuiApi.h"

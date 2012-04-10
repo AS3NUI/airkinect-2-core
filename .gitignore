@@ -1,1 +1,8 @@
-osx-xcode/build/*
+osx-xcode/build/
+bin/KinectExtension.exp
+bin/KinectExtension.lib
+bin/KinectExtension.pdb
+Release/
+win-visualstudio/ipch/
+win-visualstudio/KinectExtension.sdf
+win-visualstudio/KinectExtension.suo

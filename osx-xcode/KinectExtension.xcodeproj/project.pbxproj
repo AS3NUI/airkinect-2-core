@@ -319,12 +319,18 @@
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KinectExtension/KinectExtension-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"AIRKINECT_OS_OSX=1",
+					"AIRKINECT_TARGET_OPENNI=1",
+					"DEBUG=1",
+				);
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = (
 					/Users/wouter/Documents/experiments/boost_1_48_0,
 					"/usr/include/ni/**",
 				);
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
+				INFOPLIST_PREPROCESSOR_DEFINITIONS = "";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../runtimes/air/mac @executable_path/../Frameworks /Library/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -353,12 +359,17 @@
 				FRAMEWORK_VERSION = A;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KinectExtension/KinectExtension-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"AIRKINECT_OS_OSX=1",
+					"AIRKINECT_TARGET_OPENNI=1",
+				);
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = (
 					/Users/wouter/Documents/experiments/boost_1_48_0,
 					"/usr/include/ni/**",
 				);
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
+				INFOPLIST_PREPROCESSOR_DEFINITIONS = "";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../runtimes/air/mac @executable_path/../Frameworks /Library/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
