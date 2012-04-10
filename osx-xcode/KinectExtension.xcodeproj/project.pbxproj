@@ -8,27 +8,41 @@
 
 /* Begin PBXBuildFile section */
 		6C01D68014F56BE10015948C /* libboost_thread.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C01D67F14F56BE10015948C /* libboost_thread.a */; };
+		6C039C34153446C20060F00E /* ExtensionConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C27153446C20060F00E /* ExtensionConfig.h */; };
+		6C039C35153446C20060F00E /* KinectCapabilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C28153446C20060F00E /* KinectCapabilities.h */; };
+		6C039C36153446C20060F00E /* KinectDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C039C29153446C20060F00E /* KinectDevice.cpp */; };
+		6C039C37153446C20060F00E /* KinectDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C2A153446C20060F00E /* KinectDevice.h */; };
+		6C039C38153446C20060F00E /* KinectDeviceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C039C2B153446C20060F00E /* KinectDeviceManager.cpp */; };
+		6C039C39153446C20060F00E /* KinectDeviceManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C2C153446C20060F00E /* KinectDeviceManager.h */; };
+		6C039C3A153446C20060F00E /* KinectExtension.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C039C2D153446C20060F00E /* KinectExtension.cpp */; };
+		6C039C3B153446C20060F00E /* KinectExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C2E153446C20060F00E /* KinectExtension.h */; };
+		6C039C3C153446C20060F00E /* KinectSkeleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C2F153446C20060F00E /* KinectSkeleton.h */; };
+		6C039C3D153446C20060F00E /* OpenNIDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C039C30153446C20060F00E /* OpenNIDevice.cpp */; };
+		6C039C3E153446C20060F00E /* OpenNIDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C31153446C20060F00E /* OpenNIDevice.h */; };
+		6C039C3F153446C20060F00E /* PointCloudRegion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C039C32153446C20060F00E /* PointCloudRegion.cpp */; };
+		6C039C40153446C20060F00E /* PointCloudRegion.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C33153446C20060F00E /* PointCloudRegion.h */; };
+		6C039C44153447250060F00E /* Adobe AIR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C039C43153447250060F00E /* Adobe AIR.framework */; };
 		6CD9764114C85B990061A00B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD9764014C85B990061A00B /* Cocoa.framework */; };
 		6CD9764B14C85B990061A00B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6CD9764914C85B990061A00B /* InfoPlist.strings */; };
 		6CD9765714C85BF80061A00B /* libOpenNI.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD9765614C85BF80061A00B /* libOpenNI.dylib */; };
-		6CD9765914C85C2B0061A00B /* Adobe AIR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD9765814C85C2B0061A00B /* Adobe AIR.framework */; };
-		6CFF5B1F153445660039167A /* ExtensionConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CFF5B12153445660039167A /* ExtensionConfig.h */; };
-		6CFF5B20153445660039167A /* KinectCapabilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CFF5B13153445660039167A /* KinectCapabilities.h */; };
-		6CFF5B21153445660039167A /* KinectDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CFF5B14153445660039167A /* KinectDevice.cpp */; };
-		6CFF5B22153445660039167A /* KinectDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CFF5B15153445660039167A /* KinectDevice.h */; };
-		6CFF5B23153445660039167A /* KinectDeviceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CFF5B16153445660039167A /* KinectDeviceManager.cpp */; };
-		6CFF5B24153445660039167A /* KinectDeviceManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CFF5B17153445660039167A /* KinectDeviceManager.h */; };
-		6CFF5B25153445660039167A /* KinectExtension.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CFF5B18153445660039167A /* KinectExtension.cpp */; };
-		6CFF5B26153445660039167A /* KinectExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CFF5B19153445660039167A /* KinectExtension.h */; };
-		6CFF5B27153445660039167A /* KinectSkeleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CFF5B1A153445660039167A /* KinectSkeleton.h */; };
-		6CFF5B28153445660039167A /* OpenNIDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CFF5B1B153445660039167A /* OpenNIDevice.cpp */; };
-		6CFF5B29153445660039167A /* OpenNIDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CFF5B1C153445660039167A /* OpenNIDevice.h */; };
-		6CFF5B2A153445660039167A /* PointCloudRegion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CFF5B1D153445660039167A /* PointCloudRegion.cpp */; };
-		6CFF5B2B153445660039167A /* PointCloudRegion.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CFF5B1E153445660039167A /* PointCloudRegion.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		6C01D67F14F56BE10015948C /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libboost_thread.a; sourceTree = "<group>"; };
+		6C039C27153446C20060F00E /* ExtensionConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtensionConfig.h; sourceTree = "<group>"; };
+		6C039C28153446C20060F00E /* KinectCapabilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectCapabilities.h; sourceTree = "<group>"; };
+		6C039C29153446C20060F00E /* KinectDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KinectDevice.cpp; sourceTree = "<group>"; };
+		6C039C2A153446C20060F00E /* KinectDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectDevice.h; sourceTree = "<group>"; };
+		6C039C2B153446C20060F00E /* KinectDeviceManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KinectDeviceManager.cpp; sourceTree = "<group>"; };
+		6C039C2C153446C20060F00E /* KinectDeviceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectDeviceManager.h; sourceTree = "<group>"; };
+		6C039C2D153446C20060F00E /* KinectExtension.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KinectExtension.cpp; sourceTree = "<group>"; };
+		6C039C2E153446C20060F00E /* KinectExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectExtension.h; sourceTree = "<group>"; };
+		6C039C2F153446C20060F00E /* KinectSkeleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectSkeleton.h; sourceTree = "<group>"; };
+		6C039C30153446C20060F00E /* OpenNIDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenNIDevice.cpp; sourceTree = "<group>"; };
+		6C039C31153446C20060F00E /* OpenNIDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenNIDevice.h; sourceTree = "<group>"; };
+		6C039C32153446C20060F00E /* PointCloudRegion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointCloudRegion.cpp; sourceTree = "<group>"; };
+		6C039C33153446C20060F00E /* PointCloudRegion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointCloudRegion.h; sourceTree = "<group>"; };
+		6C039C43153447250060F00E /* Adobe AIR.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "Adobe AIR.framework"; path = "../../../../../../../Applications/Adobe Flash Builder 4.6/sdks/4.6.0/runtimes/air/mac/Adobe AIR.framework"; sourceTree = "<group>"; };
 		6CD9763D14C85B990061A00B /* KinectExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KinectExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CD9764014C85B990061A00B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6CD9764314C85B990061A00B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -38,20 +52,6 @@
 		6CD9764A14C85B990061A00B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6CD9764C14C85B990061A00B /* KinectExtension-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "KinectExtension-Prefix.pch"; sourceTree = "<group>"; };
 		6CD9765614C85BF80061A00B /* libOpenNI.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libOpenNI.dylib; sourceTree = "<group>"; };
-		6CD9765814C85C2B0061A00B /* Adobe AIR.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "Adobe AIR.framework"; path = "../../../../../../Applications/Adobe Flash Builder 4.6/sdks/4.6.0/runtimes/air/mac/Adobe AIR.framework"; sourceTree = "<group>"; };
-		6CFF5B12153445660039167A /* ExtensionConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtensionConfig.h; sourceTree = "<group>"; };
-		6CFF5B13153445660039167A /* KinectCapabilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectCapabilities.h; sourceTree = "<group>"; };
-		6CFF5B14153445660039167A /* KinectDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KinectDevice.cpp; sourceTree = "<group>"; };
-		6CFF5B15153445660039167A /* KinectDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectDevice.h; sourceTree = "<group>"; };
-		6CFF5B16153445660039167A /* KinectDeviceManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KinectDeviceManager.cpp; sourceTree = "<group>"; };
-		6CFF5B17153445660039167A /* KinectDeviceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectDeviceManager.h; sourceTree = "<group>"; };
-		6CFF5B18153445660039167A /* KinectExtension.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KinectExtension.cpp; sourceTree = "<group>"; };
-		6CFF5B19153445660039167A /* KinectExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectExtension.h; sourceTree = "<group>"; };
-		6CFF5B1A153445660039167A /* KinectSkeleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectSkeleton.h; sourceTree = "<group>"; };
-		6CFF5B1B153445660039167A /* OpenNIDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OpenNIDevice.cpp; sourceTree = "<group>"; };
-		6CFF5B1C153445660039167A /* OpenNIDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenNIDevice.h; sourceTree = "<group>"; };
-		6CFF5B1D153445660039167A /* PointCloudRegion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointCloudRegion.cpp; sourceTree = "<group>"; };
-		6CFF5B1E153445660039167A /* PointCloudRegion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointCloudRegion.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,18 +61,39 @@
 			files = (
 				6CD9764114C85B990061A00B /* Cocoa.framework in Frameworks */,
 				6CD9765714C85BF80061A00B /* libOpenNI.dylib in Frameworks */,
-				6CD9765914C85C2B0061A00B /* Adobe AIR.framework in Frameworks */,
 				6C01D68014F56BE10015948C /* libboost_thread.a in Frameworks */,
+				6C039C44153447250060F00E /* Adobe AIR.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6C039C26153446C20060F00E /* src */ = {
+			isa = PBXGroup;
+			children = (
+				6C039C27153446C20060F00E /* ExtensionConfig.h */,
+				6C039C28153446C20060F00E /* KinectCapabilities.h */,
+				6C039C29153446C20060F00E /* KinectDevice.cpp */,
+				6C039C2A153446C20060F00E /* KinectDevice.h */,
+				6C039C2B153446C20060F00E /* KinectDeviceManager.cpp */,
+				6C039C2C153446C20060F00E /* KinectDeviceManager.h */,
+				6C039C2D153446C20060F00E /* KinectExtension.cpp */,
+				6C039C2E153446C20060F00E /* KinectExtension.h */,
+				6C039C2F153446C20060F00E /* KinectSkeleton.h */,
+				6C039C30153446C20060F00E /* OpenNIDevice.cpp */,
+				6C039C31153446C20060F00E /* OpenNIDevice.h */,
+				6C039C32153446C20060F00E /* PointCloudRegion.cpp */,
+				6C039C33153446C20060F00E /* PointCloudRegion.h */,
+			);
+			name = src;
+			path = ../src;
+			sourceTree = "<group>";
+		};
 		6CD9763114C85B990061A00B = {
 			isa = PBXGroup;
 			children = (
-				6CFF5B11153445660039167A /* src */,
+				6C039C26153446C20060F00E /* src */,
 				6CD9765514C85BB70061A00B /* Libraries */,
 				6CD9764614C85B990061A00B /* KinectExtension */,
 				6CD9763F14C85B990061A00B /* Frameworks */,
@@ -91,7 +112,7 @@
 		6CD9763F14C85B990061A00B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				6CD9765814C85C2B0061A00B /* Adobe AIR.framework */,
+				6C039C43153447250060F00E /* Adobe AIR.framework */,
 				6CD9764014C85B990061A00B /* Cocoa.framework */,
 				6CD9764214C85B990061A00B /* Other Frameworks */,
 			);
@@ -135,26 +156,6 @@
 			name = Libraries;
 			sourceTree = "<group>";
 		};
-		6CFF5B11153445660039167A /* src */ = {
-			isa = PBXGroup;
-			children = (
-				6CFF5B12153445660039167A /* ExtensionConfig.h */,
-				6CFF5B13153445660039167A /* KinectCapabilities.h */,
-				6CFF5B14153445660039167A /* KinectDevice.cpp */,
-				6CFF5B15153445660039167A /* KinectDevice.h */,
-				6CFF5B16153445660039167A /* KinectDeviceManager.cpp */,
-				6CFF5B17153445660039167A /* KinectDeviceManager.h */,
-				6CFF5B18153445660039167A /* KinectExtension.cpp */,
-				6CFF5B19153445660039167A /* KinectExtension.h */,
-				6CFF5B1A153445660039167A /* KinectSkeleton.h */,
-				6CFF5B1B153445660039167A /* OpenNIDevice.cpp */,
-				6CFF5B1C153445660039167A /* OpenNIDevice.h */,
-				6CFF5B1D153445660039167A /* PointCloudRegion.cpp */,
-				6CFF5B1E153445660039167A /* PointCloudRegion.h */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -162,14 +163,14 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6CFF5B1F153445660039167A /* ExtensionConfig.h in Headers */,
-				6CFF5B20153445660039167A /* KinectCapabilities.h in Headers */,
-				6CFF5B22153445660039167A /* KinectDevice.h in Headers */,
-				6CFF5B24153445660039167A /* KinectDeviceManager.h in Headers */,
-				6CFF5B26153445660039167A /* KinectExtension.h in Headers */,
-				6CFF5B27153445660039167A /* KinectSkeleton.h in Headers */,
-				6CFF5B29153445660039167A /* OpenNIDevice.h in Headers */,
-				6CFF5B2B153445660039167A /* PointCloudRegion.h in Headers */,
+				6C039C34153446C20060F00E /* ExtensionConfig.h in Headers */,
+				6C039C35153446C20060F00E /* KinectCapabilities.h in Headers */,
+				6C039C37153446C20060F00E /* KinectDevice.h in Headers */,
+				6C039C39153446C20060F00E /* KinectDeviceManager.h in Headers */,
+				6C039C3B153446C20060F00E /* KinectExtension.h in Headers */,
+				6C039C3C153446C20060F00E /* KinectSkeleton.h in Headers */,
+				6C039C3E153446C20060F00E /* OpenNIDevice.h in Headers */,
+				6C039C40153446C20060F00E /* PointCloudRegion.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,11 +236,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6CFF5B21153445660039167A /* KinectDevice.cpp in Sources */,
-				6CFF5B23153445660039167A /* KinectDeviceManager.cpp in Sources */,
-				6CFF5B25153445660039167A /* KinectExtension.cpp in Sources */,
-				6CFF5B28153445660039167A /* OpenNIDevice.cpp in Sources */,
-				6CFF5B2A153445660039167A /* PointCloudRegion.cpp in Sources */,
+				6C039C36153446C20060F00E /* KinectDevice.cpp in Sources */,
+				6C039C38153446C20060F00E /* KinectDeviceManager.cpp in Sources */,
+				6C039C3A153446C20060F00E /* KinectExtension.cpp in Sources */,
+				6C039C3D153446C20060F00E /* OpenNIDevice.cpp in Sources */,
+				6C039C3F153446C20060F00E /* PointCloudRegion.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -306,7 +307,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CONFIGURATION_BUILD_DIR = bin;
+				CONFIGURATION_BUILD_DIR = ../bin;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -340,7 +341,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CONFIGURATION_BUILD_DIR = bin;
+				CONFIGURATION_BUILD_DIR = ../bin;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_SEARCH_PATHS = (
