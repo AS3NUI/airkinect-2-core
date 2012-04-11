@@ -130,6 +130,8 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 		//SHARED CONTEXT REQUESTS
 		/** @private */
+		protected static const EXTENSION_REQUEST_APPLICATION_STARTUP:String = "applicationStartup";
+		/** @private */
 		protected static const EXTENSION_REQUEST_GET_DEVICE_COUNT:String = "getDeviceCount";
 		/** @private */
 		protected static const EXTENSION_REQUEST_APPLICATION_SHUTDOWN:String = "applicationShutdown";
@@ -375,6 +377,12 @@ package com.as3nui.nativeExtensions.air.kinect {
 		protected var _skeletonJointNames:Vector.<String>;
 		/** @private */
 		protected var userMaskByteArrays:Vector.<ByteArray>;
+		
+		//static intialization of the shared context
+		//parameter lets you specify which framework to use on windows
+		//0: auto, 1: mssdk, 2: openni
+		//will be used as soon as we figure out how to prevent ane from crashing when driver requirements are not met
+		private static var applicationStarted:* = sharedContext.call(EXTENSION_REQUEST_APPLICATION_STARTUP, 0);
 
 		/**
 		 * Private constructor of the Device class. Use Device.getDevice() instead of calling this method.
