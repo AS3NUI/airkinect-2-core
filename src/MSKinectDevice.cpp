@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "MSKinectDevice.h"
 
 MSKinectDevice::MSKinectDevice(int nr)
@@ -31,13 +30,6 @@ MSKinectDevice::MSKinectDevice(int nr)
 	asJointClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSSkeletonJoint";
 	asUserClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSUser";
 	asUserFrameClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSUserFrame";
-
-	//initialize mutexes
-	userMutex = CreateMutex(NULL, FALSE, NULL);
-	depthMutex = CreateMutex(NULL, FALSE, NULL);
-	rgbMutex = CreateMutex(NULL, FALSE, NULL);
-	userMaskMutex = CreateMutex(NULL, FALSE, NULL);
-	pointCloudMutex = CreateMutex(NULL, FALSE, NULL);
 
 	//set default values
     setDefaults();
@@ -84,6 +76,8 @@ void MSKinectDevice::setDefaults()
 {
 	//set the defaults from the base class
 	KinectDevice::setDefaults();
+
+	running = false;
 
 	//set specific defaults for MS SDK
     imageFrameTimeout = 0;
@@ -193,89 +187,11 @@ FREObject MSKinectDevice::freCameraElevationSetAngle(FREObject argv[])
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 void MSKinectDevice::start()
 {
-	FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Device");
-
-	
-	HRESULT hr = NuiCreateSensorByIndex(this->nr, &nuiSensor);
-	//Failed dispatch some message
-	if ( FAILED(hr) ){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to create Sensor");
-		return;
-	}
-	
-
-	depthPlayerIndexEnabled = asDepthShowUserColors || asUserMaskEnabled;
-	DWORD dwFlags;
-	if(asSkeletonEnabled || asUserMaskEnabled) dwFlags |= NUI_INITIALIZE_FLAG_USES_SKELETON;
-	if(asRGBEnabled || asPointCloudEnabled || asUserMaskEnabled) dwFlags |= NUI_INITIALIZE_FLAG_USES_COLOR;
-	if(asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled){
-		if(depthPlayerIndexEnabled) {
-			dwFlags |= NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX;
-		}else{
-			dwFlags |= NUI_INITIALIZE_FLAG_USES_DEPTH;
-		}
-	}
-
-	hr = nuiSensor->NuiInitialize(dwFlags);	
-	if (FAILED(hr)) {
-		dispatchError(hr);
-		this->dispose();
-		return;
-	}
-
-	userEvent	= CreateEvent( NULL, TRUE, FALSE, NULL );
-	if(asSkeletonEnabled || asUserMaskEnabled){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Skeleton Tracking");
-		hr = nuiSensor->NuiSkeletonTrackingEnable( userEvent, 0 );
-		//Failed dispatch some message
-		if ( FAILED(hr) ){
-			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize Skeleton Tracking");
-			return;
-		}
-	}
-
-	rgbFrameEvent	= CreateEvent( NULL, TRUE, FALSE, NULL );
-	if(asRGBEnabled || asPointCloudEnabled || asUserMaskEnabled) {
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting RGB Camera");
-		hr = nuiSensor->NuiImageStreamOpen( NUI_IMAGE_TYPE_COLOR, rgbResolution, 0, 2, rgbFrameEvent, &rgbFrameHandle );
-		//Failed dispatch some message
-		if ( FAILED(hr) ){
-			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize RGB Camera");
-			return;
-		}
-	}
-
-	depthFrameEvent	= CreateEvent( NULL, TRUE, FALSE, NULL );
-	
-	if(asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled) {
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Depth Camera");
-		if(depthPlayerIndexEnabled){
-			hr = nuiSensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX, depthResolution, 0, 2, depthFrameEvent, &depthFrameHandle );
-		}else{
-			hr = nuiSensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_DEPTH, depthResolution, 0, 2, depthFrameEvent, &depthFrameHandle );
-		}
-
-		//near mode support?
-		if(asDepthEnableNearMode) {
-			nuiSensor->NuiImageStreamSetImageFrameFlags(depthFrameHandle, NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE | NUI_IMAGE_STREAM_FLAG_DISTINCT_OVERFLOW_DEPTH_VALUES);
-		}
-		
-		//Failed dispatch some message
-		if ( FAILED(hr) ){
-			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize Depth Camera");
-			return;
-		}
-	}
-
-	//Update all the scale information for all the features
-	updateConfigScale();
-
-	if(asSkeletonEnabled || asRGBEnabled || asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Kinect Thread");
-		started = true;
-		nuiProcessStop=CreateEvent(NULL, FALSE, FALSE, NULL);
-		nuiProcess=CreateThread(NULL, 0, processThread, this, 0, NULL);
-	}
+	if(!running)
+    {
+        running = true;
+        mThread = boost::thread(&MSKinectDevice::deviceThread, this);
+    }
 }
 
 void MSKinectDevice::dispatchError(HRESULT hr){
@@ -321,20 +237,11 @@ void MSKinectDevice::dispatchError(HRESULT hr){
 void MSKinectDevice::stop()
 {
 	FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Stopping Kinect");
-	if(nuiProcessStop!=NULL) 
-	{
-		SetEvent(nuiProcessStop);
-
-		if(nuiProcess!=NULL) 
-		{
-			WaitForSingleObject(nuiProcess,INFINITE);
-			CloseHandle(nuiProcess);
-		}
-		CloseHandle(nuiProcessStop);
-	}
-
-	nuiProcess = NULL;
-	nuiProcessStop = NULL;
+	if(running)
+    {
+        running = false;
+        mThread.join();
+    }
 
 	if(nuiSensor) nuiSensor->NuiShutdown( );
 	
@@ -411,7 +318,172 @@ void MSKinectDevice::dispose()
     freContext = NULL;
 }
 
+void * MSKinectDevice::deviceThread(void *self)
+{
+    MSKinectDevice *adapter = (MSKinectDevice *) self;
+    adapter->run();
+    return NULL;
+}
 
+void MSKinectDevice::run()
+{
+    if(running)
+    { 
+		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Device");
+	
+		HRESULT hr = NuiCreateSensorByIndex(this->nr, &nuiSensor);
+		//Failed dispatch some message
+		if ( FAILED(hr) ){
+			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to create Sensor");
+			stop();
+			return;
+		}
+
+		depthPlayerIndexEnabled = asDepthShowUserColors || asUserMaskEnabled;
+		DWORD dwFlags;
+		if(asSkeletonEnabled || asUserMaskEnabled) dwFlags |= NUI_INITIALIZE_FLAG_USES_SKELETON;
+		if(asRGBEnabled || asPointCloudEnabled || asUserMaskEnabled) dwFlags |= NUI_INITIALIZE_FLAG_USES_COLOR;
+		if(asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled){
+			if(depthPlayerIndexEnabled) {
+				dwFlags |= NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX;
+			}else{
+				dwFlags |= NUI_INITIALIZE_FLAG_USES_DEPTH;
+			}
+		}
+
+		hr = nuiSensor->NuiInitialize(dwFlags);	
+		if (FAILED(hr)) {
+			dispatchError(hr);
+			this->dispose();
+			stop();
+			return;
+		}
+
+		userEvent	= CreateEvent( NULL, TRUE, FALSE, NULL );
+		if(asSkeletonEnabled || asUserMaskEnabled){
+			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Skeleton Tracking");
+			hr = nuiSensor->NuiSkeletonTrackingEnable( userEvent, 0 );
+			//Failed dispatch some message
+			if ( FAILED(hr) ){
+				FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize Skeleton Tracking");
+				stop();
+				return;
+			}
+		}
+
+		rgbFrameEvent	= CreateEvent( NULL, TRUE, FALSE, NULL );
+		if(asRGBEnabled || asPointCloudEnabled || asUserMaskEnabled) {
+			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting RGB Camera");
+			hr = nuiSensor->NuiImageStreamOpen( NUI_IMAGE_TYPE_COLOR, rgbResolution, 0, 2, rgbFrameEvent, &rgbFrameHandle );
+			//Failed dispatch some message
+			if ( FAILED(hr) ){
+				FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize RGB Camera");
+				stop();
+				return;
+			}
+		}
+
+		depthFrameEvent	= CreateEvent( NULL, TRUE, FALSE, NULL );
+	
+		if(asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled) {
+			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Depth Camera");
+			if(depthPlayerIndexEnabled){
+				hr = nuiSensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX, depthResolution, 0, 2, depthFrameEvent, &depthFrameHandle );
+			}else{
+				hr = nuiSensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_DEPTH, depthResolution, 0, 2, depthFrameEvent, &depthFrameHandle );
+			}
+
+			//near mode support?
+			if(asDepthEnableNearMode) {
+				nuiSensor->NuiImageStreamSetImageFrameFlags(depthFrameHandle, NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE | NUI_IMAGE_STREAM_FLAG_DISTINCT_OVERFLOW_DEPTH_VALUES);
+			}
+		
+			//Failed dispatch some message
+			if ( FAILED(hr) ){
+				FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize Depth Camera");
+				stop();
+				return;
+			}
+		}
+
+		//Update all the scale information for all the features
+		updateConfigScale();
+
+		if(asSkeletonEnabled || asRGBEnabled || asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled){
+			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Kinect Thread");
+
+			const int numEvents = 3;
+			HANDLE hEvents[numEvents] = { depthFrameEvent, rgbFrameEvent, userEvent };
+			int    nEventIdx;
+
+			started = true;
+			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "started");
+
+			while(running) {
+				nEventIdx = WaitForMultipleObjects(numEvents, hEvents, FALSE, 100);
+
+				switch(nEventIdx) {
+					case WAIT_TIMEOUT:
+						continue;
+					case WAIT_OBJECT_0:
+
+						readDepthFrame();
+
+						if(asDepthEnabled) {
+							lockDepthMutex();
+							depthFrameHandler();
+							unlockDepthMutex();
+							FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "depthFrame");
+						}
+
+						//point cloud
+						if(asPointCloudEnabled)
+						{
+							lockPointCloudMutex();
+							if(asPointCloudIncludeRGB)
+							{
+								pointCloudWithRGBHandler();
+							}
+							else
+							{
+								pointCloudHandler();
+							}
+							unlockPointCloudMutex();
+							FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "pointCloudFrame");
+						}
+
+						//user mask
+						if(asUserMaskEnabled)
+						{
+							lockUserMaskMutex();
+							userMaskHandler();
+							unlockUserMaskMutex();
+							FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "userMaskFrame");
+						}
+
+						break;
+					case WAIT_OBJECT_0 +1:
+						readRGBFrame();
+
+						lockRGBMutex();
+						rgbFrameHandler();
+						unlockRGBMutex();
+						FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "RGBFrame");
+						break;
+					case WAIT_OBJECT_0 +2:
+						lockUserMutex();
+						userFrameHandler();
+						unlockUserMutex();
+						FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "userFrame");
+						break;
+				}
+			}
+
+		} else {
+			stop();
+		}
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -426,6 +498,7 @@ void MSKinectDevice::dispose()
 // 	
 /// 
 
+/*
 DWORD WINAPI MSKinectDevice::processThread(LPVOID pParam)
 {
     MSKinectDevice *pthis = (MSKinectDevice *) pParam;
@@ -508,6 +581,7 @@ DWORD WINAPI MSKinectDevice::processThread() {
 
 	return (0);
 }
+*/
 
 void MSKinectDevice::readRGBFrame()
 {
@@ -985,52 +1059,52 @@ void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, 
 
 void MSKinectDevice::lockUserMutex()
 {
-	WaitForSingleObject(userMutex, INFINITE);
+	userMutex.lock();
 }
 
 void MSKinectDevice::unlockUserMutex()
 {
-	ReleaseMutex(userMutex);
+	userMutex.unlock();
 }
 
 void MSKinectDevice::lockDepthMutex()
 {
-	WaitForSingleObject(depthMutex, INFINITE);
+	depthMutex.lock();
 }
 
 void MSKinectDevice::unlockDepthMutex()
 {
-	ReleaseMutex(depthMutex);
+	depthMutex.unlock();
 }
 
 void MSKinectDevice::lockRGBMutex()
 {
-	WaitForSingleObject(rgbMutex, INFINITE);
+	rgbMutex.lock();
 }
 
 void MSKinectDevice::unlockRGBMutex()
 {
-	ReleaseMutex(rgbMutex);
+	rgbMutex.unlock();
 }
 
 void MSKinectDevice::lockUserMaskMutex()
 {
-	WaitForSingleObject(userMaskMutex, INFINITE);
+	userMaskMutex.lock();
 }
 
 void MSKinectDevice::unlockUserMaskMutex()
 {
-	ReleaseMutex(userMaskMutex);
+	userMaskMutex.unlock();
 }
 
 void MSKinectDevice::lockPointCloudMutex()
 {
-	WaitForSingleObject(pointCloudMutex, INFINITE);
+	pointCloudMutex.lock();
 }
 
 void MSKinectDevice::unlockPointCloudMutex()
 {
-	ReleaseMutex(pointCloudMutex);
+	pointCloudMutex.unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

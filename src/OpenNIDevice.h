@@ -62,25 +62,16 @@ protected:
     void                    setDefaults();
     
 private:
-    int                     nr;
     xn::Context             context;
-    
-    boost::mutex            userMutex;
-    boost::mutex            depthMutex;
-    boost::mutex            rgbMutex;
-    boost::mutex            userMaskMutex;
-    boost::mutex            infraredMutex;
-    boost::mutex            pointCloudMutex;
     
     int                     getAsPointCloudByteArrayLength();
     
     void                    run();
     
     static void             *deviceThread(void *ptr);
-    boost::thread           mThread;
+    boost::mutex            infraredMutex;
     
     int                     returnVal;
-    bool                    running;
     
     XnCallbackHandle        userHandle;
     XnCallbackHandle        userExitHandle;

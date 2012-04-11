@@ -60,22 +60,12 @@ private:
 	void					calculateKinectTransform(kinectTransform &kTransform, Vector4 skeletonTransform);
 
 	int						imageFrameTimeout;
-	int                     nr;
 	INuiSensor *            nuiSensor;
     
     void                    setDefaults();
-    
-	static DWORD WINAPI     processThread(LPVOID pParam);
-	DWORD WINAPI			processThread();
 
-	HANDLE					nuiProcess;
-    HANDLE					nuiProcessStop;
-
-	HANDLE					userMutex;
-    HANDLE					depthMutex;
-    HANDLE					rgbMutex;
-    HANDLE					userMaskMutex;
-    HANDLE		            pointCloudMutex;
+	static void             *deviceThread(void *ptr);
+	void                    run();
 
     HANDLE					depthFrameEvent;
     HANDLE					rgbFrameEvent;

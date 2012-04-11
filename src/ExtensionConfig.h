@@ -7,6 +7,11 @@
 //and the framework (AIRKINECT_TARGET_MSSDK / AIRKINECT_TARGET_OPENNI)
 //normally, you will define these in your preprocessor definitions
 
+#ifdef AIRKINECT_OS_WINDOWS
+	#include <windows.h>
+	#include <ole2.h>
+#endif
+
 #ifdef AIRKINECT_TARGET_MSSDK
 	#include "NuiApi.h"
 	//MS SDK specific values

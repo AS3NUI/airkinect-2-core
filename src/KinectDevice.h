@@ -11,6 +11,8 @@
 
 #include <stdlib.h>
 #include <iostream>
+#include <boost/thread.hpp>
+#include <boost/thread/mutex.hpp>
 #include "KinectCapabilities.h"
 #include "KinectSkeleton.h"
 #include "PointCloudRegion.h"
@@ -89,7 +91,17 @@ protected:
 	FREContext					freContext;
 	KinectCapabilities			capabilities;
 
+	int							nr;
+	bool						running;
 	bool						started;
+
+	boost::thread				mThread;
+
+	boost::mutex				userMutex;
+    boost::mutex				depthMutex;
+    boost::mutex				rgbMutex;
+    boost::mutex				userMaskMutex;
+    boost::mutex				pointCloudMutex;
 	
 	int							userMaskWidth;
 	int							userMaskHeight;

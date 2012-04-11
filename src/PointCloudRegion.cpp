@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include <iostream>
 
 #include "PointCloudRegion.h"

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "OpenNIDevice.h"
 
 #ifdef AIRKINECT_OS_WINDOWS
@@ -357,6 +356,7 @@ void OpenNIDevice::run()
     printf("OpenNIDevice::run(), %s\n", (running) ? "true" : "false");
     if(running)
     {  
+        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Device");
         XnStatus rc;
         
         XnMapOutputMode depthMode;
@@ -365,10 +365,12 @@ void OpenNIDevice::run()
         depthMode.nFPS = 30;
         
         bool depthGeneratorCreated = false;
+        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Creating Depth Generator");
         rc = depthGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
-            printf("OpenNIDevice create depthGenerator failed: %s\n", xnGetStatusString(rc));
+            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Create DepthGenerator Failed");
+            //printf("OpenNIDevice create depthGenerator failed: %s\n", xnGetStatusString(rc));
         }
         else
         {
@@ -390,10 +392,12 @@ void OpenNIDevice::run()
         rgbMode.nFPS = 30;
         
         bool imageGeneratorCreated = false;
+        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Creating Image Generator");
         rc = imageGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
-            printf("OpenNIDevice create imageGenerator failed: %s\n", xnGetStatusString(rc));
+            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Create ImageGenerator Failed");
+            //printf("OpenNIDevice create imageGenerator failed: %s\n", xnGetStatusString(rc));
         }
         else
         {
@@ -415,10 +419,12 @@ void OpenNIDevice::run()
         infraredMode.nFPS = 30;
         
         bool infraredGeneratorCreated = false;
+        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Creating Infrared Generator");
         rc = infraredGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
-            printf("OpenNIDevice create infraredGenerator failed: %s\n", xnGetStatusString(rc));
+            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Create Infrared Generator Failed");
+            //printf("OpenNIDevice create infraredGenerator failed: %s\n", xnGetStatusString(rc));
         }
         else
         {
@@ -442,10 +448,12 @@ void OpenNIDevice::run()
         
         //initialize the user generator
         bool userGeneratorCreated = false;
+        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Creating User Generator");
         rc = userGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
-            printf("OpenNIDevice create userGenerator failed: %s\n", xnGetStatusString(rc));
+            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Create Infrared Generator Failed");
+            //printf("OpenNIDevice create userGenerator failed: %s\n", xnGetStatusString(rc));
         }
         else
         {
@@ -504,35 +512,43 @@ void OpenNIDevice::run()
         
         if(depthGeneratorCreated && (asDepthEnabled || asPointCloudEnabled))
         {
+            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Depth Generator");
             rc = depthGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
-                printf("OpenNIDevice start depthGenerator failed: %s\n", xnGetStatusString(rc));
+                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Starting Depth Generator Failed");
+                //printf("OpenNIDevice start depthGenerator failed: %s\n", xnGetStatusString(rc));
             }
         }
         if(imageGeneratorCreated && (asRGBEnabled || asUserMaskEnabled || asPointCloudEnabled))
         {
+            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Image Generator");
             rc = imageGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
-                printf("OpenNIDevice start imageGenerator failed: %s\n", xnGetStatusString(rc));
+                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Starting Image Generator Failed");
+                //printf("OpenNIDevice start imageGenerator failed: %s\n", xnGetStatusString(rc));
             }
         }
         if(userGeneratorCreated && ((asDepthEnabled && asDepthShowUserColors) || asUserMaskEnabled || asUserEnabled || asSkeletonEnabled))
         {
+            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting User Generator");
             rc = userGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
-                printf("OpenNIDevice start userGenerator failed: %s\n", xnGetStatusString(rc));
+                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Starting User Generator Failed");
+                //printf("OpenNIDevice start userGenerator failed: %s\n", xnGetStatusString(rc));
             }
         }
         //you cant have both infrared and rgb
         if(infraredGeneratorCreated && (asInfraredEnabled && !(imageGeneratorCreated && imageGenerator.IsGenerating())))
         {
+            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Infrared Generator");
             rc = infraredGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
-                printf("OpenNIDevice start infraredGenerator failed: %s\n", xnGetStatusString(rc));
+                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Infrared Generator Failed");
+                //printf("OpenNIDevice start infraredGenerator failed: %s\n", xnGetStatusString(rc));
             }
         }
         

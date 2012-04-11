@@ -24,12 +24,6 @@
     <ClInclude Include="FlashRuntimeExtensions.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -51,18 +45,15 @@
     <ClInclude Include="..\..\src\KinectSkeleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\MSKinectDevice.h">
+    <ClInclude Include="..\..\src\PointCloudRegion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\PointCloudRegion.h">
+    <ClInclude Include="..\..\src\MSKinectDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\KinectDevice.cpp">
@@ -74,10 +65,10 @@
     <ClCompile Include="..\..\src\KinectExtension.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\MSKinectDevice.cpp">
+    <ClCompile Include="..\..\src\PointCloudRegion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\PointCloudRegion.cpp">
+    <ClCompile Include="..\..\src\MSKinectDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

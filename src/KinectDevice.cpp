@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "KinectDevice.h"
 #include "KinectSkeleton.h"
 

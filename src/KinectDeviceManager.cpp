@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "KinectDeviceManager.h"
 
 #ifdef AIRKINECT_TARGET_MSSDK
