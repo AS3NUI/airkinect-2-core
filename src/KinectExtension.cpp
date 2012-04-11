@@ -15,6 +15,13 @@ extern "C"
 		FRENewObjectFromInt32(kinectDeviceManager.getNumDevices(), &retObj);
 		return retObj;
     }
+
+	FREObject Kinect_applicationStartup(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+    {
+		unsigned int framework; FREGetObjectAsUint32(argv[0], &framework);
+		kinectDeviceManager.startUp(framework);
+        return NULL;
+    }
     
     FREObject Kinect_applicationShutdown(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
@@ -215,6 +222,7 @@ extern "C"
      ------------------------------------------*/
     
 	FRENamedFunction _Static_methods[] = {
+		{ (const uint8_t*) "applicationStartup", 0, Kinect_applicationStartup},
 		{ (const uint8_t*) "getDeviceCount", 0, Kinect_getDeviceCount},
         { (const uint8_t*) "applicationShutdown", 0, Kinect_applicationShutdown}
     };
@@ -265,12 +273,6 @@ extern "C"
         {
             *numFunctions = sizeof( _Instance_methods ) / sizeof( FRENamedFunction );
             *functions = _Instance_methods;
-        }
-        
-        //make sure the manager is started
-        if(!kinectDeviceManager.isStarted())
-        {
-            kinectDeviceManager.startUp();
         }
 	}
     

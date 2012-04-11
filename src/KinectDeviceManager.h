@@ -9,8 +9,7 @@
     #include <Adobe AIR/Adobe AIR.h>
 #endif
 
-#ifdef AIRKINECT_TARGET_MSSDK
-#else
+#ifdef AIRKINECT_TARGET_OPENNI
 #include <XnCppWrapper.h>
 #endif
 
@@ -25,17 +24,20 @@ public:
     int                             getNumDevices();
     
     bool                            isStarted();
-    void                            startUp();
+    void                            startUp(unsigned int framework);
     void                            shutDown();
     KinectDevice                    *getDevice(int nr, FREContext freContext);
     
 private:
 #ifdef AIRKINECT_TARGET_OPENNI
-    xn::Context                     context;
+    xn::Context                     *openNIContext;
 #endif
     
     bool                            started;    
     std::map<int, KinectDevice*>    deviceMap;
+
+	bool							useMSSDK;
+	bool							useOpenNI;
 };
 
 #endif

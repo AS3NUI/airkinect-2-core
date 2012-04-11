@@ -2,7 +2,8 @@
 
 #ifdef AIRKINECT_TARGET_MSSDK
     #include "MSKinectDevice.h"
-#else
+#endif
+#ifdef AIRKINECT_TARGET_OPENNI
     #include "OpenNIDevice.h"
 #endif
 
@@ -13,46 +14,102 @@ KinectDeviceManager::KinectDeviceManager()
     printf("KinectDeviceManager::KinectDeviceManager()\n");
 }
 
-void KinectDeviceManager::startUp()
+/**
+ * framework lets you specify the desired framework when multiple frameworks are available
+ * 0: auto
+ * 1: mssdk
+ * 2: openni
+ */
+void KinectDeviceManager::startUp(unsigned int framework)
 {
-#ifdef AIRKINECT_TARGET_MSSDK
-    started = true;
-#else
-    if(!started)
-    {
-        started = true;
-        
-        XnStatus rc;
-        xn::EnumerationErrors errors;
-        rc = context.Init();
-        if (rc == XN_STATUS_NO_NODE_PRESENT)
-        {
-            XnChar strError[1024];
-            errors.ToString(strError, 1024);
-            printf("%s\n", strError);
-            started = false;
-        }
-        else if (rc != XN_STATUS_OK)
-        {
-            printf("Open failed: %s\n", xnGetStatusString(rc));
-            started = false;
-        }
-    }
+	if(!started)
+	{
+		started = true;
+
+		//check which framework we will use to create devices
+		useMSSDK = false;
+		useOpenNI = false;
+		#ifdef AIRKINECT_OS_OSX
+			useOpenNI = true;
+		#else
+			//check if we are requiring both OpenNI & MS SDK?
+			#ifdef AIRKINECT_TARGET_BOTH
+				//check the framework parameter
+				switch(framework)
+				{
+				case 1:
+					useMSSDK = true;
+					break;
+				case 2:
+					useOpenNI = true;
+					break;
+				case 0:
+				default:
+					//try loading the MS SDK. If this works, we will use the MS SDK for the devices
+					HINSTANCE msdll = LoadLibrary(L"Kinect10.dll");
+					if(msdll != 0) {
+						useMSSDK = true;
+					} else {
+						useOpenNI = true;
+					}
+					FreeLibrary(msdll);
+					break;
+				}
+			#else
+				#ifdef AIRKINECT_TARGET_MSSDK
+					useMSSDK = true;
+				#endif
+				#ifdef AIRKINECT_TARGET_OPENNI
+					useOpenNI = true;
+				#endif
+			#endif
+		#endif
+
+#ifdef AIRKINECT_TARGET_OPENNI
+		//MSSDK is started, OpenNI needs to initialize the context
+		if(useOpenNI)
+		{
+			try
+			{
+				XnStatus rc;
+				xn::EnumerationErrors errors;
+				openNIContext = new xn::Context();
+				rc = openNIContext->Init();
+				if (rc == XN_STATUS_NO_NODE_PRESENT)
+				{
+					XnChar strError[1024];
+					errors.ToString(strError, 1024);
+					printf("%s\n", strError);
+					started = false;
+				}
+				else if (rc != XN_STATUS_OK)
+				{
+					printf("Open failed: %s\n", xnGetStatusString(rc));
+					started = false;
+				}
+			}
+			catch(char *err)
+			{
+				printf("OpenNI failed: %s\n", err);
+				started = false;
+			}
+		}
 #endif
+	}
 }
 
 void KinectDeviceManager::shutDown()
 {
-#ifdef AIRKINECT_TARGET_MSSDK
-    started = false;
-#else
-    if(started)
-    {
-        context.Release();
-        
-        started = false;
-    }
+	if(started)
+	{
+		started = false;
+#ifdef AIRKINECT_TARGET_OPENNI
+		if(useOpenNI)
+		{
+			openNIContext->Release();
+		}
 #endif
+	}
 }
 
 bool KinectDeviceManager::isStarted()
@@ -62,23 +119,29 @@ bool KinectDeviceManager::isStarted()
 
 int KinectDeviceManager::getNumDevices()
 {
-    //printf("KinectDeviceManager::getNumDevices()\n");
     int numDevices = 0;
     if(started)
     {
 #ifdef AIRKINECT_TARGET_MSSDK
-        NuiGetSensorCount(&numDevices);
-#else
-        XnStatus rc;
-        xn::NodeInfoList deviceNodes;
-        rc = context.EnumerateProductionTrees( XN_NODE_TYPE_DEVICE, NULL, deviceNodes, NULL );
+		if(useMSSDK)
+		{
+			NuiGetSensorCount(&numDevices);
+		}
+#endif
+#ifdef AIRKINECT_TARGET_OPENNI
+		if(useOpenNI)
+		{
+			XnStatus rc;
+			xn::NodeInfoList deviceNodes;
+			rc = openNIContext->EnumerateProductionTrees( XN_NODE_TYPE_DEVICE, NULL, deviceNodes, NULL );
         
-        numDevices = 0;
+			numDevices = 0;
         
-        //get number of devices -------------------------------------------------------------------------------->
-        xn::NodeInfoList::Iterator deviceIter = deviceNodes.Begin();
-        for( ; deviceIter != deviceNodes.End(); ++deviceIter )
-            ++numDevices;  
+			//get number of devices -------------------------------------------------------------------------------->
+			xn::NodeInfoList::Iterator deviceIter = deviceNodes.Begin();
+			for( ; deviceIter != deviceNodes.End(); ++deviceIter )
+				++numDevices; 
+		}
 #endif
     }
     return numDevices;
@@ -86,7 +149,6 @@ int KinectDeviceManager::getNumDevices()
 
 KinectDevice *KinectDeviceManager::getDevice(int nr, FREContext freContext)
 {
-    //printf("KinectDeviceManager::getDevice()\n");
     KinectDevice* instance = NULL;
     std::map<int, KinectDevice*>::iterator it = deviceMap.find(nr);
     
@@ -97,9 +159,16 @@ KinectDevice *KinectDeviceManager::getDevice(int nr, FREContext freContext)
     else
     {
 #ifdef AIRKINECT_TARGET_MSSDK
-        instance = (KinectDevice *) (new MSKinectDevice(nr));
-#else
-        instance = (KinectDevice *) (new OpenNIDevice(nr, context));  
+		if(useMSSDK)
+		{
+			instance = (KinectDevice *) (new MSKinectDevice(nr));
+		}
+#endif
+#ifdef AIRKINECT_TARGET_OPENNI
+		if(useOpenNI)
+		{
+			instance = (KinectDevice *) (new OpenNIDevice(nr, *openNIContext));  
+		}
 #endif
         deviceMap[nr] = instance;
     }

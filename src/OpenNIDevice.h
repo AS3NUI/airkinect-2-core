@@ -2,6 +2,7 @@
 #define KinectExtension_OpenNIDevice_h
 
 #include "ExtensionConfig.h"
+#ifdef AIRKINECT_TARGET_OPENNI
 
 #ifdef AIRKINECT_OS_WINDOWS
 #else
@@ -65,7 +66,7 @@ private:
     
     float                   depthHistogram[MAX_DEPTH];
     
-    float                   userIndexColors[MAX_SKELETONS][4];
+    float                   **userIndexColors;//[MAX_SKELETONS][4];
     
     int                     asInfraredWidth;
     int                     asInfraredHeight;
@@ -108,4 +109,5 @@ private:
     void                    pointCloudWithRGBHandler();
 };
 
+#endif
 #endif

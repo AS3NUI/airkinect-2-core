@@ -63,9 +63,13 @@ public:
 
 protected:
 
-	const char*					asJointClass;
-	const char*					asUserClass;
-	const char*					asUserFrameClass;
+	const char					*asJointClass;
+	const char					*asUserClass;
+	const char					*asUserFrameClass;
+
+	int							numJoints;
+	int							maxSkeletons;
+	char						**jointNames;
 
 	virtual void                lockUserMutex();
     virtual void                unlockUserMutex();

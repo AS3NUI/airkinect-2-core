@@ -1,7 +1,7 @@
 #include "OpenNIDevice.h"
+#ifdef AIRKINECT_TARGET_OPENNI
 
-#ifdef AIRKINECT_OS_WINDOWS
-#else
+#ifdef AIRKINECT_OS_OSX
     #include <iostream>
     #include <math.h>
 #endif
@@ -48,6 +48,37 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
 	asJointClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNISkeletonJoint";
 	asUserClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUser";
 	asUserFrameClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUserFrame";
+	numJoints = 24;
+	maxSkeletons = 15;
+	jointNames = new char*[numJoints];
+	jointNames[0] = "head";
+	jointNames[1] = "neck";
+	jointNames[2] = "torso";
+	jointNames[3] = "waist";
+    
+	jointNames[4] = "left_collar";
+	jointNames[5] = "left_shoulder";
+	jointNames[6] = "left_elbow";
+	jointNames[7] = "left_wrist";
+	jointNames[8] = "left_hand";
+	jointNames[9] = "left_fingertip";
+    
+	jointNames[10] = "right_collar";
+	jointNames[11] = "right_shoulder";
+	jointNames[12] = "right_elbow";
+	jointNames[13] = "right_wrist";
+	jointNames[14] = "right_hand";
+	jointNames[15] = "right_fingertip";
+    
+	jointNames[16] = "left_hip";
+	jointNames[17] = "left_knee";
+	jointNames[18] = "left_ankle";
+	jointNames[19] = "left_foot";
+    
+	jointNames[20] = "right_hip";
+	jointNames[21] = "right_knee";
+	jointNames[22] = "right_ankle";
+	jointNames[23] = "right_foot";
     
     //some sensors don't have an RGB camera (asus xtion pro)
     XnStatus rc;
@@ -90,6 +121,12 @@ void OpenNIDevice::setDefaults()
     asInfraredByteArray = 0;
     
     //player index coloring
+	userIndexColors = new float*[maxSkeletons];
+	for(int i = 0; i < maxSkeletons; i++)
+	{
+		userIndexColors[i] = new float[4];
+	}
+
     setUserColor(1, 0xff0000, 1);
 	setUserColor(2, 0x00ff00, 1);
 	setUserColor(3, 0x0000ff, 1);
@@ -111,12 +148,12 @@ void OpenNIDevice::setDefaults()
 
 void OpenNIDevice::setUserColor(int userID, int color, bool useIntensity)
 {
-	if(userID > MAX_SKELETONS) return;
+	if(userID > maxSkeletons) return;
 	
     userIndexColors[userID - 1][0] = (0xFF & (color >> 16)) / 255.0f;
     userIndexColors[userID - 1][1] = (0xFF & (color >> 8)) / 255.0f;
     userIndexColors[userID - 1][2] = (0xFF & (color)) / 255.0f;
-    userIndexColors[userID - 1][3] = useIntensity ? 1 : 0;
+    userIndexColors[userID - 1][3] = useIntensity ? 1.0f : 0.0f;
 }
 
 //START FRE FUNCTIONS
@@ -254,7 +291,7 @@ void OpenNIDevice::stop()
     if(asPointCloudByteArray != 0) delete [] asPointCloudByteArray;
     if(asUserMaskByteArray != 0)
     {
-        for(int i = 0; i < MAX_SKELETONS; i++)
+        for(int i = 0; i < maxSkeletons; i++)
         {
             delete [] asUserMaskByteArray[i];
         }
@@ -630,11 +667,11 @@ void OpenNIDevice::rgbFrameHandler()
     int direction = asRGBMirrored ? -1 : 1;
     int directionFactor = asRGBMirrored ? 1 : 0;
     
-    for(uint32_t y = 0; y < asRGBHeight; y++)
+    for(int y = 0; y < asRGBHeight; y++)
     {
         const XnRGB24Pixel *pRGBBuffer = RGBFrameBuffer + ((y + directionFactor) * (rgbWidth * rgbScale)) - directionFactor;
         
-        for(uint32_t x = 0; x < asRGBWidth; x++)
+        for(int x = 0; x < asRGBWidth; x++)
         {
             *rgbRun = 0xff << 24 | ((*pRGBBuffer).nBlue + ((*pRGBBuffer).nGreen << 8) + ((*pRGBBuffer).nRed << 16));
             rgbRun++;
@@ -654,11 +691,11 @@ void OpenNIDevice::depthFrameHandler()
     unsigned int red, green, blue;
     float value;
     
-    for(uint32_t y = 0; y < asDepthHeight; y++)
+    for(int y = 0; y < asDepthHeight; y++)
     {
         const XnDepthPixel *pDepthBuffer = depthFrameBuffer + ((y + directionFactor) * (depthWidth * depthScale)) - directionFactor;
         
-        for(uint32_t x = 0; x < asDepthWidth; x++)
+        for(int x = 0; x < asDepthWidth; x++)
         {
             //get histogram pixel
             value = 0;
@@ -692,13 +729,13 @@ void OpenNIDevice::depthFrameWithUserColorsHandler()
     unsigned int red, green, blue;
     float value;
     
-    for(uint32_t y = 0; y < asDepthHeight; y++)
+    for(int y = 0; y < asDepthHeight; y++)
     {
         const XnDepthPixel *pDepthBuffer = depthFrameBuffer + ((y + directionFactor) * (depthWidth * depthScale)) - directionFactor;
         
         const XnLabel *pSceneBuffer = sceneFrameBuffer + ((y + directionFactor) * (depthWidth * depthScale)) - directionFactor;
         
-        for(uint32_t x = 0; x < asDepthWidth; x++)
+        for(int x = 0; x < asDepthWidth; x++)
         {
             //get histogram pixel
             value = 0;
@@ -751,15 +788,15 @@ void OpenNIDevice::userMaskHandler()
     int directionFactor = asUserMaskMirrored ? 1 : 0;
     
     int pixelNr = 0;
-    for(uint32_t y = 0; y < asUserMaskHeight; y++)
+    for(int y = 0; y < asUserMaskHeight; y++)
     {
         const XnRGB24Pixel *pRGBBuffer = RGBFrameBuffer + ((y + directionFactor) * (rgbWidth * userMaskScale)) - directionFactor;
         const XnLabel *pSceneBuffer = sceneFrameBuffer + ((y + directionFactor) * (depthWidth * userMaskScale)) - directionFactor;
-        for(uint32_t x = 0; x < asUserMaskWidth; x++)
+        for(int x = 0; x < asUserMaskWidth; x++)
         {
             XnLabel label = *pSceneBuffer;
             
-            for(int i = 0; i < MAX_SKELETONS; i++)
+            for(int i = 0; i < maxSkeletons; i++)
             {
                 asUserMaskByteArray[i][pixelNr] = 0;
             }
@@ -787,11 +824,11 @@ void OpenNIDevice::infraredHandler()
     unsigned int red, green, blue;
     float value;
     
-    for(uint32_t y = 0; y < asInfraredHeight; y++)
+    for(int y = 0; y < asInfraredHeight; y++)
     {
         const XnIRPixel *pInfraredBuffer = infraredFrameBuffer + ((y + directionFactor) * (infraredWidth * infraredScale)) - directionFactor;
         
-        for(uint32_t x = 0; x < asInfraredWidth; x++)
+        for(int x = 0; x < asInfraredWidth; x++)
         {
             value = *pInfraredBuffer;
             
@@ -817,7 +854,7 @@ void OpenNIDevice::pointCloudHandler()
     
     if(pointCloudRegions != 0)
     {
-        for(int i = 0; i < numRegions; i++)
+        for(unsigned int i = 0; i < numRegions; i++)
         {
             pointCloudRegions[i].numPoints = 0;
         }
@@ -827,11 +864,11 @@ void OpenNIDevice::pointCloudHandler()
         numRegions = 0;
     }
     
-    for(uint32_t y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
+    for(int y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
     {
         const XnDepthPixel *pDepthBuffer = depthFrameBuffer + ((y + directionFactor) * (pointCloudWidth * pointCloudScale)) - directionFactor;
         
-        for(uint32_t x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
+        for(int x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
         {
             //write to point cloud
             *pointCloudRun = x;
@@ -842,7 +879,7 @@ void OpenNIDevice::pointCloudHandler()
             pointCloudRun++;
             
             //check regions
-            for(int i = 0; i < numRegions; i++)
+            for(unsigned int i = 0; i < numRegions; i++)
             {
                 if(
                    x >= pointCloudRegions[i].x && x <= pointCloudRegions[i].maxX &&
@@ -870,7 +907,7 @@ void OpenNIDevice::pointCloudWithRGBHandler()
     
     if(pointCloudRegions != 0)
     {
-        for(int i = 0; i < numRegions; i++)
+        for(unsigned int i = 0; i < numRegions; i++)
         {
             pointCloudRegions[i].numPoints = 0;
         }
@@ -880,12 +917,12 @@ void OpenNIDevice::pointCloudWithRGBHandler()
         numRegions = 0;
     }
     
-    for(uint32_t y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
+    for(int y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
     {
         const XnRGB24Pixel *pRGBBuffer = RGBFrameBuffer + ((y + directionFactor) * (rgbWidth * pointCloudScale)) - directionFactor;
         const XnDepthPixel *pDepthBuffer = depthFrameBuffer + ((y + directionFactor) * (pointCloudWidth * pointCloudScale)) - directionFactor;
         
-        for(uint32_t x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
+        for(int x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
         {
             //write to point cloud
             *pointCloudRun = x;
@@ -902,7 +939,7 @@ void OpenNIDevice::pointCloudWithRGBHandler()
             pointCloudRun++;
             
             //check regions
-            for(int i = 0; i < numRegions; i++)
+            for(unsigned int i = 0; i < numRegions; i++)
             {
                 if(
                    x >= pointCloudRegions[i].x && x <= pointCloudRegions[i].maxX &&
@@ -925,8 +962,9 @@ void OpenNIDevice::userHandler()
     //clear the current users
     memset(&userFrame.users[0], 0, sizeof(userFrame.users));
     
-    XnUserID aUsers[MAX_SKELETONS];
-    XnUInt16 nUsers = MAX_SKELETONS;
+	XnUserID *aUsers = new XnUserID[maxSkeletons];
+    //XnUserID aUsers[maxSkeletons];
+    XnUInt16 nUsers = maxSkeletons;
     XnUInt16 trackedUsers = userGenerator.GetNumberOfUsers();
     XnPoint3D position;
     XnStatus rc;
@@ -936,7 +974,7 @@ void OpenNIDevice::userHandler()
     userFrame.frameNumber = userGenerator.GetFrameID();
     userFrame.timeStamp = (int) (userGenerator.GetTimestamp() / 1000);
     
-    for (int i = 0; i < MAX_SKELETONS; ++i)
+    for (int i = 0; i < maxSkeletons; ++i)
     {
         if(i < trackedUsers)
         {
@@ -1073,9 +1111,9 @@ void OpenNIDevice::calculateHistogram()
     xnOSMemSet(depthHistogram, 0, MAX_DEPTH*sizeof(float));
     
     unsigned int nNumberOfPoints = 0;
-    for (XnUInt y = 0; y < depthHeight; ++y)
+    for (int y = 0; y < depthHeight; ++y)
     {
-        for (XnUInt x = 0; x < depthWidth; ++x, ++depthFrameBuffer)
+        for (int x = 0; x < depthWidth; ++x, ++depthFrameBuffer)
         {
             
             if (*depthFrameBuffer != 0)
@@ -1198,3 +1236,4 @@ void XN_CALLBACK_TYPE calibrationCompleteCallback(xn::SkeletonCapability& rCapab
 		printf("Calibration failure for user %i, waiting for calibration pose... status: %s\n", nID, xnGetStatusString(status));
 	}
 }
+#endif

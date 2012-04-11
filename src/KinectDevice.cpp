@@ -77,6 +77,13 @@ void KinectDevice::setDefaults()
 
 	pointCloudRegions = 0;
 	numRegions = 0;
+
+	//user frame allocation
+	userFrame.users = new kinectUser[maxSkeletons];
+	for(int i = 0; i < maxSkeletons; i++)
+	{
+		userFrame.users[i].joints = new kinectSkeletonJoint[numJoints];
+	}
 }
 
 //Getter/Setters for FREContext
@@ -153,17 +160,17 @@ FREObject KinectDevice::freGetUserFrame(FREObject argv[])
     
     FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.User>", 0, NULL, &users, NULL);
     
-    for(int i = 0; i < MAX_SKELETONS; i++)
+    for(int i = 0; i < maxSkeletons; i++)
     {
         if(userFrame.users[i].isTracking)
         {   
             //create the joints vector
             FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.SkeletonJoint>", 0, NULL, &joints, NULL);
             
-            for(int j = 0; j < NUM_JOINTS; j++)
+            for(int j = 0; j < numJoints; j++)
             {
                 //name
-                FRENewObjectFromUTF8(strlen(JOINT_NAMES[j]), (const uint8_t*) JOINT_NAMES[j], &jointName);
+                FRENewObjectFromUTF8(strlen(jointNames[j]), (const uint8_t*) jointNames[j], &jointName);
                 //position
                 FRENewObjectFromDouble(userFrame.users[i].joints[j].worldX, &positionX);
                 FRENewObjectFromDouble(userFrame.users[i].joints[j].worldY, &positionY);
@@ -278,10 +285,10 @@ FREObject KinectDevice::freGetSkeletonJointNameIndices(FREObject argv[])
 {
 	FREObject skeletonJointNameIndices, jointIndex;
     FRENewObject( (const uint8_t*) "flash.utils.Dictionary", 0, NULL, &skeletonJointNameIndices, NULL);
-	for(int i = 0; i < NUM_JOINTS; i++)
+	for(int i = 0; i < numJoints; i++)
     {
         FRENewObjectFromUint32(i, &jointIndex);
-        FRESetObjectProperty(skeletonJointNameIndices, (const uint8_t*) JOINT_NAMES[i], jointIndex, NULL);
+        FRESetObjectProperty(skeletonJointNameIndices, (const uint8_t*) jointNames[i], jointIndex, NULL);
     }
     return skeletonJointNameIndices;
 }
@@ -289,9 +296,9 @@ FREObject KinectDevice::freGetSkeletonJointNames(FREObject argv[])
 { 
 	FREObject skeletonJointNames, skeletonJointName;
 	FRENewObject( (const uint8_t*) "Vector.<String>", 0, NULL, &skeletonJointNames, NULL);
-	for(int i = 0; i < NUM_JOINTS; i++)
+	for(int i = 0; i < numJoints; i++)
 	{
-	FRENewObjectFromUTF8(strlen(JOINT_NAMES[i]), (const uint8_t*) JOINT_NAMES[i], &skeletonJointName);
+	FRENewObjectFromUTF8(strlen(jointNames[i]), (const uint8_t*) jointNames[i], &skeletonJointName);
 	FRESetArrayElementAt(skeletonJointNames, i, skeletonJointName);
 	}
 	return skeletonJointNames;
@@ -313,14 +320,14 @@ FREObject KinectDevice::freSetUserMaskMode(FREObject argv[])
     //reset bytearray
     if(asUserMaskByteArray != 0)
     {
-        for(int i = 0; i < MAX_SKELETONS; i++)
+        for(int i = 0; i < maxSkeletons; i++)
         {
             delete [] asUserMaskByteArray[i];
         }
         delete [] asUserMaskByteArray;
     }
-    asUserMaskByteArray = new uint32_t*[MAX_SKELETONS];
-    for(int i = 0; i < MAX_SKELETONS; i++)
+    asUserMaskByteArray = new uint32_t*[maxSkeletons];
+    for(int i = 0; i < maxSkeletons; i++)
     {
         asUserMaskByteArray[i] = new uint32_t[asUserMaskPixelCount];
     }

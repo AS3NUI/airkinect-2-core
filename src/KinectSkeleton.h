@@ -41,13 +41,13 @@ struct kinectUser: kinectTransform{
     bool                isTracking;
     
     bool                hasSkeleton;
-    kinectSkeletonJoint joints[NUM_JOINTS];
+    kinectSkeletonJoint *joints;
 };
 
 typedef struct {
     int                 frameNumber;
     int                 timeStamp;
-	kinectUser          users[MAX_SKELETONS];
+	kinectUser          *users;
 } kinectUserFrame;
 
 #endif

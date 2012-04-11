@@ -31,6 +31,33 @@ MSKinectDevice::MSKinectDevice(int nr)
 	asJointClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSSkeletonJoint";
 	asUserClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSUser";
 	asUserFrameClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSUserFrame";
+	numJoints = 20;
+	maxSkeletons = NUI_SKELETON_COUNT;
+	jointNames = new char*[numJoints];
+	jointNames[0] = "waist";
+	jointNames[1] = "torso";
+	jointNames[2] = "neck";
+	jointNames[3] = "head";
+    
+	jointNames[4] = "left_shoulder";
+	jointNames[5] = "left_elbow";
+	jointNames[6] = "left_wrist";
+	jointNames[7] = "left_hand";
+    
+	jointNames[8] = "right_shoulder";
+	jointNames[9] = "right_elbow";
+	jointNames[10] = "right_wrist";
+	jointNames[11] = "right_hand";
+    
+	jointNames[12] = "left_hip";
+	jointNames[13] = "left_knee";
+	jointNames[14] = "left_ankle";
+	jointNames[15] = "left_foot";
+    
+	jointNames[16] = "right_hip";
+	jointNames[17] = "right_knee";
+	jointNames[18] = "right_ankle";
+	jointNames[19] = "right_foot";
 
 	//set default values
     setDefaults();
@@ -352,6 +379,7 @@ void MSKinectDevice::run()
 
 		hr = nuiSensor->NuiInitialize(dwFlags);	
 		if (FAILED(hr)) {
+			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to initialize Sensor");
 			dispatchError(hr);
 			this->dispose();
 			stop();
@@ -871,7 +899,7 @@ void MSKinectDevice::userMaskHandler()
 			const USHORT *pSceneBuffer = sceneByteArray + ((y + directionFactor) * (depthWidth * userMaskScale)) - directionFactor;
 			for(int x = 0; x < asUserMaskWidth; x++)
 			{
-				for(int i = 0; i < MAX_SKELETONS; i++)
+				for(int i = 0; i < maxSkeletons; i++)
 				{
 					asUserMaskByteArray[i][pixelNr] = 0;
 				}

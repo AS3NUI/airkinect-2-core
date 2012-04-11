@@ -8,76 +8,23 @@
 //normally, you will define these in your preprocessor definitions
 
 #ifdef AIRKINECT_OS_WINDOWS
+	#ifdef AIRKINECT_TARGET_OPENNI
+		#pragma comment(lib, "openNI.lib") //include openni library
+	#endif
+	#ifdef AIRKINECT_TARGET_MSSDK
+		#pragma comment(lib, "Kinect10.lib") //include kinect sdk library
+	#endif
 	#include <windows.h>
 	#include <ole2.h>
+	#ifdef AIRKINECT_TARGET_OPENNI
+		#ifdef AIRKINECT_TARGET_MSSDK
+			#define AIRKINECT_TARGET_BOTH
+		#endif
+	#endif
 #endif
 
 #ifdef AIRKINECT_TARGET_MSSDK
 	#include "NuiApi.h"
-	//MS SDK specific values
-	const int MAX_SKELETONS = NUI_SKELETON_COUNT;
-	const int NUM_JOINTS = 20;
-
-	const char JOINT_NAMES[][16] = {
-		"waist",
-		"torso",
-		"neck",
-		"head",
-    
-		"left_shoulder",
-		"left_elbow",
-		"left_wrist",
-		"left_hand",
-    
-		"right_shoulder",
-		"right_elbow",
-		"right_wrist",
-		"right_hand",
-    
-		"left_hip",
-		"left_knee",
-		"left_ankle",
-		"left_foot",
-    
-		"right_hip",
-		"right_knee",
-		"right_ankle",
-		"right_foot"
-	};
-#else
-	//OpenNI specific values
-	const int MAX_SKELETONS = 15;
-	const int NUM_JOINTS = 24;
-	const char JOINT_NAMES[][16] = {
-		"head",
-		"neck",
-		"torso",
-		"waist",
-    
-		"left_collar",
-		"left_shoulder",
-		"left_elbow",
-		"left_wrist",
-		"left_hand",
-		"left_fingertip",
-    
-		"right_collar",
-		"right_shoulder",
-		"right_elbow",
-		"right_wrist",
-		"right_hand",
-		"right_fingertip",
-    
-		"left_hip",
-		"left_knee",
-		"left_ankle",
-		"left_foot",
-    
-		"right_hip",
-		"right_knee",
-		"right_ankle",
-		"right_foot"
-	};
 #endif
 
 #endif
