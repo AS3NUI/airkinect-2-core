@@ -1052,62 +1052,6 @@ void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                      MUTEX FUNCTIONS
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void MSKinectDevice::lockUserMutex()
-{
-	userMutex.lock();
-}
-
-void MSKinectDevice::unlockUserMutex()
-{
-	userMutex.unlock();
-}
-
-void MSKinectDevice::lockDepthMutex()
-{
-	depthMutex.lock();
-}
-
-void MSKinectDevice::unlockDepthMutex()
-{
-	depthMutex.unlock();
-}
-
-void MSKinectDevice::lockRGBMutex()
-{
-	rgbMutex.lock();
-}
-
-void MSKinectDevice::unlockRGBMutex()
-{
-	rgbMutex.unlock();
-}
-
-void MSKinectDevice::lockUserMaskMutex()
-{
-	userMaskMutex.lock();
-}
-
-void MSKinectDevice::unlockUserMaskMutex()
-{
-	userMaskMutex.unlock();
-}
-
-void MSKinectDevice::lockPointCloudMutex()
-{
-	pointCloudMutex.lock();
-}
-
-void MSKinectDevice::unlockPointCloudMutex()
-{
-	pointCloudMutex.unlock();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
 //                                      TRANSLATION FUNCTIONS
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
