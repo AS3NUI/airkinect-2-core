@@ -2,6 +2,9 @@
 #define KinectExtension_MSKinectDevice_h
 
 #include "ExtensionConfig.h"
+
+#ifdef AIRKINECT_TARGET_MSSDK
+
 #include "KinectSkeleton.h"
 #include "PointCloudRegion.h"
 #include "KinectCapabilities.h"
@@ -30,21 +33,6 @@ public:
 	FREObject           freCameraElevationSetAngle(FREObject argv[]);
 
 protected:
-
-	void                lockUserMutex();
-    void                unlockUserMutex();
-    
-    void                lockDepthMutex();
-    void                unlockDepthMutex();
-    
-    void                lockRGBMutex();
-    void                unlockRGBMutex();
-    
-    void                lockUserMaskMutex();
-    void                unlockUserMaskMutex();
-    
-    void                lockPointCloudMutex();
-    void                unlockPointCloudMutex();
 
 	void				setUserColor(int userID, int color, bool useIntensity);
 
@@ -111,4 +99,5 @@ private:
 	RGBQUAD ShortToQuad_Depth( USHORT s, BOOLEAN usePlayer );
 };
 
+#endif
 #endif

@@ -4,6 +4,7 @@
 void KinectDevice::setDefaults()
 {
 	started = false;
+    running = false;
 
 	asUserMirrored = false;
     asUserEnabled = false;
@@ -609,50 +610,62 @@ FREObject KinectDevice::freCameraElevationSetAngle(FREObject argv[])
 
 void KinectDevice::lockUserMutex()
 {
+    userMutex.lock();
 }
 
 void KinectDevice::unlockUserMutex()
 {
+    userMutex.unlock();
 }
 
 void KinectDevice::lockDepthMutex()
 {
+    depthMutex.lock();
 }
 
 void KinectDevice::unlockDepthMutex()
 {
+    depthMutex.unlock();
 }
 
 void KinectDevice::lockRGBMutex()
 {
+    rgbMutex.lock();
 }
 
 void KinectDevice::unlockRGBMutex()
 {
+    rgbMutex.unlock();
 }
 
 void KinectDevice::lockUserMaskMutex()
 {
+    userMaskMutex.lock();
 }
 
 void KinectDevice::unlockUserMaskMutex()
 {
+    userMaskMutex.unlock();
 }
 
 void KinectDevice::lockInfraredMutex()
 {
+    infraredMutex.lock();
 }
 
 void KinectDevice::unlockInfraredMutex()
 {
+    infraredMutex.unlock();
 }
 
 void KinectDevice::lockPointCloudMutex()
 {
+    pointCloudMutex.lock();
 }
 
 void KinectDevice::unlockPointCloudMutex()
 {
+    pointCloudMutex.unlock();
 }
 
 void KinectDevice::setUserColor(int userID, int color, bool useIntensity)

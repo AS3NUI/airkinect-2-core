@@ -23,42 +23,20 @@ public:
     
     OpenNIDevice(int nr, xn::Context context);
     
-    //Getter/Setters for FREContext
-    FREContext			getFreContext();
-	void				setFreContext(FREContext pFreContext);
-    
 	//Starts and Stop the Kinect Device
-    void				start();
-    void				stop();
+    void                    start();
+    void                    stop();
     
-	//Dispose the Device form memory
-    void				dispose();
+	//Dispose the Device from memory
+    void                    dispose();
     
-    FREObject           freSetInfraredMode(FREObject argv[]);
-    FREObject           freSetInfraredEnabled(FREObject argv[]);
-    FREObject           freGetInfraredFrame(FREObject argv[]);
+    FREObject               freSetInfraredMode(FREObject argv[]);
+    FREObject               freSetInfraredEnabled(FREObject argv[]);
+    FREObject               freGetInfraredFrame(FREObject argv[]);
     
 protected:
-	void                    lockUserMutex();
-    void                    unlockUserMutex();
-    
-    void                    lockDepthMutex();
-    void                    unlockDepthMutex();
-    
-    void                    lockRGBMutex();
-    void                    unlockRGBMutex();
-    
-    void                    lockUserMaskMutex();
-    void                    unlockUserMaskMutex();
-    
-    void                    lockInfraredMutex();
-    void                    unlockInfraredMutex();
-    
-    void                    lockPointCloudMutex();
-    void                    unlockPointCloudMutex();
     
 	void                    setUserColor(int userID, int color, bool useIntensity);
-    
     void                    setDefaults();
     
 private:
@@ -69,7 +47,6 @@ private:
     void                    run();
     
     static void             *deviceThread(void *ptr);
-    boost::mutex            infraredMutex;
     
     int                     returnVal;
     

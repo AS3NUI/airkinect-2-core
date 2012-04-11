@@ -63,21 +63,11 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
     setDefaults();
 }
 
-void OpenNIDevice::setFreContext(FREContext pFreContext)
-{
-	freContext = pFreContext;
-}
-
-FREContext OpenNIDevice::getFreContext()
-{
-	return freContext;
-}
-
 void OpenNIDevice::setDefaults()
 {
     KinectDevice::setDefaults();
     //set some default values
-    running = false;
+    
     userCallbacksRegistered = false;
     
     depthGenerator = NULL;    
@@ -189,66 +179,6 @@ int OpenNIDevice::getAsPointCloudByteArrayLength()
     {
         return (asPointCloudWidth * asPointCloudHeight * sizeof(short) * 3) / asPointCloudDensity;
     }
-}
-
-void OpenNIDevice::lockUserMutex()
-{
-    userMutex.lock();
-}
-
-void OpenNIDevice::unlockUserMutex()
-{
-    userMutex.unlock();
-}
-
-void OpenNIDevice::lockDepthMutex()
-{
-    depthMutex.lock();
-}
-
-void OpenNIDevice::unlockDepthMutex()
-{
-    depthMutex.unlock();
-}
-
-void OpenNIDevice::lockRGBMutex()
-{
-    rgbMutex.lock();
-}
-
-void OpenNIDevice::unlockRGBMutex()
-{
-    rgbMutex.unlock();
-}
-
-void OpenNIDevice::lockUserMaskMutex()
-{
-    userMaskMutex.lock();
-}
-
-void OpenNIDevice::unlockUserMaskMutex()
-{
-    userMaskMutex.unlock();
-}
-
-void OpenNIDevice::lockInfraredMutex()
-{
-    infraredMutex.lock();
-}
-
-void OpenNIDevice::unlockInfraredMutex()
-{
-    infraredMutex.unlock();
-}
-
-void OpenNIDevice::lockPointCloudMutex()
-{
-    pointCloudMutex.lock();
-}
-
-void OpenNIDevice::unlockPointCloudMutex()
-{
-    pointCloudMutex.unlock();
 }
 
 void OpenNIDevice::start()

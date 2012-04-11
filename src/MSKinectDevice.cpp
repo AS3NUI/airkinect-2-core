@@ -1,4 +1,5 @@
 #include "MSKinectDevice.h"
+#ifdef AIRKINECT_TARGET_MSSDK
 
 MSKinectDevice::MSKinectDevice(int nr)
 {
@@ -76,8 +77,6 @@ void MSKinectDevice::setDefaults()
 {
 	//set the defaults from the base class
 	KinectDevice::setDefaults();
-
-	running = false;
 
 	//set specific defaults for MS SDK
     imageFrameTimeout = 0;
@@ -1157,25 +1156,6 @@ RGBQUAD MSKinectDevice::ShortToQuad_Depth( USHORT s, BOOLEAN usePlayer ) {
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*
-void MSKinectDevice::setRGB(int width, int height){
-	rgbWidth = width;
-    rgbHeight = height;
-	rgbResolution = getResolutionFrom(width, height);
-    rgbPixelCount = rgbWidth * rgbHeight;
-}
-
-void MSKinectDevice::setDepth(int width, int height){
-	depthWidth = width;
-    depthHeight = height;
-	depthResolution = getResolutionFrom(width, height);
-    depthPixelCount = depthWidth * depthHeight;
-	//point cloud & user mask is the same
-	pointCloudWidth = userMaskWidth = width;
-	pointCloudHeight = userMaskHeight = height;
-	pointCloudPixelCount = userMaskPixelCount = depthPixelCount;
-}
-*/
 
 void MSKinectDevice::setUserColor(int userID, int color, bool useIntensity){
 	//bitches!
@@ -1195,3 +1175,5 @@ void MSKinectDevice::updateConfigScale(){
 	userMaskScale = depthWidth / asUserMaskWidth;
 	pointCloudScale = depthWidth / asPointCloudWidth;
 }
+
+#endif

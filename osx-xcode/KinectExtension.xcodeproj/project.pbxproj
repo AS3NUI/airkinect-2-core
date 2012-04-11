@@ -22,6 +22,8 @@
 		6C039C40153446C20060F00E /* PointCloudRegion.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C33153446C20060F00E /* PointCloudRegion.h */; };
 		6C039C44153447250060F00E /* Adobe AIR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C039C43153447250060F00E /* Adobe AIR.framework */; };
 		6C68D786153583D900D2BF8E /* libboost_thread.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C68D785153583D900D2BF8E /* libboost_thread.a */; };
+		6C68D78915358DB800D2BF8E /* MSKinectDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C68D78715358DB800D2BF8E /* MSKinectDevice.cpp */; };
+		6C68D78A15358DB800D2BF8E /* MSKinectDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C68D78815358DB800D2BF8E /* MSKinectDevice.h */; };
 		6CD9764114C85B990061A00B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD9764014C85B990061A00B /* Cocoa.framework */; };
 		6CD9764B14C85B990061A00B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6CD9764914C85B990061A00B /* InfoPlist.strings */; };
 		6CD9765714C85BF80061A00B /* libOpenNI.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD9765614C85BF80061A00B /* libOpenNI.dylib */; };
@@ -43,6 +45,8 @@
 		6C039C33153446C20060F00E /* PointCloudRegion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointCloudRegion.h; sourceTree = "<group>"; };
 		6C039C43153447250060F00E /* Adobe AIR.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "Adobe AIR.framework"; path = "../../../../../../../Applications/Adobe Flash Builder 4.6/sdks/4.6.0/runtimes/air/mac/Adobe AIR.framework"; sourceTree = "<group>"; };
 		6C68D785153583D900D2BF8E /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = "../external-libraries/boost/lib/libboost_thread.a"; sourceTree = "<group>"; };
+		6C68D78715358DB800D2BF8E /* MSKinectDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MSKinectDevice.cpp; sourceTree = "<group>"; };
+		6C68D78815358DB800D2BF8E /* MSKinectDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MSKinectDevice.h; sourceTree = "<group>"; };
 		6CD9763D14C85B990061A00B /* KinectExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KinectExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CD9764014C85B990061A00B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6CD9764314C85B990061A00B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -72,6 +76,8 @@
 		6C039C26153446C20060F00E /* src */ = {
 			isa = PBXGroup;
 			children = (
+				6C68D78715358DB800D2BF8E /* MSKinectDevice.cpp */,
+				6C68D78815358DB800D2BF8E /* MSKinectDevice.h */,
 				6C039C27153446C20060F00E /* ExtensionConfig.h */,
 				6C039C28153446C20060F00E /* KinectCapabilities.h */,
 				6C039C29153446C20060F00E /* KinectDevice.cpp */,
@@ -171,6 +177,7 @@
 				6C039C3C153446C20060F00E /* KinectSkeleton.h in Headers */,
 				6C039C3E153446C20060F00E /* OpenNIDevice.h in Headers */,
 				6C039C40153446C20060F00E /* PointCloudRegion.h in Headers */,
+				6C68D78A15358DB800D2BF8E /* MSKinectDevice.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,6 +248,7 @@
 				6C039C3A153446C20060F00E /* KinectExtension.cpp in Sources */,
 				6C039C3D153446C20060F00E /* OpenNIDevice.cpp in Sources */,
 				6C039C3F153446C20060F00E /* PointCloudRegion.cpp in Sources */,
+				6C68D78915358DB800D2BF8E /* MSKinectDevice.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

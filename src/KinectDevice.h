@@ -102,6 +102,7 @@ protected:
     boost::mutex				rgbMutex;
     boost::mutex				userMaskMutex;
     boost::mutex				pointCloudMutex;
+    boost::mutex                infraredMutex;
 	
 	int							userMaskWidth;
 	int							userMaskHeight;
