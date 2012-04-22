@@ -332,7 +332,7 @@
 				);
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = (
-					/Users/wouter/Documents/experiments/boost_1_48_0,
+					"\"$(SRCROOT)/../external-libraries/boost\"",
 					"/usr/include/ni/**",
 				);
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
@@ -372,7 +372,7 @@
 				);
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = (
-					/Users/wouter/Documents/experiments/boost_1_48_0,
+					"\"$(SRCROOT)/../external-libraries/boost\"",
 					"/usr/include/ni/**",
 				);
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
