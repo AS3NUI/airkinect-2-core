@@ -22,5 +22,6 @@ package com.as3nui.nativeExtensions.air.kinect.constants
 		public static const RESOLUTION_160_120:Point = new Point(160, 120);
 		public static const RESOLUTION_320_240:Point = new Point(320, 240);
 		public static const RESOLUTION_640_480:Point = new Point(640, 480);
+		public static const RESOLUTION_1280_960:Point = new Point(1280, 960);
 	}
 }
