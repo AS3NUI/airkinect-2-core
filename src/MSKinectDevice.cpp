@@ -121,8 +121,6 @@ void MSKinectDevice::setDefaults()
 	//----------------
 	// RGB Image
 	//----------------
-	asRGBResolution = getResolutionFrom(asRGBWidth, asRGBHeight);
-	rgbResolution = getResolutionFrom(rgbWidth, rgbHeight);
     rgbImageByteArray = 0;
     
 	//----------------
@@ -175,12 +173,6 @@ FREObject MSKinectDevice::freSetDepthMode(FREObject argv[]) {
 }
 
 // ----------------------- RGB IMAGE ------------------------
-
-FREObject MSKinectDevice::freSetRGBMode(FREObject argv[]) {
-    KinectDevice::freSetRGBMode(argv);
-	asRGBResolution = getResolutionFrom(asRGBWidth, asRGBHeight);
-    return NULL;
-}
 
 FREObject MSKinectDevice::freCameraElevationGetAngle(FREObject argv[])
 {
@@ -1139,6 +1131,19 @@ void MSKinectDevice::setUserColor(int userID, int color, bool useIntensity){
 	userIndexColors[colorIndex+1] = (BYTE) (color >> 8);
 	userIndexColors[colorIndex+2] = (BYTE) color;
 	userIndexColors[colorIndex+3] = useIntensity ? 1 : 0;
+}
+
+void MSKinectDevice::setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored)
+{
+	//support higher resolution for MS SDK
+	if(asRGBWidth == 1280 && asRGBHeight == 960)
+	{
+		rgbWidth = 1280;
+		rgbHeight = 960;
+	}
+	KinectDevice::setRGBMode(rgbWidth, rgbHeight, asRGBWidth, asRGBHeight, asRGBMirrored);
+	asRGBResolution = getResolutionFrom(asRGBWidth, asRGBHeight);
+	rgbResolution = getResolutionFrom(rgbWidth, rgbHeight);
 }
 
 void MSKinectDevice::updateConfigScale(){

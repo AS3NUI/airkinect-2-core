@@ -28,13 +28,13 @@ public:
 	//Overridden FRE functions
     FREObject           freSetUserMaskMode(FREObject argv[]);
     FREObject           freSetDepthMode(FREObject argv[]);
-    FREObject           freSetRGBMode(FREObject argv[]);
 	FREObject           freCameraElevationGetAngle(FREObject argv[]);
 	FREObject           freCameraElevationSetAngle(FREObject argv[]);
 
 protected:
 
 	void				setUserColor(int userID, int color, bool useIntensity);
+	void				setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored);
 
 private:
 

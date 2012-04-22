@@ -31,17 +31,9 @@ void KinectDevice::setDefaults()
 	//
 	// RGB IMAGE
 	//
-	asRGBWidth = 640;
-    asRGBHeight = 480;
-    asRGBPixelCount = asRGBWidth * asRGBHeight;
-    asRGBMirrored = false;
+	setRGBMode(640, 480, 640, 480, false);
     asRGBEnabled = false;
 	asRGBByteArray = 0;
-
-	rgbWidth = 640;
-    rgbHeight = 480;
-    rgbPixelCount = rgbWidth * rgbHeight;
-    rgbScale = rgbWidth / asRGBWidth;
 
 	//
 	// USER MASK IMAGE
@@ -425,12 +417,8 @@ FREObject KinectDevice::freSetRGBMode(FREObject argv[])
     unsigned int mirrored; FREGetObjectAsBool(argv[3], &mirrored);
     
     lockRGBMutex();
-    
-    asRGBWidth = width;
-    asRGBHeight = height;
-    asRGBPixelCount = asRGBWidth * asRGBHeight;
-    asRGBMirrored = (mirrored != 0);
-    rgbScale = rgbWidth / asRGBWidth;
+
+	setRGBMode(rgbWidth, rgbHeight, width, height, (mirrored != 0));
     
     //reset bytearray
     if(asRGBByteArray != 0) delete [] asRGBByteArray;
@@ -677,4 +665,18 @@ void KinectDevice::unlockPointCloudMutex()
 
 void KinectDevice::setUserColor(int userID, int color, bool useIntensity)
 {
+}
+
+void KinectDevice::setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored)
+{
+	this->rgbWidth = rgbWidth;
+    this->rgbHeight = rgbHeight;
+	this->asRGBWidth = asRGBWidth;
+    this->asRGBHeight = asRGBHeight;
+	this->asRGBMirrored = asRGBMirrored;
+
+	rgbPixelCount = rgbWidth * rgbHeight;
+    rgbScale = rgbWidth / asRGBWidth;
+
+    asRGBPixelCount = asRGBWidth * asRGBHeight;
 }

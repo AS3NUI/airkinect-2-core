@@ -92,6 +92,8 @@ protected:
 	virtual void				setDefaults();
 	virtual void				setUserColor(int userID, int color, bool useIntensity);
 
+	virtual void				setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored);
+
 	FREContext					freContext;
 	KinectCapabilities			capabilities;
 
