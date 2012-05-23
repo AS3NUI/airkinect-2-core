@@ -270,7 +270,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 		/**
 		 * Automatically chooses from the "default" devices for an operating system
-		 * this is currently OpenNI for OSX and MSSDK for windows
+		 * this is currently OpenNI for OSX and MSSDK / OpenNI for windows (depending on the ane)
 		 * @param nr    Device number to get
 		 * @return
 		 */
