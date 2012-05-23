@@ -62,6 +62,6 @@ extern "C"
     void contextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx, uint32_t* numFunctions, const FRENamedFunction** functions);
     void contextFinalizer(FREContext ctx);
     
-    KINECTEXTENSION_API void initializer(void** extData, FREContextInitializer* ctxInitializer, FREContextFinalizer* ctxFinalizer);
-	KINECTEXTENSION_API void finalizer(void* extData);
+    KINECTEXTENSION_API void AIRKinectInitializer(void** extData, FREContextInitializer* ctxInitializer, FREContextFinalizer* ctxFinalizer);
+	KINECTEXTENSION_API void AIRKinectFinalizer(void* extData);
 }

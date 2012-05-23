@@ -281,13 +281,13 @@ extern "C"
 		return;
 	}
     
-	void initializer(void** extData, FREContextInitializer* ctxInitializer, FREContextFinalizer* ctxFinalizer)
+	void AIRKinectInitializer(void** extData, FREContextInitializer* ctxInitializer, FREContextFinalizer* ctxFinalizer)
     {
 		*ctxInitializer = &contextInitializer;
 		*ctxFinalizer = &contextFinalizer;
 	}
     
-	void finalizer(void* extData)
+	void AIRKinectFinalizer(void* extData)
     {
 		return;
 	}

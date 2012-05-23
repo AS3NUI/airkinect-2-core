@@ -1086,7 +1086,7 @@ void OpenNIDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJ
     kUser.joints[targetIndex].worldRelativeZ = (jointPositionZ * 7.8125) / MAX_DEPTH;
     
     
-    //depth & rgb space are the same, as we aligned the depth & image streams
+    //relative position / depth & rgb are aligned
     XnPoint3D pt[1];
     pt[0] = jointPosition.position;
     depthGenerator.ConvertRealWorldToProjective(1, pt, pt);
