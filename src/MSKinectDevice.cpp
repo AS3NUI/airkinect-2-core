@@ -880,30 +880,30 @@ void MSKinectDevice::userFrameHandler()
 
 			//Joint Position Calculations
 			if (userFrame.users[i].hasSkeleton){
-				addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 0);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SPINE, 1);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER, 2);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HEAD, 3);
+				addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_HIP_CENTER, boneOrientations, NUI_SKELETON_POSITION_SPINE, 0);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_SPINE, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER, 1);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_SHOULDER_CENTER, boneOrientations, NUI_SKELETON_POSITION_HEAD, 2);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_HEAD, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 3);//NUI_SKELETON_POSITION_HIP_CENTER -> no orientation
                 
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_LEFT, 4);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT, 5);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT, 6);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT, 7);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_SHOULDER_LEFT, boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT, 4);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_ELBOW_LEFT, boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT, 5);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_WRIST_LEFT, boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT, 6);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_HAND_LEFT, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 7);//NUI_SKELETON_POSITION_HIP_CENTER -> no orientation
                 
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_RIGHT, 8);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT, 9);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT, 10);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT, 11);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_SHOULDER_RIGHT, boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT, 8);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_ELBOW_RIGHT, boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT, 9);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_WRIST_RIGHT, boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT, 10);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_HAND_RIGHT, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 11); //NUI_SKELETON_POSITION_HIP_CENTER -> no orientation
                 
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_LEFT, 12);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_LEFT, 13);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_LEFT, 14);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_LEFT, 15);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_HIP_LEFT, boneOrientations, NUI_SKELETON_POSITION_KNEE_LEFT, 12);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_KNEE_LEFT, boneOrientations, NUI_SKELETON_POSITION_ANKLE_LEFT, 13);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_ANKLE_LEFT, boneOrientations, NUI_SKELETON_POSITION_FOOT_LEFT, 14);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_FOOT_LEFT, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 15); //NUI_SKELETON_POSITION_HIP_CENTER -> no orientation
                 
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_RIGHT, 16);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_RIGHT, 17);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_RIGHT, 18);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_RIGHT, 19);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_HIP_RIGHT, boneOrientations, NUI_SKELETON_POSITION_KNEE_RIGHT, 16);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_KNEE_RIGHT, boneOrientations, NUI_SKELETON_POSITION_ANKLE_RIGHT, 17);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_ANKLE_RIGHT, boneOrientations, NUI_SKELETON_POSITION_FOOT_RIGHT, 18);
+                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_FOOT_RIGHT, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 19); //NUI_SKELETON_POSITION_HIP_CENTER -> no orientation
 			}
 
 			//cleanup
@@ -958,7 +958,7 @@ void MSKinectDevice::calculateKinectTransform(kinectTransform &kTransform, Vecto
 }
 
 
-void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint, uint32_t targetIndex)
+void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, NUI_SKELETON_POSITION_INDEX eJoint, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eRotationJoint, uint32_t targetIndex)
 {
     float jointPositionConfidence;
     
@@ -972,12 +972,14 @@ void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, 
     //Unknown in MSSDK Will need to be calculated
     kUser.joints[targetIndex].orientationConfidence = 0;
 
-	//convert rotation matrix to 3 angles
-	kUser.joints[targetIndex].orientationX = atan2f(boneOrientations[eJoint].absoluteRotation.rotationMatrix.M32, boneOrientations[eJoint].absoluteRotation.rotationMatrix.M33);
-    kUser.joints[targetIndex].orientationY = -asinf(boneOrientations[eJoint].absoluteRotation.rotationMatrix.M31);
-    kUser.joints[targetIndex].orientationZ = atan2f(boneOrientations[eJoint].absoluteRotation.rotationMatrix.M21, boneOrientations[eJoint].absoluteRotation.rotationMatrix.M11);
+	//MSSDK - TODO: make it complient to openni coordinate system
+	kUser.joints[targetIndex].orientationX = atan2f(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M32, boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M33);
+    kUser.joints[targetIndex].orientationY = -asinf(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M31);
+    kUser.joints[targetIndex].orientationZ = atan2f(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M21, boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M11);
+	
 	/*
-	    kUser.joints[targetIndex].orientationX = atan2f(orientation.orientation.elements[7], orientation.orientation.elements[8]);
+	//OPENNI WAY (3x3 matrix)
+	kUser.joints[targetIndex].orientationX = atan2f(orientation.orientation.elements[7], orientation.orientation.elements[8]);
     kUser.joints[targetIndex].orientationY = -asinf(orientation.orientation.elements[6]);
     kUser.joints[targetIndex].orientationZ = atan2f(orientation.orientation.elements[3], orientation.orientation.elements[0]);
 	*/
