@@ -12,7 +12,6 @@
 
 class MSKinectDevice : public KinectDevice
 {
-
 	static const int			DEPTH_MIN = 800;
 	static const int			DEPTH_MAX = 4000;
 	static const int			DEPTH_RANGE = DEPTH_MAX - DEPTH_MIN;
@@ -97,6 +96,7 @@ private:
 	NUI_IMAGE_RESOLUTION getResolutionFrom(int width, int height);
 	POINT getDepthPixelPointFromJointCoordinate(Vector4 jointCoordinates);
 	RGBQUAD ShortToQuad_Depth( USHORT s, BOOLEAN usePlayer );
+	Vector4 QuaternionToEuler(Vector4 q);
 };
 
 #endif

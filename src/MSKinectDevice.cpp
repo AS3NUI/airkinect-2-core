@@ -1,6 +1,8 @@
 #include "MSKinectDevice.h"
 #ifdef AIRKINECT_TARGET_MSSDK
 
+const float PI = acos(-1.0f);
+
 MSKinectDevice::MSKinectDevice(int nr)
 {
     printf("MSKinectDevice::MSKinectDevice(%i)\n", nr);
@@ -976,7 +978,16 @@ void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, 
 	kUser.joints[targetIndex].orientationX = atan2f(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M32, boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M33);
     kUser.joints[targetIndex].orientationY = -asinf(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M31);
     kUser.joints[targetIndex].orientationZ = atan2f(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M21, boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M11);
-	
+
+	//Quaternion -> Euler
+	/*
+	Vector4 euler = QuaternionToEuler(boneOrientations[eRotationJoint].absoluteRotation.rotationQuaternion);
+	euler.z-= PI/2;
+	kUser.joints[targetIndex].orientationX = euler.x;
+	kUser.joints[targetIndex].orientationY = euler.y;
+	kUser.joints[targetIndex].orientationZ = euler.z;
+	*/
+
 	/*
 	//OPENNI WAY (3x3 matrix)
 	kUser.joints[targetIndex].orientationX = atan2f(orientation.orientation.elements[7], orientation.orientation.elements[8]);
@@ -1075,6 +1086,41 @@ void MSKinectDevice::updateConfigScale(){
 	depthScale = depthWidth / asDepthWidth;
 	userMaskScale = depthWidth / asUserMaskWidth;
 	pointCloudScale = depthWidth / asPointCloudWidth;
+}
+
+Vector4 MSKinectDevice::QuaternionToEuler(Vector4 q){
+	Vector4 v; 
+ 
+	v.x = (float)atan2  
+	( 
+		2 * q.y * q.w - 2 * q.x * q.z, 
+			1 - 2 * pow(q.y, 2) - 2 * pow(q.z, 2) 
+	); 
+ 
+	v.y = (float)asin 
+	( 
+		2 * q.x * q.y + 2 * q.z * q.w
+	); 
+ 
+	v.z = (float)atan2 
+	( 
+		2 * q.x * q.w - 2 * q.y * q.z, 
+		1 - 2 * pow(q.x, 2) - 2 * pow(q.z, 2) 
+	); 
+ 
+	if (q.x * q.y + q.z * q.w == 0.5) 
+	{ 
+		v.x = (float)(2 * atan2(q.x, q.w)); 
+		v.z = 0;
+	} 
+ 
+	else if (q.x * q.y + q.z * q.w == -0.5) 
+	{ 
+		v.x = (float)(-2 * atan2(q.x, q.w)); 
+		v.z = 0; 
+	} 
+ 
+	return v;
 }
 
 #endif
