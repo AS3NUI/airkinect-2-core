@@ -15,7 +15,7 @@ MSKinectDevice::MSKinectDevice(int nr)
 	capabilities.hasDepthUserSupport					= true;
 	capabilities.hasInfraredSupport						= false;
 	capabilities.hasJointOrientationConfidenceSupport	= false;
-	capabilities.hasJointOrientationSupport				= true;
+	capabilities.hasJointOrientationSupport				= false;
 	capabilities.hasMultipleSensorSupport				= true;
 	capabilities.hasPointCloudRegionSupport				= true;
 	capabilities.hasPointCloudSupport					= true;
@@ -982,12 +982,10 @@ void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, 
 	//Quaternion -> Euler
 	/*
 	Vector4 euler = QuaternionToEuler(boneOrientations[eRotationJoint].absoluteRotation.rotationQuaternion);
-	euler.z-= PI/2;
 	kUser.joints[targetIndex].orientationX = euler.x;
 	kUser.joints[targetIndex].orientationY = euler.y;
 	kUser.joints[targetIndex].orientationZ = euler.z;
 	*/
-
 	/*
 	//OPENNI WAY (3x3 matrix)
 	kUser.joints[targetIndex].orientationX = atan2f(orientation.orientation.elements[7], orientation.orientation.elements[8]);
