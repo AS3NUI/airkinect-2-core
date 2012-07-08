@@ -7,6 +7,7 @@
 package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 	import com.as3nui.nativeExtensions.air.kinect.Kinect;
 	import com.as3nui.nativeExtensions.air.kinect.KinectSettings;
+	import com.as3nui.nativeExtensions.air.kinect.bridge.ExtensionContextBridge;
 	import com.as3nui.nativeExtensions.air.kinect.frameworks.openni.OpenNIKinectSettings;
 	import com.as3nui.nativeExtensions.air.kinect.frameworks.openni.events.OpenNICameraImageEvent;
 	
@@ -17,11 +18,6 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 
 	[Event(name="infraredImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.frameworks.openni.events.OpenNICameraImageEvent")]
 	public class OpenNIKinect extends Kinect {
-		protected static const EXTENSION_EVENT_INFRARED_FRAME_AVAILABLE:String = 'infraredFrame';
-
-		protected static const EXTENSION_REQUEST_SET_INFRARED_MODE:String = "setInfraredMode";
-		protected static const EXTENSION_REQUEST_SET_INFRARED_ENABLED:String = "setInfraredEnabled";
-		protected static const EXTENSION_REQUEST_GET_INFRARED_FRAME:String = "getInfraredFrame";
 
 		protected var infraredImageBytes:ByteArray;
 		protected var infraredImageData:BitmapData;
@@ -54,13 +50,13 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 		}
 
 		protected function applyInfraredSettings():void {
-			context.call(EXTENSION_REQUEST_SET_INFRARED_ENABLED, _nr, openNISettings.infraredEnabled);
-			context.call(EXTENSION_REQUEST_SET_INFRARED_MODE, _nr, openNISettings.infraredResolution.x, openNISettings.infraredResolution.y, openNISettings.infraredMirrored);
+			contextBridge.setInfraredEnabled(_nr, openNISettings.infraredEnabled);
+			contextBridge.setInfraredMode(_nr, openNISettings.infraredResolution.x, openNISettings.infraredResolution.y, openNISettings.infraredMirrored);
 		}
 
 		protected function handleInfraredFrame():void {
 			if (!hasEventListener(OpenNICameraImageEvent.INFRARED_IMAGE_UPDATE)) return;
-			context.call(EXTENSION_REQUEST_GET_INFRARED_FRAME, _nr, infraredImageBytes);
+			contextBridge.getInfraredFrame(_nr, infraredImageBytes);
 			infraredImageBytes.position = 0;
 			infraredImageBytes.endian = Endian.LITTLE_ENDIAN;
 			infraredImageData.setPixels(infraredImageData.rect, infraredImageBytes);
@@ -72,7 +68,7 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 		override protected function contextStatusHandler(event:StatusEvent):void {
 			super.contextStatusHandler(event);
 			switch (event.level) {
-				case EXTENSION_EVENT_INFRARED_FRAME_AVAILABLE:
+				case ExtensionContextBridge.EXTENSION_EVENT_INFRARED_FRAME_AVAILABLE:
 					handleInfraredFrame();
 					break;
 			}

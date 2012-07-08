@@ -15,6 +15,7 @@
 */
 package com.as3nui.nativeExtensions.air.kinect.data
 {
+	import flash.geom.Matrix3D;
 	import flash.geom.Point;
 	import flash.geom.Vector3D;
 
@@ -25,6 +26,7 @@ package com.as3nui.nativeExtensions.air.kinect.data
 	 * positions (x, y, z), you can get position info in 2D in
 	 * RGB or depth space aswell.</p>
 	 */ 
+	[RemoteClass(alias='com.as3nui.nativeExtensions.air.kinect.data.SkeletonJoint')]
 	public class SkeletonJoint extends Object
 	{
 		public static const HEAD:String = "head";
@@ -86,11 +88,11 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 * Accuracy of the joint position
 		 */
 		public var positionConfidence:Number;
-
-		/**
-		 * Orientation of the joint as euler coordinates (radians), mapped in world space
-		 */
-		public var orientation:Vector3D;
+		
+		public var absoluteOrientationMatrix:Matrix3D;
+		public var absoluteOrientationQuaternion:Vector3D;
+		public var hierarchicalOrientationMatrix:Matrix3D;
+		public var hierarchicalOrientationQuaternion:Vector3D;
 
 		/**
 		 * Accuracy of the joint orientation
@@ -98,7 +100,20 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		public var orientationConfidence:Number;
 
 
-		public function SkeletonJoint(name:String, position:Vector3D, positionRelative:Vector3D, positionConfidence:Number, orientation:Vector3D, orientationConfidence:Number, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point)
+		public function SkeletonJoint(
+			name:String, 
+			position:Vector3D,
+			positionRelative:Vector3D, 
+			positionConfidence:Number,
+			absoluteOrientationMatrix:Matrix3D, 
+			absoluteOrientationQuaternion:Vector3D, 
+			hierarchicalOrientationMatrix:Matrix3D, 
+			hierarchicalOrientationQuaternion:Vector3D, 
+			orientationConfidence:Number, 
+			rgbPosition:Point, 
+			rgbRelativePosition:Point, 
+			depthPosition:Point, 
+			depthRelativePosition:Point)
 		{
 			this.name = name;
 			this.position = position;
@@ -108,7 +123,10 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			this.depthPosition = depthPosition;
 			this.depthRelativePosition = depthRelativePosition;
 			this.positionConfidence = positionConfidence;
-			this.orientation = orientation;
+			this.absoluteOrientationMatrix = absoluteOrientationMatrix;
+			this.absoluteOrientationQuaternion = absoluteOrientationQuaternion;
+			this.hierarchicalOrientationMatrix = hierarchicalOrientationMatrix;
+			this.hierarchicalOrientationQuaternion = hierarchicalOrientationQuaternion;
 			this.orientationConfidence = orientationConfidence;
 		}
 		
@@ -117,7 +135,7 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 */ 
 		public function cloneJoint():SkeletonJoint
 		{
-			return new SkeletonJoint(name, position.clone(), positionRelative.clone(), positionConfidence, orientation.clone(), orientationConfidence, rgbPosition.clone(), rgbRelativePosition.clone(), depthPosition.clone(), depthRelativePosition.clone());
+			return new SkeletonJoint(name, position.clone(), positionRelative.clone(), positionConfidence, absoluteOrientationMatrix.clone(), absoluteOrientationQuaternion.clone(), hierarchicalOrientationMatrix.clone(), hierarchicalOrientationQuaternion.clone(), orientationConfidence, rgbPosition.clone(), rgbRelativePosition.clone(), depthPosition.clone(), depthRelativePosition.clone());
 		}
 		
 		/**
@@ -133,7 +151,10 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			depthPosition.copyFrom(otherJoint.depthPosition);
 			depthRelativePosition.copyFrom(otherJoint.depthRelativePosition);
 			positionConfidence = otherJoint.positionConfidence;
-			orientation.copyFrom(otherJoint.orientation);
+			absoluteOrientationMatrix.copyFrom(otherJoint.absoluteOrientationMatrix);
+			absoluteOrientationQuaternion.copyFrom(otherJoint.absoluteOrientationQuaternion);
+			hierarchicalOrientationMatrix.copyFrom(otherJoint.hierarchicalOrientationMatrix);
+			hierarchicalOrientationQuaternion.copyFrom(otherJoint.hierarchicalOrientationQuaternion);
 			orientationConfidence = otherJoint.orientationConfidence;
 		}
 	}

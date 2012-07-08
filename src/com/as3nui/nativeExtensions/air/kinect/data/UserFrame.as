@@ -15,6 +15,7 @@
 */
 package com.as3nui.nativeExtensions.air.kinect.data
 {
+	[RemoteClass(alias='com.as3nui.nativeExtensions.air.kinect.data.UserFrame')]
 	public class UserFrame
 	{
 		

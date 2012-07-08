@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 package com.as3nui.nativeExtensions.air.kinect {
+	import com.as3nui.nativeExtensions.air.kinect.bridge.ExtensionContextBridge;
+	import com.as3nui.nativeExtensions.air.kinect.bridge.IContextBridge;
 	import com.as3nui.nativeExtensions.air.kinect.constants.DeviceState;
 	import com.as3nui.nativeExtensions.air.kinect.constants.Framework;
 	import com.as3nui.nativeExtensions.air.kinect.constants.OS;
@@ -37,10 +39,8 @@ package com.as3nui.nativeExtensions.air.kinect {
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.StatusEvent;
-	import flash.external.ExtensionContext;
 	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
-	import flash.utils.Endian;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
 
@@ -111,101 +111,11 @@ package com.as3nui.nativeExtensions.air.kinect {
 	 * @includeExample BasicCameraExample.as
 	 */
 	public class Kinect extends EventDispatcher {
-		
-		/** @private */
-		protected static const EXTENSION_EVENT_DEVICE_STARTED:String = 'started';
-		/** @private */
-		protected static const EXTENSION_EVENT_DEVICE_STOPPED:String = 'stopped';
 
 		/** @private */
-		protected static const EXTENSION_EVENT_RGB_FRAME_AVAILABLE:String = 'RGBFrame';
+		protected static const USE_GET_INSTANCE:String = 'Classes extending Kinect can only be instantiated once by the getInstance method';
 		/** @private */
-		protected static const EXTENSION_EVENT_DEPTH_FRAME_AVAILABLE:String = 'depthFrame';
-		/** @private */
-		protected static const EXTENSION_EVENT_USER_FRAME_AVAILABLE:String = 'userFrame';
-		/** @private */
-		protected static const EXTENSION_EVENT_USERMASK_FRAME_AVAILABLE:String = 'userMaskFrame';
-		/** @private */
-		protected static const EXTENSION_EVENT_POINTCLOUD_FRAME_AVAILABLE:String = 'pointCloudFrame';
-
-		//SHARED CONTEXT REQUESTS
-		/** @private */
-		protected static const EXTENSION_REQUEST_APPLICATION_STARTUP:String = "applicationStartup";
-		/** @private */
-		protected static const EXTENSION_REQUEST_GET_DEVICE_COUNT:String = "getDeviceCount";
-		/** @private */
-		protected static const EXTENSION_REQUEST_APPLICATION_SHUTDOWN:String = "applicationShutdown";
-
-		//Main Context Requests
-		/** @private */
-		protected static const EXTENSION_REQUEST_START:String = "start";
-		/** @private */
-		protected static const EXTENSION_REQUEST_STOP:String = "stop";
-		
-		/** @private */
-		protected static const EXTENSION_REQUEST_GET_CAPABILITIES:String = "getCapabilities";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_USER_MODE:String = "setUserMode";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_USER_COLOR:String = "setUserColor";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_USER_ENABLED:String = "setUserEnabled";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_SKELETON_MODE:String = "setSkeletonMode";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_SKELETON_ENABLED:String = "setSkeletonEnabled";
-		/** @private */
-		protected static const EXTENSION_REQUEST_GET_USER_FRAME:String = "getUserFrame";
-		/** @private */
-		protected static const EXTENSION_REQUEST_GET_SKELETON_JOINT_NAME_INDICIES:String = "getSkeletonJointNameIndices";
-		/** @private */
-		protected static const EXTENSION_REQUEST_GET_SKELETON_JOINT_NAMES:String = "getSkeletonJointNames";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_USER_MASK_MODE:String = "setUserMaskMode";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_USER_MASK_ENABLED:String = "setUserMaskEnabled";
-		/** @private */
-		protected static const EXTENSION_REQUEST_GET_USER_MASK_FRAME:String = "getUserMaskFrame";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_DEPTH_MODE:String = "setDepthMode";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_DEPTH_ENABLED:String = "setDepthEnabled";
-		/** @private */
-		protected static const EXTENSION_REQUEST_GET_DEPTH_FRAME:String = "getDepthFrame";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_DEPTH_SHOW_USER_COLORS:String = "setDepthShowUserColors";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_DEPTH_ENABLE_NEAR_MODE:String = "setDepthEnableNearMode";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_RGB_MODE:String = "setRGBMode";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_RGB_ENABLED:String = "setRGBEnabled";
-		/** @private */
-		protected static const EXTENSION_REQUEST_GET_RGB_FRAME:String = "getRGBFrame";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_POINTCLOUD_MODE:String = "setPointCloudMode";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_POINTCLOUD_ENABLED:String = "setPointCloudEnabled";
-		/** @private */
-		protected static const EXTENSION_REQUEST_GET_POINTCLOUD_FRAME:String = "getPointCloudFrame";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_POINTCLOUD_REGIONS:String = "setPointCloudRegions";
-		/** @private */
-		protected static const EXTENSION_REQUEST_GET_CAMERA_ELEVATION_ANGLE:String = "getCameraElevationAngle";
-		/** @private */
-		protected static const EXTENSION_REQUEST_SET_CAMERA_ELEVATION_ANGLE:String = "setCameraElevationAngle";
-
-		/** @private */
-		protected static const EXTENSION_EVENT_DISCONNECT:String = 'deviceDisconnected';
-		/** @private */
-		protected static const EXTENSION_EVENT_RECONNECT:String = 'deviceReconnected';
-		/** @private */
-		protected static const EXTENSION_EVENT_ERROR:String = 'error';
-
-		/** @private */
-		protected static const USE_GET_INSTANCE:String = 'Classes extending Device can only be instantiated once by the getInstance method';
-		/** @private */
-		protected static const CLASS_MUST_EXTEND_DEVICE:String = 'Device is a base class that cannot be instantiated';
+		protected static const CLASS_MUST_EXTEND_DEVICE:String = 'Kinect is a base class that cannot be instantiated';
 		/** @private */
 		protected static const GET_INSTANCE_OF_CLASS_ERROR:String = 'getInstance can only be called for Classes extending Device';
 
@@ -214,16 +124,14 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 * @private
 		 */
 		private static var _deviceInstanceMap:Dictionary;
-		private static var _sharedContext:ExtensionContext;
+		private static var _sharedBridge:IContextBridge;
 
-
-		private static function get sharedContext():ExtensionContext {
-			if (_sharedContext == null) {
-				_sharedContext = ExtensionContext.createExtensionContext("com.as3nui.nativeExtensions.air.kinect", "shared");
+		private static function get sharedBridge():IContextBridge {
+			if (_sharedBridge == null) {
+				_sharedBridge = new ExtensionContextBridge(true);
 			}
-			return _sharedContext;
+			return _sharedBridge;
 		}
-
 
 		/**
 		 * Check if there is a Sensor available for use
@@ -237,7 +145,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 * @return    Number of Sensors connected
 		 */
 		public static function numDevices():uint {
-			return (sharedContext.call(EXTENSION_REQUEST_GET_DEVICE_COUNT) as uint);
+			return sharedBridge.getDeviceCount();
 		}
 
 		/**
@@ -296,8 +204,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 */ 
 		public function get capabilities():DeviceCapabilities {
 			if (!_capabilities) {
-				var nativeCapabilities:Object = context.call(EXTENSION_REQUEST_GET_CAPABILITIES, _nr) as Object;
-				_capabilities = new DeviceCapabilities(nativeCapabilities);
+				_capabilities = contextBridge.getCapabilities(_nr);
 			}
 			return _capabilities;
 		}
@@ -323,7 +230,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 * Check capabilities.hasCameraElevationSupport
 		 */ 
 		public function get cameraElevationAngle():int {
-			return context.call(EXTENSION_REQUEST_GET_CAMERA_ELEVATION_ANGLE, _nr) as int;
+			return contextBridge.getCameraElevationAngle(_nr);
 		}
 		
 		/**
@@ -333,16 +240,17 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 * Check capabilities.hasCameraElevationSupport
 		 */ 
 		public function set cameraElevationAngle(value:int):void {
-			context.call(EXTENSION_REQUEST_SET_CAMERA_ELEVATION_ANGLE, _nr, value);
+			contextBridge.setCameraElevationAngle(_nr, value);
 		}
 
 		/** @private */
-		protected var context:ExtensionContext;
+		protected var contextBridge:IContextBridge;
 		/** @private */
 		protected var _settings:KinectSettings;
-		/** @private */
-		protected var _userSimulationMode:Boolean;
-
+		
+		public function get settings():KinectSettings {
+			return _settings.clone();
+		}
 
 		// Depth Image Variables
 		/** @private */
@@ -382,36 +290,24 @@ package com.as3nui.nativeExtensions.air.kinect {
 		//parameter lets you specify which framework to use on windows
 		//0: auto, 1: mssdk, 2: openni
 		//will be used as soon as we figure out how to prevent ane from crashing when driver requirements are not met
-		private static var applicationStarted:* = sharedContext.call(EXTENSION_REQUEST_APPLICATION_STARTUP, 0);
+		private static var applicationStarted:* = sharedBridge.applicationStartup(0);
 
 		/**
 		 * Private constructor of the Device class. Use Device.getDevice() instead of calling this method.
 		 * @private
 		 */
 		public function Kinect(nr:uint) {
-			var className:String = getQualifiedClassName(this);
-			var managementClass:Class = getDefinitionByName(className) as Class;
-
-			if (managementClass == Kinect) {
-				throw(CLASS_MUST_EXTEND_DEVICE);
-			}
-
-			var instance:Kinect = _deviceInstanceMap[managementClass][nr];
-			if (instance != null) {
-				throw(USE_GET_INSTANCE);
-			}
-			else {
-				_deviceInstanceMap[managementClass][nr] = this;
-			}
-
 			_nr = nr;
 			_state = DeviceState.STOPPED;
 			
-			//create the extension _context
-			context = ExtensionContext.createExtensionContext("com.as3nui.nativeExtensions.air.kinect", null);
-
-			//dispose the kinect on application exit
+			createContextBridge();
+			
 			NativeApplication.nativeApplication.addEventListener("exiting", exitingHandler, false, 0, true);
+		}
+		
+		protected function createContextBridge():void
+		{
+			contextBridge = new ExtensionContextBridge();
 		}
 
 		/**
@@ -424,11 +320,11 @@ package com.as3nui.nativeExtensions.air.kinect {
 				_settings = parseSettings(deviceSettings);
 				_state = DeviceState.STARTING;
 				//add status listener to the _context
-				context.addEventListener(StatusEvent.STATUS, contextStatusHandler, false, 0, true);
+				contextBridge.addEventListener(StatusEvent.STATUS, contextStatusHandler, false, 0, true);
 				//Initialize all variales needed for settings requested
 				initSettings();
 				//start the _context
-				context.call(EXTENSION_REQUEST_START, _nr);
+				contextBridge.start(_nr);
 				//the started event will be dispatched from the _context, as this can take a while
 			}
 		}
@@ -447,9 +343,9 @@ package com.as3nui.nativeExtensions.air.kinect {
 			if (_state == DeviceState.STARTED || _state == DeviceState.STARTING) {
 				_state = DeviceState.STOPPED;
 				//remove the status listener
-				context.removeEventListener(StatusEvent.STATUS, contextStatusHandler);
+				contextBridge.removeEventListener(StatusEvent.STATUS, contextStatusHandler);
 				//stop the _context
-				context.call(EXTENSION_REQUEST_STOP, _nr);
+				contextBridge.stop(_nr);
 				disposeSettings();
 				//dispatch the stopped event
 				dispatchEvent(new DeviceEvent(DeviceEvent.STOPPED));
@@ -462,13 +358,23 @@ package com.as3nui.nativeExtensions.air.kinect {
 		public function dispose():void {
 			stop();
 			var className:String = getQualifiedClassName(this);
-			var managementClass:Class = getDefinitionByName(className) as Class;
-			delete _deviceInstanceMap[managementClass][_nr];
+			if(className != null)
+			{
+				try
+				{
+					var managementClass:Class = getDefinitionByName(className) as Class;
+					if(_deviceInstanceMap[managementClass] != null && _deviceInstanceMap[managementClass][_nr] != null)
+						delete _deviceInstanceMap[managementClass][_nr];
+				}
+				catch(error:Error)
+				{
+				}
+			}
 		}
 
 		private function exitingHandler(event:Event):void {
 			dispose();
-			sharedContext.call(EXTENSION_REQUEST_APPLICATION_SHUTDOWN);
+			sharedBridge.applicationShutdown();
 		}
 
 		/** @private */
@@ -504,8 +410,8 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 		/** @private */
 		protected function applyRGBSettings():void {
-			context.call(EXTENSION_REQUEST_SET_RGB_ENABLED, _nr, _settings.rgbEnabled);
-			context.call(EXTENSION_REQUEST_SET_RGB_MODE, _nr, _settings.rgbResolution.x, _settings.rgbResolution.y, _settings.rgbMirrored);
+			contextBridge.setRgbEnabled(_nr, _settings.rgbEnabled);
+			contextBridge.setRgbMode(_nr, _settings.rgbResolution.x, _settings.rgbResolution.y, _settings.rgbMirrored);
 		}
 
 		/** @private */
@@ -530,10 +436,10 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 		/** @private */
 		protected function applyDepthImageSettings():void {
-			context.call(EXTENSION_REQUEST_SET_DEPTH_ENABLED, _nr, _settings.depthEnabled);
-			context.call(EXTENSION_REQUEST_SET_DEPTH_MODE, _nr, _settings.depthResolution.x, _settings.depthResolution.y, _settings.depthMirrored);
-			context.call(EXTENSION_REQUEST_SET_DEPTH_SHOW_USER_COLORS, _nr, _settings.depthShowUserColors);
-			context.call(EXTENSION_REQUEST_SET_DEPTH_ENABLE_NEAR_MODE, _nr, _settings.depthEnableNearMode);
+			contextBridge.setDepthEnabled(_nr, _settings.depthEnabled);
+			contextBridge.setDepthMode(_nr, _settings.depthResolution.x, _settings.depthResolution.y, _settings.depthMirrored);
+			contextBridge.setDepthShowUserColors(_nr, _settings.depthShowUserColors);
+			contextBridge.setDepthEnableNearMode(_nr, _settings.depthEnableNearMode);
 		}
 
 		/** @private */
@@ -557,8 +463,8 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 		/** @private */
 		protected function applyPointCloudSettings():void {
-			context.call(EXTENSION_REQUEST_SET_POINTCLOUD_ENABLED, _nr, _settings.pointCloudEnabled);
-			context.call(EXTENSION_REQUEST_SET_POINTCLOUD_MODE, _nr, _settings.pointCloudResolution.x, _settings.pointCloudResolution.y, _settings.pointCloudMirrored, _settings.pointCloudDensity, _settings.pointCloudIncludeRGB);
+			contextBridge.setPointcloudEnabled(_nr, _settings.pointCloudEnabled);
+			contextBridge.setPointcloudMode(_nr, _settings.pointCloudResolution.x, _settings.pointCloudResolution.y, _settings.pointCloudMirrored, _settings.pointCloudDensity, _settings.pointCloudIncludeRGB);
 		}
 
 		/** @private */
@@ -570,7 +476,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		/** @private */
 		public function setPointCloudRegions(pointCloudRegions:Vector.<PointCloudRegion>):void {
 			this.pointCloudRegions = pointCloudRegions;
-			if (context != null)  context.call(EXTENSION_REQUEST_SET_POINTCLOUD_REGIONS, _nr, pointCloudRegions);
+			if(contextBridge != null) contextBridge.setPointCloudRegions(_nr, pointCloudRegions);
 		}
 
 		//----------------------------------
@@ -583,17 +489,18 @@ package com.as3nui.nativeExtensions.air.kinect {
 				usersByTrackingId = new Dictionary();
 				_usersWithSkeleton = new Vector.<User>();
 				usersWithSkeletonByTrackingId = new Dictionary();
-				_skeletonJointNameIndices = context.call(EXTENSION_REQUEST_GET_SKELETON_JOINT_NAME_INDICIES, _nr) as Dictionary;
-				_skeletonJointNames = context.call(EXTENSION_REQUEST_GET_SKELETON_JOINT_NAMES, _nr) as Vector.<String>;
+				
+				_skeletonJointNameIndices = contextBridge.getSkeletonJointNameIndices(_nr);
+				_skeletonJointNames = contextBridge.getSkeletonJointNames(_nr);
 			}
 			applyUserSettings()
 		}
 		/** @private */
 		protected function applyUserSettings():void {
-			context.call(EXTENSION_REQUEST_SET_USER_ENABLED, _nr, _settings.userEnabled);
-			context.call(EXTENSION_REQUEST_SET_USER_MODE, _nr, _settings.userMirrored);
-			context.call(EXTENSION_REQUEST_SET_SKELETON_ENABLED, _nr, _settings.skeletonEnabled);
-			context.call(EXTENSION_REQUEST_SET_SKELETON_MODE, _nr, _settings.skeletonMirrored);
+			contextBridge.setUserEnabled(_nr, _settings.userEnabled);
+			contextBridge.setUserMode(_nr, _settings.userMirrored);
+			contextBridge.setSkeletonEnabled(_nr, _settings.skeletonEnabled);
+			contextBridge.setSkeletonMode(_nr, _settings.skeletonMirrored);
 		}
 		/** @private */
 		private function disposeUserSettings():void {
@@ -618,8 +525,8 @@ package com.as3nui.nativeExtensions.air.kinect {
 		}
 		/** @private */
 		protected function applyUserMaskSettings():void {
-			context.call(EXTENSION_REQUEST_SET_USER_MASK_ENABLED, _nr, _settings.userMaskEnabled);
-			context.call(EXTENSION_REQUEST_SET_USER_MASK_MODE, _nr, _settings.userMaskResolution.x, _settings.userMaskResolution.y, _settings.userMaskMirrored);
+			contextBridge.setUserMaskEnabled(_nr, _settings.userMaskEnabled);
+			contextBridge.setUserMaskMode(_nr, _settings.userMaskResolution.x, _settings.userMaskResolution.y, _settings.userMaskMirrored);
 		}
 		/** @private */
 		private function disposeUserMaskSettings():void {
@@ -691,28 +598,28 @@ package com.as3nui.nativeExtensions.air.kinect {
 			switch (event.code) {
 				case "status":
 					switch (event.level) {
-						case EXTENSION_EVENT_DEVICE_STARTED:
+						case ExtensionContextBridge.EXTENSION_EVENT_DEVICE_STARTED:
 							handleDeviceStarted();
 							break;
-						case EXTENSION_EVENT_DEVICE_STOPPED:
+						case ExtensionContextBridge.EXTENSION_EVENT_DEVICE_STOPPED:
 							handleDeviceStopped();
 							break;
-						case EXTENSION_EVENT_DEPTH_FRAME_AVAILABLE:
+						case ExtensionContextBridge.EXTENSION_EVENT_DEPTH_FRAME_AVAILABLE:
 							handleDepthFrame();
 							break;
-						case EXTENSION_EVENT_RGB_FRAME_AVAILABLE:
+						case ExtensionContextBridge.EXTENSION_EVENT_RGB_FRAME_AVAILABLE:
 							handleRGBFrame();
 							break;
-						case EXTENSION_EVENT_POINTCLOUD_FRAME_AVAILABLE:
+						case ExtensionContextBridge.EXTENSION_EVENT_POINTCLOUD_FRAME_AVAILABLE:
 							handlePointCloudFrame();
 							break;
-						case EXTENSION_EVENT_USER_FRAME_AVAILABLE:
+						case ExtensionContextBridge.EXTENSION_EVENT_USER_FRAME_AVAILABLE:
 							handleUserFrame();
 							break;
-						case EXTENSION_EVENT_USERMASK_FRAME_AVAILABLE:
+						case ExtensionContextBridge.EXTENSION_EVENT_USERMASK_FRAME_AVAILABLE:
 							handleUserMaskFrame();
 							break;
-						case EXTENSION_EVENT_RECONNECT:
+						case ExtensionContextBridge.EXTENSION_EVENT_RECONNECT:
 							start(_settings);
 							break;
 					}
@@ -750,9 +657,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		protected function handleDepthFrame():void {
 			if (!hasEventListener(CameraImageEvent.DEPTH_IMAGE_UPDATE)) return;
 			if(depthImageBytes == null || depthImageData == null) return;
-			context.call(EXTENSION_REQUEST_GET_DEPTH_FRAME, _nr, depthImageBytes);
-			depthImageBytes.position = 0;
-			depthImageBytes.endian = Endian.LITTLE_ENDIAN;
+			contextBridge.getDepthFrame(_nr, depthImageBytes);
 			depthImageData.setPixels(depthImageData.rect, depthImageBytes);
 
 			//dispatch the event
@@ -766,10 +671,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		protected function handleRGBFrame():void {
 			if (!hasEventListener(CameraImageEvent.RGB_IMAGE_UPDATE)) return;
 			if(rgbImageBytes == null || rgbImageData == null) return;
-
-			context.call(EXTENSION_REQUEST_GET_RGB_FRAME, _nr, rgbImageBytes);
-			rgbImageBytes.position = 0;
-			rgbImageBytes.endian = Endian.LITTLE_ENDIAN;
+			contextBridge.getRgbFrame(_nr, rgbImageBytes);
 			rgbImageData.setPixels(rgbImageData.rect, rgbImageBytes);
 
 			//dispatch the event
@@ -783,9 +685,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		protected function handlePointCloudFrame():void {
 			if (!hasEventListener(PointCloudEvent.POINT_CLOUD_UPDATE)) return;
 			if(pointCloudBytes == null) return;
-			context.call(EXTENSION_REQUEST_GET_POINTCLOUD_FRAME, _nr, pointCloudBytes, pointCloudRegions);
-			pointCloudBytes.position = 0;
-			pointCloudBytes.endian = Endian.LITTLE_ENDIAN;
+			contextBridge.getPointcloudFrame(_nr, pointCloudBytes, pointCloudRegions);
 			dispatchEvent(new PointCloudEvent(PointCloudEvent.POINT_CLOUD_UPDATE, false, false, pointCloudBytes, pointCloudRegions));
 		}
 
@@ -801,9 +701,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 			var i:uint = 0;
 			for each(var user:User in users) {
-				context.call(EXTENSION_REQUEST_GET_USER_MASK_FRAME, _nr, user.userID, userMaskByteArrays[i]);
-				userMaskByteArrays[i].position = 0;
-				userMaskByteArrays[i].endian = Endian.LITTLE_ENDIAN;
+				contextBridge.getUserMaskFrame(_nr, user.userID, userMaskByteArrays[i]);
 				if (user.userMaskData == null) {
 					user.userMaskData = new BitmapData(_settings.userMaskResolution.x, _settings.userMaskResolution.y, true, 0);
 				}
@@ -820,8 +718,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		// -------------------------------------------
 		/** @private */
 		protected function handleUserFrame():void {
-			if (userSimulationMode) return;
-			var userFrame:UserFrame = context.call(EXTENSION_REQUEST_GET_USER_FRAME, _nr) as UserFrame;
+			var userFrame:UserFrame = contextBridge.getUserFrame(_nr);
 			processUserFrame(userFrame);
 		}
 
@@ -926,31 +823,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 		public function get skeletonJointNames():Vector.<String>
 		{
 			return _skeletonJointNames;
-		}
-
-		//----------------------------------
-		// User Frame Simulation Code
-		//----------------------------------
-
-		/**
-		 * Allows for this device to disregard updates from the _context and only listen for manual User Frame updates.
-		 * @param value
-		 */
-		public function set userSimulationMode(value:Boolean):void {
-			_userSimulationMode = value;
-		}
-
-		public function get userSimulationMode():Boolean {
-			return _userSimulationMode;
-		}
-
-		/**
-		 * Allows for constructed UserFrames to be passed thru the device as if they were coming from the _context.
-		 * This is used for simulated skeleton playback
-		 * @param userFrame            Userframe to simulate
-		 */
-		public function simulateUserFrame(userFrame:UserFrame):void {
-			processUserFrame(userFrame);
 		}
 	}
 }

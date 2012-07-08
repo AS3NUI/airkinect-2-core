@@ -6,8 +6,9 @@
  */
 package com.as3nui.nativeExtensions.air.kinect {
 	import com.as3nui.nativeExtensions.air.kinect.constants.CameraResolution;
-
+	
 	import flash.geom.Point;
+	import flash.utils.describeType;
 
 	public class KinectSettings  {
 
@@ -38,6 +39,58 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 
 		public function KinectSettings() {
+		}
+		
+		public function copyFrom(otherKinectSettings:KinectSettings):void
+		{
+			_depthEnabled = otherKinectSettings.depthEnabled;
+			_depthResolution.copyFrom(otherKinectSettings.depthResolution);
+			_depthShowUserColors = otherKinectSettings.depthShowUserColors;
+			_depthEnableNearMode = otherKinectSettings.depthEnableNearMode;
+			_depthMirrored = otherKinectSettings.depthMirrored;
+			
+			_rgbEnabled = otherKinectSettings.rgbEnabled;
+			_rgbResolution.copyFrom(otherKinectSettings.rgbResolution);
+			_rgbMirrored = otherKinectSettings.rgbMirrored;
+			
+			_userEnabled = otherKinectSettings.userEnabled;
+			_userMirrored = otherKinectSettings.userMirrored;
+			_skeletonEnabled = otherKinectSettings.skeletonEnabled;
+			_skeletonMirrored = otherKinectSettings.skeletonMirrored;
+			
+			_pointCloudEnabled = otherKinectSettings.pointCloudEnabled;
+			_pointCloudResolution.copyFrom(otherKinectSettings.pointCloudResolution);
+			_pointCloudIncludeRGB = otherKinectSettings.pointCloudIncludeRGB;
+			_pointCloudDensity = otherKinectSettings.pointCloudDensity;
+			_pointCloudMirrored = otherKinectSettings.pointCloudMirrored;
+			
+			_userMaskEnabled = otherKinectSettings.userMaskEnabled;
+			_userMaskResolution.copyFrom(otherKinectSettings.userMaskResolution);
+			_userMaskMirrored = otherKinectSettings.userMaskMirrored;
+		}
+		
+		public function clone():KinectSettings {
+			var cloned:KinectSettings = new KinectSettings();
+			cloned.copyFrom(this);
+			return cloned;
+		}
+		
+		/**
+		 * Factory method to create an instance of OpenNISettings, based on an
+		 * anonymously typed object
+		 */ 
+		public static function create(deviceSettings:Object):KinectSettings
+		{
+			var settings:KinectSettings = new KinectSettings();
+			//automatic copying-in properties from the object
+			var def:XML = describeType(deviceSettings);
+			var props:XMLList = def..variable.@name;
+			props += def..accessor.@name;
+			for each (var prop:String in props)
+			{
+				if(settings.hasOwnProperty(prop)) settings[prop] = deviceSettings[prop];
+			}
+			return settings;
 		}
 
 		public function get depthEnabled():Boolean {
@@ -198,9 +251,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 		public function set userMaskMirrored(value:Boolean):void {
 			_userMaskMirrored = value;
-		}
-
-		public function dispose():void {
 		}
 	}
 }

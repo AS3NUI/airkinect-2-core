@@ -41,6 +41,26 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 			_infraredMirrored = value;
 		}
 		
+		override public function copyFrom(otherKinectSettings:KinectSettings):void
+		{
+			super.copyFrom(otherKinectSettings);
+			if(otherKinectSettings is OpenNIKinectSettings)
+			{
+				var otherOpenNIKinectSettings:OpenNIKinectSettings = otherKinectSettings as OpenNIKinectSettings;
+				
+				_infraredEnabled = otherOpenNIKinectSettings.infraredEnabled;
+				_infraredResolution.copyFrom(otherOpenNIKinectSettings.infraredResolution);
+				_infraredMirrored = otherOpenNIKinectSettings.infraredMirrored;
+			}
+		}
+		
+		override public function clone():KinectSettings
+		{
+			var cloned:OpenNIKinectSettings = new OpenNIKinectSettings();
+			cloned.copyFrom(this);
+			return cloned;
+		}
+		
 		/**
 		 * Factory method to create an instance of OpenNISettings, based on an
 		 * anonymously typed object

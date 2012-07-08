@@ -11,6 +11,18 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk {
 
 	public class MSKinectSettings extends KinectSettings {
 		
+		override public function copyFrom(otherKinectSettings:KinectSettings):void
+		{
+			super.copyFrom(otherKinectSettings);
+		}
+		
+		override public function clone():KinectSettings
+		{
+			var cloned:MSKinectSettings = new MSKinectSettings();
+			cloned.copyFrom(this);
+			return cloned;
+		}
+		
 		/**
 		 * Factory method to create an instance of MSSettings, based on an
 		 * anonymously typed object

@@ -43,6 +43,7 @@ package com.as3nui.nativeExtensions.air.kinect.data
 	 * <p>When you enable user masking in the kinect config, the <code>userMask</code>
 	 * property will contain the rgb pixels for this user.</p>
 	 */ 
+	[RemoteClass(alias='com.as3nui.nativeExtensions.air.kinect.data.User')]
 	public class User
 	{
 		
@@ -173,7 +174,7 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 */ 
 		public function get skeletonJointNames():Vector.<String>
 		{
-			return as3nui::_skeletonJointNames.concat();
+			return (as3nui::_skeletonJointNames != null) ? as3nui::_skeletonJointNames.concat() : null;
 		}
 		
 		public function User(framework:String, userID:uint, trackingID:uint,  position:Vector3D, positionRelative:Vector3D, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point, hasSkeleton:Boolean, skeletonJoints:Vector.<SkeletonJoint>)
