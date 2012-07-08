@@ -1069,9 +1069,9 @@ void OpenNIDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJ
     
     kUser.joints[targetIndex].orientationConfidence = orientation.fConfidence;
     
-    kUser.joints[targetIndex].orientationX = atan2f(orientation.orientation.elements[7], orientation.orientation.elements[8]);
-    kUser.joints[targetIndex].orientationY = -asinf(orientation.orientation.elements[6]);
-    kUser.joints[targetIndex].orientationZ = atan2f(orientation.orientation.elements[3], orientation.orientation.elements[0]);
+    //kUser.joints[targetIndex].orientationX = atan2f(orientation.orientation.elements[7], orientation.orientation.elements[8]);
+    //kUser.joints[targetIndex].orientationY = -asinf(orientation.orientation.elements[6]);
+    //kUser.joints[targetIndex].orientationZ = atan2f(orientation.orientation.elements[3], orientation.orientation.elements[0]);
     
     kUser.joints[targetIndex].positionConfidence = jointPositionConfidence;
 
@@ -1132,7 +1132,7 @@ void OpenNIDevice::calculateHistogram()
     {
         for (int nIndex=1; nIndex<MAX_DEPTH; nIndex++)
         {
-            depthHistogram[nIndex] = (unsigned int)(256 * (1.0f - (depthHistogram[nIndex] / nNumberOfPoints)));
+            depthHistogram[nIndex] = (unsigned int)(256.0 * (1.0f - (depthHistogram[nIndex] / nNumberOfPoints)));
         }
     }
 }

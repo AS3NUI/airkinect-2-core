@@ -145,10 +145,10 @@ FREObject KinectDevice::freGetUserFrame(FREObject argv[])
     short int trackedSkeletons = 0;
     
     FREObject freUserFrame, frameNumber, timestamp, users, user, userType, userID, trackingID, hasSkeleton, joints, joint, jointName;
-    FREObject position, positionRelative, positionConfidence, orientation, orientationConfidence, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition;
-    FREObject orientationX, orientationY, orientationZ;
-    FREObject positionX, positionY, positionZ, positionRelativeX, positionRelativeY, positionRelativeZ;
-    FREObject rgbPositionX, rgbPositionY, rgbRelativePositionX, rgbRelativePositionY, depthPositionX, depthPositionY, depthRelativePositionX, depthRelativePositionY;
+    FREObject position, positionRelative, positionConfidence, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition;
+	FREObject orientationConfidence;
+	FREObject absoluteOrientationMatrix, absoluteOrientationQuaternion;
+	FREObject hierarchicalOrientationMatrix, hierarchicalOrientationQuaternion;
     
     FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.User>", 0, NULL, &users, NULL);
     
@@ -164,91 +164,35 @@ FREObject KinectDevice::freGetUserFrame(FREObject argv[])
                 //name
                 FRENewObjectFromUTF8(strlen(jointNames[j]), (const uint8_t*) jointNames[j], &jointName);
                 //position
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].worldX, &positionX);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].worldY, &positionY);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].worldZ, &positionZ);
-                FREObject positionParams[] = {positionX, positionY, positionZ};
-                FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 3, positionParams, &position, NULL);
-                //position relative
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].worldRelativeX, &positionRelativeX);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].worldRelativeY, &positionRelativeY);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].worldRelativeZ, &positionRelativeZ);
-                FREObject positionRelativeParams[] = {positionRelativeX, positionRelativeY, positionRelativeZ};
-                FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 3, positionRelativeParams, &positionRelative, NULL);
-                //position confidence
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].positionConfidence, &positionConfidence);
-                
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].orientationX, &orientationX);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].orientationY, &orientationY);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].orientationZ, &orientationZ);
-                
-                //orientation
-                FREObject orientationParams[] = {orientationX, orientationY, orientationZ};
-                FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 3, orientationParams, &orientation, NULL);
-                
+				position = createFREVector3D(userFrame.users[i].joints[j].worldX, userFrame.users[i].joints[j].worldY, userFrame.users[i].joints[j].worldZ, 0.0);
+                positionRelative = createFREVector3D(userFrame.users[i].joints[j].worldRelativeX, userFrame.users[i].joints[j].worldRelativeY, userFrame.users[i].joints[j].worldRelativeZ, 0.0);
+				rgbPosition = createFREPoint(userFrame.users[i].joints[j].rgbX, userFrame.users[i].joints[j].rgbY);
+				rgbRelativePosition = createFREPoint(userFrame.users[i].joints[j].rgbRelativeX, userFrame.users[i].joints[j].rgbRelativeY);
+				depthPosition = createFREPoint(userFrame.users[i].joints[j].depthX, userFrame.users[i].joints[j].depthY);
+				depthRelativePosition = createFREPoint(userFrame.users[i].joints[j].depthRelativeX, userFrame.users[i].joints[j].depthRelativeY);
+				//position confidence
+				FRENewObjectFromDouble(userFrame.users[i].joints[j].positionConfidence, &positionConfidence);
+				//orientation
+				absoluteOrientationMatrix = createFREMatrix3DFromKinectRotationMatrix(userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix);
+				absoluteOrientationQuaternion = createFREVector3DFromKinectRotationQuaternion(userFrame.users[i].joints[j].absoluteOrientation.rotationQuaternion);
+				hierarchicalOrientationMatrix = createFREMatrix3DFromKinectRotationMatrix(userFrame.users[i].joints[j].hierarchicalOrientation.rotationMatrix);
+				hierarchicalOrientationQuaternion = createFREVector3DFromKinectRotationQuaternion(userFrame.users[i].joints[j].hierarchicalOrientation.rotationQuaternion);
                 //orientation confidence
                 FRENewObjectFromDouble(userFrame.users[i].joints[j].orientationConfidence, &orientationConfidence);
-                //rgb position
-                FRENewObjectFromInt32(userFrame.users[i].joints[j].rgbX, &rgbPositionX);
-                FRENewObjectFromInt32(userFrame.users[i].joints[j].rgbY, &rgbPositionY);
-                FREObject rgbPositionParams[] = {rgbPositionX, rgbPositionY};
-                FRENewObject( (const uint8_t*) "flash.geom.Point", 2, rgbPositionParams, &rgbPosition, NULL);
-                //rgb relative position
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].rgbRelativeX, &rgbRelativePositionX);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].rgbRelativeY, &rgbRelativePositionY);
-                FREObject rgbRelativePositionParams[] = {rgbRelativePositionX, rgbRelativePositionY};
-                FRENewObject( (const uint8_t*) "flash.geom.Point", 2, rgbRelativePositionParams, &rgbRelativePosition, NULL);
-                //depth position
-                FRENewObjectFromInt32(userFrame.users[i].joints[j].depthX, &depthPositionX);
-                FRENewObjectFromInt32(userFrame.users[i].joints[j].depthY, &depthPositionY);
-                FREObject depthPositionParams[] = {depthPositionX, depthPositionY};
-                FRENewObject( (const uint8_t*) "flash.geom.Point", 2, depthPositionParams, &depthPosition, NULL);
-                //depth relative position
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].depthRelativeX, &depthRelativePositionX);
-                FRENewObjectFromDouble(userFrame.users[i].joints[j].depthRelativeY, &depthRelativePositionY);
-                FREObject depthRelativePositionParams[] = {depthRelativePositionX, depthRelativePositionY};
-                FRENewObject( (const uint8_t*) "flash.geom.Point", 2, depthRelativePositionParams, &depthRelativePosition, NULL);
+
                 //create the joint
-                FREObject jointParams[] = {jointName, position, positionRelative, positionConfidence, orientation, orientationConfidence, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition};
-                FRENewObject( (const uint8_t*) asJointClass, 10, jointParams, &joint, NULL);
+                FREObject jointParams[] = {jointName, position, positionRelative, positionConfidence, absoluteOrientationMatrix, absoluteOrientationQuaternion, hierarchicalOrientationMatrix, hierarchicalOrientationQuaternion, orientationConfidence, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition};
+                FRENewObject( (const uint8_t*) asJointClass, 13, jointParams, &joint, NULL);
                 
 				FRESetArrayElementAt(joints, j, joint);
             }
             
-            //user position
-            FRENewObjectFromDouble(userFrame.users[i].worldX, &positionX);
-            FRENewObjectFromDouble(userFrame.users[i].worldY, &positionY);
-            FRENewObjectFromDouble(userFrame.users[i].worldZ, &positionZ);
-            FREObject positionParams[] = {positionX, positionY, positionZ};
-            FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 3, positionParams, &position, NULL);
-            
-            //user position relative
-            FRENewObjectFromDouble(userFrame.users[i].worldRelativeX, &positionRelativeX);
-            FRENewObjectFromDouble(userFrame.users[i].worldRelativeY, &positionRelativeY);
-            FRENewObjectFromDouble(userFrame.users[i].worldRelativeZ, &positionRelativeZ);
-            FREObject positionRelativeParams[] = {positionRelativeX, positionRelativeY, positionRelativeZ};
-            FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 3, positionRelativeParams, &positionRelative, NULL);
-            
-            //user rgb position
-            FRENewObjectFromInt32(userFrame.users[i].rgbX, &rgbPositionX);
-            FRENewObjectFromInt32(userFrame.users[i].rgbY, &rgbPositionY);
-            FREObject rgbPositionParams[] = {rgbPositionX, rgbPositionY};
-            FRENewObject( (const uint8_t*) "flash.geom.Point", 2, rgbPositionParams, &rgbPosition, NULL);
-            //user rgb relative position
-            FRENewObjectFromDouble(userFrame.users[i].rgbRelativeX, &rgbRelativePositionX);
-            FRENewObjectFromDouble(userFrame.users[i].rgbRelativeY, &rgbRelativePositionY);
-            FREObject rgbRelativePositionParams[] = {rgbRelativePositionX, rgbRelativePositionY};
-            FRENewObject( (const uint8_t*) "flash.geom.Point", 2, rgbRelativePositionParams, &rgbRelativePosition, NULL);
-            //user depth position
-            FRENewObjectFromInt32(userFrame.users[i].depthX, &depthPositionX);
-            FRENewObjectFromInt32(userFrame.users[i].depthY, &depthPositionY);
-            FREObject depthPositionParams[] = {depthPositionX, depthPositionY};
-            FRENewObject( (const uint8_t*) "flash.geom.Point", 2, depthPositionParams, &depthPosition, NULL);
-            //user depth relative position
-            FRENewObjectFromDouble(userFrame.users[i].depthRelativeX, &depthRelativePositionX);
-            FRENewObjectFromDouble(userFrame.users[i].depthRelativeY, &depthRelativePositionY);
-            FREObject depthRelativePositionParams[] = {depthRelativePositionX, depthRelativePositionY};
-            FRENewObject( (const uint8_t*) "flash.geom.Point", 2, depthRelativePositionParams, &depthRelativePosition, NULL);
+			position = createFREVector3D(userFrame.users[i].worldX, userFrame.users[i].worldY, userFrame.users[i].worldZ, 0.0);
+			positionRelative = createFREVector3D(userFrame.users[i].worldRelativeX, userFrame.users[i].worldRelativeY, userFrame.users[i].worldRelativeZ, 0.0);
+            rgbPosition = createFREPoint(userFrame.users[i].rgbX, userFrame.users[i].rgbY);
+			rgbRelativePosition = createFREPoint(userFrame.users[i].rgbRelativeX, userFrame.users[i].rgbRelativeY);
+			depthPosition = createFREPoint(userFrame.users[i].depthX, userFrame.users[i].depthY);
+			depthRelativePosition = createFREPoint(userFrame.users[i].depthRelativeX, userFrame.users[i].depthRelativeY);
             
             FRENewObjectFromUTF8(strlen(capabilities.framework), (const uint8_t*) capabilities.framework, &userType);
             FRENewObjectFromUint32(userFrame.users[i].userID, &userID);
@@ -273,6 +217,113 @@ FREObject KinectDevice::freGetUserFrame(FREObject argv[])
     
     return freUserFrame;
 }
+
+FREObject KinectDevice::createFREPoint(double x, double y)
+{
+	FREObject point;
+	FREObject freX, freY;
+	FRENewObjectFromDouble(x, &freX);
+    FRENewObjectFromDouble(y, &freY);
+    FREObject pointParams[] = {freX, freY};
+    FRENewObject( (const uint8_t*) "flash.geom.Point", 2, pointParams, &point, NULL);
+	return point;
+}
+
+FREObject KinectDevice::createFREVector3DFromKinectRotationQuaternion(kinectRotationQuaternion q)
+{
+	return createFREVector3D(q.x, q.y, q.z, q.w);
+}
+
+FREObject KinectDevice::createFREVector3D(double x, double y, double z, double w)
+{
+	FREObject vector;
+	FREObject freX, freY, freZ, freW;
+	FRENewObjectFromDouble(x, &freX);
+	FRENewObjectFromDouble(y, &freY);
+	FRENewObjectFromDouble(z, &freZ);
+	FRENewObjectFromDouble(w, &freW);
+    FREObject vectorParams[] = {freX, freY, freZ, freW};
+    FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 4, vectorParams, &vector, NULL);
+	return vector;
+}
+
+FREObject KinectDevice::createFREMatrix3DFromKinectRotationMatrix(kinectRotationMatrix m)
+{
+	return createFREMatrix3D(
+		m.M11,
+		m.M12,
+		m.M13,
+		m.M14,
+		m.M21,
+		m.M22,
+		m.M23,
+		m.M24,
+		m.M31,
+		m.M32,
+		m.M33,
+		m.M34,
+		m.M41,
+		m.M42,
+		m.M43,
+		m.M44);
+}
+
+FREObject KinectDevice::createFREMatrix3D(double m11, double m12, double m13, double m14, double m21, double m22, double m23, double m24, double m31, double m32, double m33, double m34, double m41, double m42, double m43, double m44)
+{
+	FREObject freM11, freM12, freM13, freM14;
+	FRENewObjectFromDouble(m11, &freM11);
+	FRENewObjectFromDouble(m12, &freM12);
+	FRENewObjectFromDouble(m13, &freM13);
+	FRENewObjectFromDouble(m14, &freM14);
+
+	FREObject freM21, freM22, freM23, freM24;
+	FRENewObjectFromDouble(m21, &freM21);
+	FRENewObjectFromDouble(m22, &freM22);
+	FRENewObjectFromDouble(m23, &freM23);
+	FRENewObjectFromDouble(m24, &freM24);
+
+	FREObject freM31, freM32, freM33, freM34;
+	FRENewObjectFromDouble(m31, &freM31);
+	FRENewObjectFromDouble(m32, &freM32);
+	FRENewObjectFromDouble(m33, &freM33);
+	FRENewObjectFromDouble(m34, &freM34);
+
+	FREObject freM41, freM42, freM43, freM44;
+	FRENewObjectFromDouble(m41, &freM41);
+	FRENewObjectFromDouble(m42, &freM42);
+	FRENewObjectFromDouble(m43, &freM43);
+	FRENewObjectFromDouble(m44, &freM44);
+
+	FREObject freMatrixNumbers;
+	FRENewObject( (const uint8_t*) "Vector.<Number>", 0, NULL, &freMatrixNumbers, NULL);
+
+	FRESetArrayElementAt(freMatrixNumbers, 0, freM11);
+	FRESetArrayElementAt(freMatrixNumbers, 1, freM12);
+	FRESetArrayElementAt(freMatrixNumbers, 2, freM13);
+	FRESetArrayElementAt(freMatrixNumbers, 3, freM14);
+
+	FRESetArrayElementAt(freMatrixNumbers, 4, freM21);
+	FRESetArrayElementAt(freMatrixNumbers, 5, freM22);
+	FRESetArrayElementAt(freMatrixNumbers, 6, freM23);
+	FRESetArrayElementAt(freMatrixNumbers, 7, freM24);
+
+	FRESetArrayElementAt(freMatrixNumbers, 8, freM31);
+	FRESetArrayElementAt(freMatrixNumbers, 9, freM32);
+	FRESetArrayElementAt(freMatrixNumbers, 10, freM33);
+	FRESetArrayElementAt(freMatrixNumbers, 11, freM34);
+
+	FRESetArrayElementAt(freMatrixNumbers, 12, freM41);
+	FRESetArrayElementAt(freMatrixNumbers, 13, freM42);
+	FRESetArrayElementAt(freMatrixNumbers, 14, freM43);
+	FRESetArrayElementAt(freMatrixNumbers, 15, freM44);
+
+	FREObject matrix;
+	FREObject matrixParams[] = {freMatrixNumbers};
+    FRENewObject( (const uint8_t*) "flash.geom.Matrix3D", 1, matrixParams, &matrix, NULL);
+
+	return matrix;
+}
+
 FREObject KinectDevice::freGetSkeletonJointNameIndices(FREObject argv[])
 {
 	FREObject skeletonJointNameIndices, jointIndex;

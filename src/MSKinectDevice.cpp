@@ -15,7 +15,7 @@ MSKinectDevice::MSKinectDevice(int nr)
 	capabilities.hasDepthUserSupport					= true;
 	capabilities.hasInfraredSupport						= false;
 	capabilities.hasJointOrientationConfidenceSupport	= false;
-	capabilities.hasJointOrientationSupport				= false;
+	capabilities.hasJointOrientationSupport				= true;
 	capabilities.hasMultipleSensorSupport				= true;
 	capabilities.hasPointCloudRegionSupport				= true;
 	capabilities.hasPointCloudSupport					= true;
@@ -882,30 +882,30 @@ void MSKinectDevice::userFrameHandler()
 
 			//Joint Position Calculations
 			if (userFrame.users[i].hasSkeleton){
-				addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_HIP_CENTER, boneOrientations, NUI_SKELETON_POSITION_SPINE, 0);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_SPINE, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER, 1);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_SHOULDER_CENTER, boneOrientations, NUI_SKELETON_POSITION_HEAD, 2);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_HEAD, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 3);//NUI_SKELETON_POSITION_HIP_CENTER -> no orientation
+				addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 0);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SPINE, 1);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER, 2);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HEAD, 3);
                 
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_SHOULDER_LEFT, boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT, 4);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_ELBOW_LEFT, boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT, 5);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_WRIST_LEFT, boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT, 6);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_HAND_LEFT, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 7);//NUI_SKELETON_POSITION_HIP_CENTER -> no orientation
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_LEFT, 4);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT, 5);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT, 6);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT, 7);
                 
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_SHOULDER_RIGHT, boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT, 8);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_ELBOW_RIGHT, boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT, 9);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_WRIST_RIGHT, boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT, 10);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_HAND_RIGHT, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 11); //NUI_SKELETON_POSITION_HIP_CENTER -> no orientation
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_RIGHT, 8);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT, 9);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT, 10);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT, 11);
                 
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_HIP_LEFT, boneOrientations, NUI_SKELETON_POSITION_KNEE_LEFT, 12);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_KNEE_LEFT, boneOrientations, NUI_SKELETON_POSITION_ANKLE_LEFT, 13);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_ANKLE_LEFT, boneOrientations, NUI_SKELETON_POSITION_FOOT_LEFT, 14);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_FOOT_LEFT, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 15); //NUI_SKELETON_POSITION_HIP_CENTER -> no orientation
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_LEFT, 12);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_LEFT, 13);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_LEFT, 14);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_LEFT, 15);
                 
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_HIP_RIGHT, boneOrientations, NUI_SKELETON_POSITION_KNEE_RIGHT, 16);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_KNEE_RIGHT, boneOrientations, NUI_SKELETON_POSITION_ANKLE_RIGHT, 17);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_ANKLE_RIGHT, boneOrientations, NUI_SKELETON_POSITION_FOOT_RIGHT, 18);
-                addJointElement(userFrame.users[i], skeletonData, NUI_SKELETON_POSITION_FOOT_RIGHT, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 19); //NUI_SKELETON_POSITION_HIP_CENTER -> no orientation
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_RIGHT, 16);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_RIGHT, 17);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_RIGHT, 18);
+                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_RIGHT, 19);
 			}
 
 			//cleanup
@@ -960,7 +960,7 @@ void MSKinectDevice::calculateKinectTransform(kinectTransform &kTransform, Vecto
 }
 
 
-void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, NUI_SKELETON_POSITION_INDEX eJoint, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eRotationJoint, uint32_t targetIndex)
+void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint, uint32_t targetIndex)
 {
     float jointPositionConfidence;
     
@@ -974,10 +974,60 @@ void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, 
     //Unknown in MSSDK Will need to be calculated
     kUser.joints[targetIndex].orientationConfidence = 0;
 
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M11 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M11;
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M12 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M12;
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M13 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M13;
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M14 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M14;
+
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M21 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M21;
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M22 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M22;
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M23 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M23;
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M24 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M24;
+
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M31 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M31;
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M32 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M32;
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M33 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M33;
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M34 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M34;
+
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M41 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M41;
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M42 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M42;
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M43 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M43;
+	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M44 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M44;
+
+	kUser.joints[targetIndex].absoluteOrientation.rotationQuaternion.x = boneOrientations[eJoint].absoluteRotation.rotationQuaternion.x;
+	kUser.joints[targetIndex].absoluteOrientation.rotationQuaternion.y = boneOrientations[eJoint].absoluteRotation.rotationQuaternion.y;
+	kUser.joints[targetIndex].absoluteOrientation.rotationQuaternion.z = boneOrientations[eJoint].absoluteRotation.rotationQuaternion.z;
+	kUser.joints[targetIndex].absoluteOrientation.rotationQuaternion.w = boneOrientations[eJoint].absoluteRotation.rotationQuaternion.w;
+
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M11 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M11;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M12 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M12;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M13 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M13;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M14 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M14;
+
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M21 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M21;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M22 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M22;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M23 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M23;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M24 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M24;
+
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M31 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M31;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M32 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M32;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M33 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M33;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M34 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M34;
+
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M41 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M41;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M42 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M42;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M43 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M43;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M44 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M44;
+
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationQuaternion.x = boneOrientations[eJoint].hierarchicalRotation.rotationQuaternion.x;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationQuaternion.y = boneOrientations[eJoint].hierarchicalRotation.rotationQuaternion.y;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationQuaternion.z = boneOrientations[eJoint].hierarchicalRotation.rotationQuaternion.z;
+	kUser.joints[targetIndex].hierarchicalOrientation.rotationQuaternion.w = boneOrientations[eJoint].hierarchicalRotation.rotationQuaternion.w;
+
 	//MSSDK - TODO: make it complient to openni coordinate system
-	kUser.joints[targetIndex].orientationX = atan2f(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M32, boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M33);
-    kUser.joints[targetIndex].orientationY = -asinf(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M31);
-    kUser.joints[targetIndex].orientationZ = atan2f(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M21, boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M11);
+	//kUser.joints[targetIndex].orientationX = atan2f(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M32, boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M33);
+    //kUser.joints[targetIndex].orientationY = -asinf(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M31);
+    //kUser.joints[targetIndex].orientationZ = atan2f(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M21, boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M11);
 
 	//Quaternion -> Euler
 	/*

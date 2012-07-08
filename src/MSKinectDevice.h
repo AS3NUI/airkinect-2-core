@@ -43,7 +43,7 @@ private:
 	static void CALLBACK	statusProcThunk( HRESULT hrStatus, const OLECHAR* instanceName, const OLECHAR* uniqueDeviceName, void * pUserData);
 	void					dispatchError(HRESULT hr);
 
-	void					addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, NUI_SKELETON_POSITION_INDEX eJoint, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eRotationJoint, uint32_t targetIndex);
+	void					addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint, uint32_t targetIndex);
 	void					calculateKinectTransform(kinectTransform &kTransform, Vector4 skeletonTransform);
 
 	int						imageFrameTimeout;
