@@ -29,8 +29,6 @@ extern "C"
     FREObject Kinect_setUserEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_setSkeletonMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_setSkeletonEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
-    FREObject Kinect_getSkeletonJointNameIndices(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
-    FREObject Kinect_getSkeletonJointNames(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_getUserFrame(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_setUserMaskMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_setUserMaskEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
@@ -40,7 +38,8 @@ extern "C"
     FREObject Kinect_setDepthEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_getDepthFrame(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_setDepthShowUserColors(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
-	FREObject Kinect_setDepthEnableNearMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
+
+	FREObject Kinect_setNearModeEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     
     FREObject Kinect_setRGBMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_setRGBEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);

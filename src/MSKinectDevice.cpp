@@ -25,6 +25,7 @@ MSKinectDevice::MSKinectDevice(int nr)
 	capabilities.hasAdvancedJointSupport				= true;
 	capabilities.hasUserMaskSupport						= true;
 	capabilities.hasNearModeSupport						= true;
+	capabilities.hasSeatedSkeletonSupport				= true;
 
 	capabilities.maxSensors								= 4;
 	capabilities.framework								= "mssdk";
@@ -33,8 +34,10 @@ MSKinectDevice::MSKinectDevice(int nr)
 	asJointClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSSkeletonJoint";
 	asUserClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSUser";
 	asUserFrameClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSUserFrame";
-	numJoints = NUI_SKELETON_POSITION_COUNT;
+	
 	maxSkeletons = NUI_SKELETON_COUNT;
+	
+	numJoints = NUI_SKELETON_POSITION_COUNT;
 	jointNames = new char*[numJoints];
 	jointNames[0] = "waist";
 	jointNames[1] = "torso";
@@ -158,7 +161,30 @@ void MSKinectDevice::setDefaults()
 // Start FRE Function
 //-------------------
 
-// ----------------------- USER MASK ------------------------
+FREObject MSKinectDevice::freSetSkeletonMode(FREObject argv[]) {
+	KinectDevice::freSetSkeletonMode(argv);
+
+	unsigned int seatedSkeletonEnabled; FREGetObjectAsBool(argv[2], &seatedSkeletonEnabled);
+	bool newSeatedSkeletonEnabled = (seatedSkeletonEnabled != 0);
+	if(newSeatedSkeletonEnabled != asSeatedSkeletonEnabled) {
+		asSeatedSkeletonEnabled = newSeatedSkeletonEnabled;
+		if(running) {
+			lockUserMutex();
+
+			DWORD skeletonFlags = 0;
+			if(asSeatedSkeletonEnabled) skeletonFlags |= NUI_SKELETON_TRACKING_FLAG_ENABLE_SEATED_SUPPORT;
+			HRESULT hr = nuiSensor->NuiSkeletonTrackingEnable( userEvent, skeletonFlags );
+			//Failed dispatch some message
+			if ( FAILED(hr) ){
+				FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize Skeleton Tracking");
+			}
+
+			unlockUserMutex();
+		}
+	}
+
+	return NULL;
+}
 
 FREObject MSKinectDevice::freSetUserMaskMode(FREObject argv[]) {
 	KinectDevice::freSetUserMaskMode(argv);
@@ -166,15 +192,33 @@ FREObject MSKinectDevice::freSetUserMaskMode(FREObject argv[]) {
     return NULL;
 }
 
-// ----------------------- DEPTH IMAGE ------------------------
-
 FREObject MSKinectDevice::freSetDepthMode(FREObject argv[]) {
 	KinectDevice::freSetDepthMode(argv);
 	asDepthResolution = getResolutionFrom(asDepthWidth, asDepthHeight);
     return NULL;
 }
 
-// ----------------------- RGB IMAGE ------------------------
+FREObject MSKinectDevice::freSetNearModeEnabled(FREObject argv[])
+{
+	bool previousValue = asNearModeEnabled;
+	KinectDevice::freSetNearModeEnabled(argv);
+
+	if(started && previousValue != asNearModeEnabled)
+	{
+		lockDepthMutex();
+		if(asNearModeEnabled)
+		{
+			nuiSensor->NuiImageStreamSetImageFrameFlags(depthFrameHandle, NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE);
+		}
+		else
+		{
+			nuiSensor->NuiImageStreamSetImageFrameFlags(depthFrameHandle, 0);
+		}
+		unlockDepthMutex();
+	}
+
+    return NULL;
+}
 
 FREObject MSKinectDevice::freCameraElevationGetAngle(FREObject argv[])
 {
@@ -383,7 +427,10 @@ void MSKinectDevice::run()
 		userEvent	= CreateEvent( NULL, TRUE, FALSE, NULL );
 		if(asSkeletonEnabled || asUserMaskEnabled){
 			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Skeleton Tracking");
-			hr = nuiSensor->NuiSkeletonTrackingEnable( userEvent, 0 );
+
+			DWORD skeletonFlags = 0;
+			if(asSeatedSkeletonEnabled) skeletonFlags |= NUI_SKELETON_TRACKING_FLAG_ENABLE_SEATED_SUPPORT;
+			hr = nuiSensor->NuiSkeletonTrackingEnable( userEvent, skeletonFlags );
 			//Failed dispatch some message
 			if ( FAILED(hr) ){
 				FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize Skeleton Tracking");
@@ -415,8 +462,8 @@ void MSKinectDevice::run()
 			}
 
 			//near mode support?
-			if(asDepthEnableNearMode) {
-				nuiSensor->NuiImageStreamSetImageFrameFlags(depthFrameHandle, NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE | NUI_IMAGE_STREAM_FLAG_DISTINCT_OVERFLOW_DEPTH_VALUES);
+			if(asNearModeEnabled) {
+				nuiSensor->NuiImageStreamSetImageFrameFlags(depthFrameHandle, NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE);
 			}
 		
 			//Failed dispatch some message
@@ -962,17 +1009,12 @@ void MSKinectDevice::calculateKinectTransform(kinectTransform &kTransform, Vecto
 
 void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint, uint32_t targetIndex)
 {
-    float jointPositionConfidence;
-    
 	Vector4 jointPosition = user.SkeletonPositions[eJoint];
-    
-	//Unknown in MSSDK Will need to be calculated
-	//Vector4 orientation;
-   
-	//Unknown in MSSDK Will need to be calculated
-    jointPositionConfidence = 1;
-    //Unknown in MSSDK Will need to be calculated
-    kUser.joints[targetIndex].orientationConfidence = 0;
+
+	//Transform for User
+	calculateKinectTransform(kUser.joints[targetIndex], jointPosition);
+
+    kUser.joints[targetIndex].orientationConfidence = 1;
 
 	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M11 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M11;
 	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M12 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M12;
@@ -1024,33 +1066,7 @@ void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, 
 	kUser.joints[targetIndex].hierarchicalOrientation.rotationQuaternion.z = boneOrientations[eJoint].hierarchicalRotation.rotationQuaternion.z;
 	kUser.joints[targetIndex].hierarchicalOrientation.rotationQuaternion.w = boneOrientations[eJoint].hierarchicalRotation.rotationQuaternion.w;
 
-	//MSSDK - TODO: make it complient to openni coordinate system
-	//kUser.joints[targetIndex].orientationX = atan2f(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M32, boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M33);
-    //kUser.joints[targetIndex].orientationY = -asinf(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M31);
-    //kUser.joints[targetIndex].orientationZ = atan2f(boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M21, boneOrientations[eRotationJoint].absoluteRotation.rotationMatrix.M11);
-
-	//Quaternion -> Euler
-	/*
-	Vector4 euler = QuaternionToEuler(boneOrientations[eRotationJoint].absoluteRotation.rotationQuaternion);
-	kUser.joints[targetIndex].orientationX = euler.x;
-	kUser.joints[targetIndex].orientationY = euler.y;
-	kUser.joints[targetIndex].orientationZ = euler.z;
-	*/
-	/*
-	//OPENNI WAY (3x3 matrix)
-	kUser.joints[targetIndex].orientationX = atan2f(orientation.orientation.elements[7], orientation.orientation.elements[8]);
-    kUser.joints[targetIndex].orientationY = -asinf(orientation.orientation.elements[6]);
-    kUser.joints[targetIndex].orientationZ = atan2f(orientation.orientation.elements[3], orientation.orientation.elements[0]);
-	*/
-
-	//Unknown in MSSDK Will need to be calculated
-	//MSKinect SDK Does not have confidence values. 
-	//Look into use dwQualityFlag to determine if joint if off any part of the screen.
-	//possibly new value for this
     kUser.joints[targetIndex].positionConfidence = 1;
-
-	//Transform for User
-	calculateKinectTransform(kUser.joints[targetIndex], jointPosition);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -38,8 +38,6 @@ public:
     virtual FREObject           freSetSkeletonMode(FREObject argv[]);
     virtual FREObject           freSetSkeletonEnabled(FREObject argv[]);
     virtual FREObject           freGetUserFrame(FREObject argv[]);
-    virtual FREObject           freGetSkeletonJointNameIndices(FREObject argv[]);
-    virtual FREObject			freGetSkeletonJointNames(FREObject argv[]);
     virtual FREObject           freSetUserMaskMode(FREObject argv[]);
     virtual FREObject           freSetUserMaskEnabled(FREObject argv[]);
     virtual FREObject           freGetUserMaskFrame(FREObject argv[]);
@@ -47,7 +45,7 @@ public:
     virtual FREObject           freSetDepthEnabled(FREObject argv[]);
     virtual FREObject           freGetDepthFrame(FREObject argv[]);
     virtual FREObject           freSetDepthShowUserColors(FREObject argv[]);
-	virtual FREObject			freSetDepthEnableNearMode(FREObject argv[]);
+	virtual FREObject			freSetNearModeEnabled(FREObject argv[]);
     virtual FREObject           freSetRGBMode(FREObject argv[]);
     virtual FREObject           freSetRGBEnabled(FREObject argv[]);
     virtual FREObject           freGetRGBFrame(FREObject argv[]);
@@ -93,6 +91,9 @@ protected:
 	virtual void				setUserColor(int userID, int color, bool useIntensity);
 
 	virtual void				setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored);
+
+	virtual FREObject           freGetSkeletonJointNameIndices(FREObject argv[]);
+    virtual FREObject			freGetSkeletonJointNames(FREObject argv[]);
 
 	virtual FREObject			createFREPoint(double x, double y);
 	virtual FREObject			createFREVector3DFromKinectRotationQuaternion(kinectRotationQuaternion q);
@@ -141,6 +142,7 @@ protected:
 
 	bool						asSkeletonMirrored;
     bool						asSkeletonEnabled;
+	bool						asSeatedSkeletonEnabled;
 
 	bool						asUserMaskEnabled;
 	int							asUserMaskWidth;
@@ -150,11 +152,12 @@ protected:
 
 	bool						asDepthEnabled;
     bool						asDepthShowUserColors;
-	bool						asDepthEnableNearMode;
 	int							asDepthWidth;
     int							asDepthHeight;
     int							asDepthPixelCount;
     bool						asDepthMirrored;
+
+	bool						asNearModeEnabled;
 
 	bool						asRGBEnabled;
 	int							asRGBWidth;

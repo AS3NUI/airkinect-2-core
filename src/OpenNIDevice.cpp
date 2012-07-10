@@ -40,6 +40,7 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
     capabilities.hasSkeletonSupport						= true;
     capabilities.hasUserMaskSupport						= true;
     capabilities.hasNearModeSupport                     = false;
+	capabilities.hasSeatedSkeletonSupport				= false;
     
     capabilities.maxSensors								= 1;
     capabilities.framework								= "openni";

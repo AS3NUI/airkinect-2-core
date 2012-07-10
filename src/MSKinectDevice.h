@@ -25,8 +25,10 @@ public:
     void			dispose();
 
 	//Overridden FRE functions
+	FREObject           freSetSkeletonMode(FREObject argv[]);
     FREObject           freSetUserMaskMode(FREObject argv[]);
     FREObject           freSetDepthMode(FREObject argv[]);
+	FREObject			freSetNearModeEnabled(FREObject argv[]);
 	FREObject           freCameraElevationGetAngle(FREObject argv[]);
 	FREObject           freCameraElevationSetAngle(FREObject argv[]);
 

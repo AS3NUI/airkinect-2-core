@@ -79,18 +79,6 @@ extern "C"
         return kinectDeviceManager.getDevice(nr, ctx)->freSetSkeletonEnabled(argv);
     }
     
-    FREObject Kinect_getSkeletonJointNameIndices(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
-    {
-		unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
-		return kinectDeviceManager.getDevice(nr, ctx)->freGetSkeletonJointNameIndices(argv);
-    }
-    
-    FREObject Kinect_getSkeletonJointNames(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
-    {
-		unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
-		return kinectDeviceManager.getDevice(nr, ctx)->freGetSkeletonJointNames(argv);
-    }
-    
     FREObject Kinect_getUserFrame(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
         unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
@@ -139,10 +127,10 @@ extern "C"
         return kinectDeviceManager.getDevice(nr, ctx)->freSetDepthShowUserColors(argv);
     }
     
-	FREObject Kinect_setDepthEnableNearMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+	FREObject Kinect_setNearModeEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
 	{
 		unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
-        return kinectDeviceManager.getDevice(nr, ctx)->freSetDepthEnableNearMode(argv);
+        return kinectDeviceManager.getDevice(nr, ctx)->freSetNearModeEnabled(argv);
 	}
     
     FREObject Kinect_setRGBMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
@@ -237,8 +225,6 @@ extern "C"
         { (const uint8_t*) "setSkeletonMode", 0, Kinect_setSkeletonMode },
         { (const uint8_t*) "setSkeletonEnabled", 0, Kinect_setSkeletonEnabled },
         { (const uint8_t*) "getUserFrame", 0, Kinect_getUserFrame },
-        { (const uint8_t*) "getSkeletonJointNameIndices", 0, Kinect_getSkeletonJointNameIndices },
-        { (const uint8_t*) "getSkeletonJointNames", 0, Kinect_getSkeletonJointNames },
         { (const uint8_t*) "setUserMaskMode", 0, Kinect_setUserMaskMode },
         { (const uint8_t*) "setUserMaskEnabled", 0, Kinect_setUserMaskEnabled },
         { (const uint8_t*) "getUserMaskFrame", 0, Kinect_getUserMaskFrame },
@@ -246,7 +232,7 @@ extern "C"
         { (const uint8_t*) "setDepthEnabled", 0, Kinect_setDepthEnabled },
         { (const uint8_t*) "getDepthFrame", 0, Kinect_getDepthFrame },
         { (const uint8_t*) "setDepthShowUserColors", 0, Kinect_setDepthShowUserColors },
-		{ (const uint8_t*) "setDepthEnableNearMode", 0, Kinect_setDepthEnableNearMode },
+		{ (const uint8_t*) "setNearModeEnabled", 0, Kinect_setNearModeEnabled },
         { (const uint8_t*) "setRGBMode", 0, Kinect_setRGBMode },
         { (const uint8_t*) "setRGBEnabled", 0, Kinect_setRGBEnabled },
         { (const uint8_t*) "getRGBFrame", 0, Kinect_getRGBFrame },
