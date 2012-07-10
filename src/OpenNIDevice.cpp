@@ -30,8 +30,8 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
     capabilities.hasDepthCameraSupport					= true;
     capabilities.hasDepthUserSupport					= true;
     capabilities.hasInfraredSupport						= true;
-    capabilities.hasJointOrientationConfidenceSupport	= true;
-    capabilities.hasJointOrientationSupport				= true;
+    capabilities.hasJointOrientationConfidenceSupport	= false;
+    capabilities.hasJointOrientationSupport				= false;
     capabilities.hasMultipleSensorSupport				= false;
     capabilities.hasPointCloudRegionSupport				= true;
     capabilities.hasPointCloudSupport					= true;
@@ -48,37 +48,28 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
 	asJointClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNISkeletonJoint";
 	asUserClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUser";
 	asUserFrameClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUserFrame";
-	numJoints = 24;
+	numJoints = 16;
 	maxSkeletons = 15;
 	jointNames = new char*[numJoints];
 	jointNames[0] = "head";
 	jointNames[1] = "neck";
 	jointNames[2] = "torso";
-	jointNames[3] = "waist";
     
-	jointNames[4] = "left_collar";
-	jointNames[5] = "left_shoulder";
-	jointNames[6] = "left_elbow";
-	jointNames[7] = "left_wrist";
-	jointNames[8] = "left_hand";
-	jointNames[9] = "left_fingertip";
+	jointNames[3] = "left_shoulder";
+	jointNames[4] = "left_elbow";
+	jointNames[5] = "left_hand";
     
-	jointNames[10] = "right_collar";
-	jointNames[11] = "right_shoulder";
-	jointNames[12] = "right_elbow";
-	jointNames[13] = "right_wrist";
-	jointNames[14] = "right_hand";
-	jointNames[15] = "right_fingertip";
+	jointNames[6] = "right_shoulder";
+	jointNames[7] = "right_elbow";
+	jointNames[8] = "right_hand";
     
-	jointNames[16] = "left_hip";
-	jointNames[17] = "left_knee";
-	jointNames[18] = "left_ankle";
-	jointNames[19] = "left_foot";
+	jointNames[9] = "left_hip";
+	jointNames[10] = "left_knee";
+	jointNames[11] = "left_foot";
     
-	jointNames[20] = "right_hip";
-	jointNames[21] = "right_knee";
-	jointNames[22] = "right_ankle";
-	jointNames[23] = "right_foot";
+	jointNames[12] = "right_hip";
+	jointNames[13] = "right_knee";
+	jointNames[14] = "right_foot";
     
     //some sensors don't have an RGB camera (asus xtion pro)
     XnStatus rc;
@@ -1013,34 +1004,55 @@ void OpenNIDevice::userHandler()
             
             if (userFrame.users[i].hasSkeleton)
             {
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_HEAD, 0);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_NECK, 1);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_TORSO, 2);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_WAIST, 3);
+                //in openni, left/right are in screen space, rather than user space
+                //that's why we switch LEFT/RIGHT here, to match MS SDK (user space)
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_HEAD, 0, 0);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_NECK, 1, 1);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_TORSO, 2, 2);
                 
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_COLLAR, 4);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_SHOULDER, 5);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_ELBOW, 6);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_WRIST, 7);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_HAND, 8);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_FINGERTIP, 9);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_SHOULDER, 3, 3);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_ELBOW, 4, 4);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_HAND, 5, 5);
                 
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_COLLAR, 10);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_SHOULDER, 11);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_ELBOW, 12);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_WRIST, 13);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_HAND, 14);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_FINGERTIP, 15);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_SHOULDER, 6, 6);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_ELBOW, 7, 7);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_HAND, 8, 8);
                 
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_HIP, 16);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_KNEE, 17);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_ANKLE, 18);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_FOOT, 19);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_HIP, 9, 9);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_KNEE, 10, 10);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_FOOT, 11, 11);
                 
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_HIP, 20);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_KNEE, 21);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_ANKLE, 22);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_FOOT, 23);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_HIP, 12, 12);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_KNEE, 13, 13);
+                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_FOOT, 14, 14);
+                
+                //set joint orientation matrices for joints with no orientation confidence
+                for(int j = 0; j < numJoints; j++)
+                {
+                    if(userFrame.users[i].joints[j].orientationConfidence == 0.0)
+                    {
+                        //set it to the identity matrix
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M11 = 1.0;
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M12 = 0.0;
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M13 = 0.0;
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M14 = 0.0;
+                        
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M21 = 0.0;
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M22 = 1.0;
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M23 = 0.0;
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M24 = 0.0;
+                        
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M31 = 0.0;
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M32 = 0.0;
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M33 = 1.0;
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M34 = 0.0;
+                        
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M41 = 0.0;
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M42 = 0.0;
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M43 = 0.0;
+                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M44 = 1.0;
+                    }
+                }
             }
         }
         else
@@ -1051,15 +1063,12 @@ void OpenNIDevice::userHandler()
     
 }
 
-void OpenNIDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex)
+void OpenNIDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex, int targetOrientationIndex)
 {
     float jointPositionX, jointPositionY, jointPositionZ, jointW, jointPositionConfidence;
     
     XnSkeletonJointPosition jointPosition;
     userGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, eJoint, jointPosition);
-    
-    XnSkeletonJointOrientation orientation;
-    userGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, eJoint, orientation);
     
     jointPositionX = jointPosition.position.X;
     jointPositionY = jointPosition.position.Y;
@@ -1067,24 +1076,48 @@ void OpenNIDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJ
     jointW = 0;
     jointPositionConfidence = jointPosition.fConfidence;
     
-    kUser.joints[targetIndex].orientationConfidence = orientation.fConfidence;
-    
-    //kUser.joints[targetIndex].orientationX = atan2f(orientation.orientation.elements[7], orientation.orientation.elements[8]);
-    //kUser.joints[targetIndex].orientationY = -asinf(orientation.orientation.elements[6]);
-    //kUser.joints[targetIndex].orientationZ = atan2f(orientation.orientation.elements[3], orientation.orientation.elements[0]);
+    //diable joint orientation on OpenNI for now
+    if(false && targetOrientationIndex > -1)
+    {
+        XnSkeletonJointOrientation orientation;
+        userGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, eJoint, orientation);
+        
+        kUser.joints[targetOrientationIndex].orientationConfidence = orientation.fConfidence;
+        
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M11 = orientation.orientation.elements[0];
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M12 = orientation.orientation.elements[3];
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M13 = orientation.orientation.elements[6];
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M14 = 0.0;
+        
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M21 = orientation.orientation.elements[1];
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M22 = orientation.orientation.elements[4];
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M23 = orientation.orientation.elements[7];
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M24 = 0.0;
+        
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M31 = orientation.orientation.elements[2];
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M32 = orientation.orientation.elements[5];
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M33 = orientation.orientation.elements[8];
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M34 = 0.0;
+        
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M41 = 0.0;
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M42 = 0.0;
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M43 = 0.0;
+        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M44 = 1.0;
+    }
+    else
+    {
+        kUser.joints[targetOrientationIndex].orientationConfidence = 0.0;
+    }
     
     kUser.joints[targetIndex].positionConfidence = jointPositionConfidence;
 
     kUser.joints[targetIndex].worldX = jointPositionX;
-    //if(asSkeletonMirrored) skeleton.joints[targetIndex].x = .5 - skeleton.joints[targetIndex].x;
     kUser.joints[targetIndex].worldY = jointPositionY;
     kUser.joints[targetIndex].worldZ = jointPositionZ;
     
     kUser.joints[targetIndex].worldRelativeX = (depthWidth - jointPositionX) / (depthWidth * 2) - .5;
-    //if(asSkeletonMirrored) skeleton.joints[targetIndex].x = .5 - skeleton.joints[targetIndex].x;
     kUser.joints[targetIndex].worldRelativeY = -1 * (((depthHeight - jointPositionY) / (depthHeight * 2)) - .5);
     kUser.joints[targetIndex].worldRelativeZ = (jointPositionZ * 7.8125) / MAX_DEPTH;
-    
     
     //relative position / depth & rgb are aligned
     XnPoint3D pt[1];

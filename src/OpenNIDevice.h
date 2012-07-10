@@ -62,7 +62,7 @@ private:
     bool                    userCallbacksRegistered;
     
     void                    userHandler();
-    void                    addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex);
+    void                    addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex, int targetOrientationIndex);
     
     float                   depthHistogram[MAX_DEPTH];
     
