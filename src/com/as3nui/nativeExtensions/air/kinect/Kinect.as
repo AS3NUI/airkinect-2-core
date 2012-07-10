@@ -17,8 +17,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 	import com.as3nui.nativeExtensions.air.kinect.bridge.ExtensionContextBridge;
 	import com.as3nui.nativeExtensions.air.kinect.bridge.IContextBridge;
 	import com.as3nui.nativeExtensions.air.kinect.constants.DeviceState;
-	import com.as3nui.nativeExtensions.air.kinect.constants.Framework;
-	import com.as3nui.nativeExtensions.air.kinect.constants.OS;
 	import com.as3nui.nativeExtensions.air.kinect.data.DeviceCapabilities;
 	import com.as3nui.nativeExtensions.air.kinect.data.PointCloudRegion;
 	import com.as3nui.nativeExtensions.air.kinect.data.User;
@@ -30,8 +28,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 	import com.as3nui.nativeExtensions.air.kinect.events.PointCloudEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.UserEvent;
 	import com.as3nui.nativeExtensions.air.kinect.events.UserFrameEvent;
-	import com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.MSKinect;
-	import com.as3nui.nativeExtensions.air.kinect.frameworks.openni.OpenNIKinect;
+	import com.as3nui.nativeExtensions.air.kinect.manager.KinectManager;
 	import com.as3nui.nativeExtensions.air.kinect.namespaces.as3nui;
 	
 	import flash.desktop.NativeApplication;
@@ -41,8 +38,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 	import flash.events.StatusEvent;
 	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
-	import flash.utils.getDefinitionByName;
-	import flash.utils.getQualifiedClassName;
 
 	use namespace as3nui;
 
@@ -111,33 +106,21 @@ package com.as3nui.nativeExtensions.air.kinect {
 	 * @includeExample BasicCameraExample.as
 	 */
 	public class Kinect extends EventDispatcher {
-
-		/** @private */
-		protected static const USE_GET_INSTANCE:String = 'Classes extending Kinect can only be instantiated once by the getInstance method';
-		/** @private */
-		protected static const CLASS_MUST_EXTEND_DEVICE:String = 'Kinect is a base class that cannot be instantiated';
-		/** @private */
-		protected static const GET_INSTANCE_OF_CLASS_ERROR:String = 'getInstance can only be called for Classes extending Device';
-
-		/**
-		 * internal dictionary to keep class instances
-		 * @private
-		 */
-		private static var _deviceInstanceMap:Dictionary;
-		private static var _sharedBridge:IContextBridge;
-
-		private static function get sharedBridge():IContextBridge {
-			if (_sharedBridge == null) {
-				_sharedBridge = new ExtensionContextBridge(true);
-			}
-			return _sharedBridge;
+		
+		private static var _kinectManager:KinectManager;
+		
+		private static function get kinectManager():KinectManager
+		{
+			if(_kinectManager == null)
+				_kinectManager = KinectManager.getInstance();
+			return _kinectManager;
 		}
 
 		/**
 		 * Check if there is a Sensor available for use
 		 */
 		public static function isSupported():Boolean {
-			return (numDevices() > 0);
+			return kinectManager.isSupported();
 		}
 
 		/**
@@ -145,7 +128,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 * @return    Number of Sensors connected
 		 */
 		public static function numDevices():uint {
-			return sharedBridge.getDeviceCount();
+			return kinectManager.numDevices();
 		}
 
 		/**
@@ -156,12 +139,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 * @return
 		 */
 		public static function getDeviceByClass(deviceClass:Class, nr:uint = 0):Kinect {
-			if (_deviceInstanceMap == null) _deviceInstanceMap = new Dictionary();
-			if (_deviceInstanceMap[deviceClass] == null)  _deviceInstanceMap[deviceClass] = new Dictionary();
-			if (_deviceInstanceMap[deviceClass][nr] == null) {
-				_deviceInstanceMap[deviceClass][nr] = new deviceClass(nr);
-			}
-			return _deviceInstanceMap[deviceClass][nr];
+			return kinectManager.getDeviceByClass(deviceClass, nr);
 		}
 
 		/**
@@ -172,8 +150,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 * @return
 		 */
 		public static function getDeviceByFramework(framework:String, nr:uint = 0):Kinect {
-			var deviceClass:Class = Framework.MSSDK ? MSKinect : OpenNIKinect;
-			return getDeviceByClass(deviceClass, nr);
+			return kinectManager.getDeviceByFramework(framework, nr);
 		}
 
 		/**
@@ -183,8 +160,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 * @return
 		 */
 		public static function getDevice(nr:uint = 0):Kinect {
-			var deviceClass:Class = OS.isWindows() ? MSKinect : OpenNIKinect;
-			return getDeviceByClass(deviceClass, nr);
+			return kinectManager.getDevice(nr);
 		}
 
 		/** @private */
@@ -285,18 +261,13 @@ package com.as3nui.nativeExtensions.air.kinect {
 		protected var _skeletonJointNames:Vector.<String>;
 		/** @private */
 		protected var userMaskByteArrays:Vector.<ByteArray>;
-		
-		//static intialization of the shared context
-		//parameter lets you specify which framework to use on windows
-		//0: auto, 1: mssdk, 2: openni
-		//will be used as soon as we figure out how to prevent ane from crashing when driver requirements are not met
-		private static var applicationStarted:* = sharedBridge.applicationStartup(0);
 
 		/**
 		 * Private constructor of the Device class. Use Device.getDevice() instead of calling this method.
 		 * @private
 		 */
-		public function Kinect(nr:uint) {
+		public function Kinect(nr:uint) 
+		{
 			_nr = nr;
 			_state = DeviceState.STOPPED;
 			
@@ -357,24 +328,12 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 */
 		public function dispose():void {
 			stop();
-			var className:String = getQualifiedClassName(this);
-			if(className != null)
-			{
-				try
-				{
-					var managementClass:Class = getDefinitionByName(className) as Class;
-					if(_deviceInstanceMap[managementClass] != null && _deviceInstanceMap[managementClass][_nr] != null)
-						delete _deviceInstanceMap[managementClass][_nr];
-				}
-				catch(error:Error)
-				{
-				}
-			}
+			kinectManager.disposeDevice(this);
 		}
 
 		private function exitingHandler(event:Event):void {
 			dispose();
-			sharedBridge.applicationShutdown();
+			kinectManager.applicationShutdown();
 		}
 
 		/** @private */

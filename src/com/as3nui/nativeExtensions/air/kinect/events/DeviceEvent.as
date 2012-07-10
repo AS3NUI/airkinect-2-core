@@ -20,6 +20,8 @@ package com.as3nui.nativeExtensions.air.kinect.events
 	public class DeviceEvent extends Event
 	{
 		
+		public static const CONNECTED:String = "connected";
+		public static const DISCONNECTED:String = "disconnected";
 		public static const STARTED:String = "started";
 		public static const STOPPED:String = "stopped";
 		
