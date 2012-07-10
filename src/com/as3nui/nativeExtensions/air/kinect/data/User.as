@@ -50,22 +50,12 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		/**
 		 * Current user User ID
 		 */
-		private var _userID:uint;
-		
-		public function get userID():uint
-		{
-			return _userID;
-		}
+		public var userID:uint;
 
 		/**
 		 * Current user Tracking ID
 		 */
-		private var _trackingID:uint;
-
-		public function get trackingID():uint
-		{
-			return _trackingID;
-		}
+		public var trackingID:uint;
 		
 		/**
 		 * Position of the user in world coordinates
@@ -100,21 +90,38 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		/**
 		 * Does this user have a calibrated skeleton or not?
 		 */
-		private var _hasSkeleton:Boolean;
-		
-		public function get hasSkeleton():Boolean
-		{
-			return _hasSkeleton;
-		}
+		public var hasSkeleton:Boolean;
 		
 		/**
 		 * Collection of Skeleton joints
 		 */
-		private var _skeletonJoints:Vector.<SkeletonJoint>;
+		public var skeletonJoints:Vector.<SkeletonJoint>;
 		
-		public function get skeletonJoints():Vector.<SkeletonJoint>
+		/**
+		 * Framework used to generate this skeleton
+		 * @see com.as3nui.nativeExtensions.air.kinect.constants.Framework for possible options
+		 */ 
+		public var framework:String;
+		
+		/**
+		 * User Mask Bitmapdata
+		 */ 
+		public var userMaskData:BitmapData;
+		
+		/**
+		 * Dictionary of skeleton joint names, mapping to index in the skeleton joints vector
+		 * 
+		 * @private
+		 */ 
+		public var skeletonJointNameIndices:Dictionary;
+		
+		/**
+		 * List of all skeleton joint names for this user
+		 */ 
+		public var skeletonJointNames:Vector.<String>;
+		
+		public function User()
 		{
-			return _skeletonJoints;
 		}
 		
 		public function get head():SkeletonJoint { return getJointByName(SkeletonJoint.HEAD); }
@@ -138,67 +145,12 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		public function get rightFoot():SkeletonJoint { return getJointByName(SkeletonJoint.RIGHT_FOOT); }
 		
 		/**
-		 * Framework used to generate this skeleton
-		 * @see com.as3nui.nativeExtensions.air.kinect.constants.Framework for possible options
-		 */ 
-		private var _framework:String;
-		
-		public function get framework():String
-		{
-			return _framework;
-		}
-		
-		/**
-		 * User Mask Bitmapdata
-		 */ 
-		public var userMaskData:BitmapData;
-		
-		/**
-		 * Dictionary of skeleton joint names, mapping to index in the skeleton joints vector
-		 * This is set by the usergenerator, and is used to get a joint by it's name
-		 * 
-		 * @private
-		 */ 
-		as3nui var skeletonJointNameIndices:Dictionary;
-		
-		/**
-		 * Vector of skeleton joint names.
-		 * This is set by the usergenerator
-		 * 
-		 * @private
-		 */ 
-		as3nui var _skeletonJointNames:Vector.<String>;
-		
-		/**
-		 * Get a list of all skeleton joint names for this user
-		 */ 
-		public function get skeletonJointNames():Vector.<String>
-		{
-			return (as3nui::_skeletonJointNames != null) ? as3nui::_skeletonJointNames.concat() : null;
-		}
-		
-		public function User(framework:String, userID:uint, trackingID:uint,  position:Vector3D, positionRelative:Vector3D, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point, hasSkeleton:Boolean, skeletonJoints:Vector.<SkeletonJoint>)
-		{
-			_framework = framework;
-			_userID = userID;
-			_trackingID = trackingID;
-			this.position = position;
-			this.positionRelative = positionRelative;
-			this.rgbPosition = rgbPosition;
-			this.rgbRelativePosition = rgbRelativePosition;
-			this.depthPosition = depthPosition;
-			this.depthRelativePosition = depthRelativePosition;
-			_hasSkeleton = hasSkeleton;
-			_skeletonJoints = skeletonJoints;
-		}
-		
-		/**
 		 * Get a joint by it's name
 		 * @see com.as3nui.nativeExtensions.air.kinect.constants.JointNames for the basic options
 		 */ 
 		public function getJointByName(jointName:String):SkeletonJoint
 		{
-			return _skeletonJoints[as3nui::skeletonJointNameIndices[jointName]];
+			return skeletonJoints[skeletonJointNameIndices[jointName]];
 		}
 		
 		/**
@@ -206,36 +158,19 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 */ 
 		public function copyFrom(otherUser:User):void
 		{
-			_framework = otherUser.framework;
-			_userID = otherUser.userID;
+			framework = otherUser.framework;
+			userID = otherUser.userID;
 			position.copyFrom(otherUser.position);
 			positionRelative.copyFrom(otherUser.positionRelative);
 			rgbPosition.copyFrom(otherUser.rgbPosition);
 			rgbRelativePosition.copyFrom(otherUser.rgbRelativePosition);
 			depthPosition.copyFrom(otherUser.depthPosition);
 			depthRelativePosition.copyFrom(otherUser.depthRelativePosition);
-			_hasSkeleton = otherUser.hasSkeleton;
+			hasSkeleton = otherUser.hasSkeleton;
 			for(var i:uint = 0; i < otherUser.skeletonJoints.length; i++)
 			{
-				_skeletonJoints[i].copyFrom(otherUser.skeletonJoints[i]);
+				skeletonJoints[i].copyFrom(otherUser.skeletonJoints[i]);
 			}
-		}
-
-		public function toJSON(s:String):* {
-			var jsonObject:Object = {
-				framework:_framework,
-				userID:_userID,
-				trackingID: _trackingID,
-				position:position,
-				positionRelative:positionRelative,
-				rgbPosition:rgbPosition,
-				rgbRelativePosition:rgbRelativePosition,
-				depthPosition:depthPosition,
-				depthRelativePosition:depthRelativePosition,
-				hasSkeleton:hasSkeleton,
-				skeletonJoints:_skeletonJoints
-			};
-			return jsonObject;
 		}
 	}
 }

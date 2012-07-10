@@ -24,16 +24,14 @@ package com.as3nui.nativeExtensions.air.kinect.bridge
 		function setDepthEnabled(nr:uint, enabled:Boolean):void;
 		function setDepthMode(nr:uint, width:uint, height:uint, mirrored:Boolean):void;
 		function setDepthShowUserColors(nr:uint, showUserColors:Boolean):void;
-		function setDepthEnableNearMode(nr:uint, enableNearMode:Boolean):void;
+		function setNearModeEnabled(nr:uint, enableNearMode:Boolean):void;
 		function setPointcloudEnabled(nr:uint, enabled:Boolean):void;
 		function setPointcloudMode(nr:uint, width:uint, height:uint, mirrored:Boolean, density:uint, includeRgb:Boolean):void;
 		function setPointCloudRegions(nr:uint, pointCloudRegions:Vector.<PointCloudRegion>):void;
-		function getSkeletonJointNameIndices(nr:uint):Dictionary;
-		function getSkeletonJointNames(nr:uint):Vector.<String>;
 		function setUserEnabled(nr:uint, enabled:Boolean):void;
 		function setUserMode(nr:uint, mirrored:Boolean):void;
 		function setSkeletonEnabled(nr:uint, enabled:Boolean):void;
-		function setSkeletonMode(nr:uint, mirrored:Boolean):void;
+		function setSkeletonMode(nr:uint, mirrored:Boolean, seatedSkeletonEnabled:Boolean):void;
 		function setUserMaskEnabled(nr:uint, enabled:Boolean):void;
 		function setUserMaskMode(nr:uint, width:uint, height:uint, mirrored:Boolean):void;
 		function getDepthFrame(nr:uint, imageBytes:ByteArray):void;

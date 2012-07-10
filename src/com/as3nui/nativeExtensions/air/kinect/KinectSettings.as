@@ -15,8 +15,9 @@ package com.as3nui.nativeExtensions.air.kinect {
 		private var _depthEnabled:Boolean 					= false;
 		private var _depthResolution:Point 					= CameraResolution.RESOLUTION_320_240;
 		private var _depthShowUserColors:Boolean 			= false;
-		private var _depthEnableNearMode:Boolean			= false;
 		private var _depthMirrored:Boolean 					= true;
+		
+		private var _nearModeEnabled:Boolean				= false;
 
 		private var _rgbEnabled:Boolean 					= false;
 		private var _rgbResolution:Point 					= CameraResolution.RESOLUTION_640_480;
@@ -26,6 +27,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		private var _userMirrored:Boolean 					= true;
 		private var _skeletonEnabled:Boolean 				= false;
 		private var _skeletonMirrored:Boolean 				= true;
+		private var _seatedSkeletonEnabled:Boolean			= false;
 
 		private var _pointCloudEnabled:Boolean				= false;
 		private var _pointCloudResolution:Point				= CameraResolution.RESOLUTION_320_240;
@@ -46,7 +48,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 			_depthEnabled = otherKinectSettings.depthEnabled;
 			_depthResolution.copyFrom(otherKinectSettings.depthResolution);
 			_depthShowUserColors = otherKinectSettings.depthShowUserColors;
-			_depthEnableNearMode = otherKinectSettings.depthEnableNearMode;
+			_nearModeEnabled = otherKinectSettings.nearModeEnabled;
 			_depthMirrored = otherKinectSettings.depthMirrored;
 			
 			_rgbEnabled = otherKinectSettings.rgbEnabled;
@@ -57,6 +59,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 			_userMirrored = otherKinectSettings.userMirrored;
 			_skeletonEnabled = otherKinectSettings.skeletonEnabled;
 			_skeletonMirrored = otherKinectSettings.skeletonMirrored;
+			_seatedSkeletonEnabled = otherKinectSettings.seatedSkeletonEnabled;
 			
 			_pointCloudEnabled = otherKinectSettings.pointCloudEnabled;
 			_pointCloudResolution.copyFrom(otherKinectSettings.pointCloudResolution);
@@ -117,12 +120,12 @@ package com.as3nui.nativeExtensions.air.kinect {
 			_depthShowUserColors = value;
 		}
 		
-		public function get depthEnableNearMode():Boolean {
-			return _depthEnableNearMode;
+		public function get nearModeEnabled():Boolean {
+			return _nearModeEnabled;
 		}
 		
-		public function set depthEnableNearMode(value:Boolean):void {
-			_depthEnableNearMode = value;
+		public function set nearModeEnabled(value:Boolean):void {
+			_nearModeEnabled = value;
 		}
 
 		public function get depthMirrored():Boolean {
@@ -187,6 +190,14 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 		public function set skeletonMirrored(value:Boolean):void {
 			_skeletonMirrored = value;
+		}
+		
+		public function get seatedSkeletonEnabled():Boolean {
+			return _seatedSkeletonEnabled;
+		}
+		
+		public function set seatedSkeletonEnabled(value:Boolean):void {
+			_seatedSkeletonEnabled = value;
 		}
 
 		public function get pointCloudEnabled():Boolean {

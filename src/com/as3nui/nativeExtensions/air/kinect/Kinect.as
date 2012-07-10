@@ -256,10 +256,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 		/** @private */
 		protected var usersWithSkeletonByTrackingId:Dictionary;
 		/** @private */
-		protected var _skeletonJointNameIndices:Dictionary;
-		/** @private */
-		protected var _skeletonJointNames:Vector.<String>;
-		/** @private */
 		protected var userMaskByteArrays:Vector.<ByteArray>;
 
 		/**
@@ -398,7 +394,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 			contextBridge.setDepthEnabled(_nr, _settings.depthEnabled);
 			contextBridge.setDepthMode(_nr, _settings.depthResolution.x, _settings.depthResolution.y, _settings.depthMirrored);
 			contextBridge.setDepthShowUserColors(_nr, _settings.depthShowUserColors);
-			contextBridge.setDepthEnableNearMode(_nr, _settings.depthEnableNearMode);
+			contextBridge.setNearModeEnabled(_nr, _settings.nearModeEnabled);
 		}
 
 		/** @private */
@@ -448,9 +444,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 				usersByTrackingId = new Dictionary();
 				_usersWithSkeleton = new Vector.<User>();
 				usersWithSkeletonByTrackingId = new Dictionary();
-				
-				_skeletonJointNameIndices = contextBridge.getSkeletonJointNameIndices(_nr);
-				_skeletonJointNames = contextBridge.getSkeletonJointNames(_nr);
 			}
 			applyUserSettings()
 		}
@@ -459,7 +452,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 			contextBridge.setUserEnabled(_nr, _settings.userEnabled);
 			contextBridge.setUserMode(_nr, _settings.userMirrored);
 			contextBridge.setSkeletonEnabled(_nr, _settings.skeletonEnabled);
-			contextBridge.setSkeletonMode(_nr, _settings.skeletonMirrored);
+			contextBridge.setSkeletonMode(_nr, _settings.skeletonMirrored, _settings.seatedSkeletonEnabled);
 		}
 		/** @private */
 		private function disposeUserSettings():void {
@@ -501,6 +494,19 @@ package com.as3nui.nativeExtensions.air.kinect {
 		public function setSkeletonMirror(value:Boolean):void {
 			_settings.skeletonMirrored = value;
 			applyUserSettings();
+		}
+		
+		/**
+		 * Change the seated skeleton mode while the device is running
+		 */ 
+		public function setSeatedSkeletonEnabled(value:Boolean):void {
+			_settings.seatedSkeletonEnabled = value;
+			applyUserSettings();
+		}
+		
+		public function setNearModeEnabled(value:Boolean):void {
+			_settings.nearModeEnabled = value;
+			contextBridge.setNearModeEnabled(_nr, _settings.nearModeEnabled);
 		}
 
 		/**
@@ -692,7 +698,14 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 			//which users should we remove?
 			var removedUsers:Vector.<User> = getUsersToRemoveAndRemoveFromDictionary(userFrame.users, _users, usersByTrackingId);
-			var removedUsersWithSkeleton:Vector.<User> = getUsersToRemoveAndRemoveFromDictionary(userFrame.usersWithSkeleton, _usersWithSkeleton, usersWithSkeletonByTrackingId);
+			
+			var calculatedUsersWithSkeleton:Vector.<User> = new Vector.<User>();
+			for each(user in userFrame.users){
+				if(user.hasSkeleton)
+					calculatedUsersWithSkeleton.push(user);
+			}
+			
+			var removedUsersWithSkeleton:Vector.<User> = getUsersToRemoveAndRemoveFromDictionary(calculatedUsersWithSkeleton, _usersWithSkeleton, usersWithSkeletonByTrackingId);
 			var addedUsers:Vector.<User> = new Vector.<User>();
 			var addedUsersWithSkeleton:Vector.<User> = new Vector.<User>();
 			var currentUsers:Vector.<User> = new Vector.<User>();
@@ -708,8 +721,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 					addedUsers.push(user);
 				}
 
-				user.as3nui::skeletonJointNameIndices = _skeletonJointNameIndices;
-				user.as3nui::_skeletonJointNames = _skeletonJointNames;
 				currentUsers.push(user);
 				if (user.hasSkeleton) {
 					currentUsersWithSkeleton.push(user);
@@ -761,7 +772,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 			return removedUsers;
 		}
 
-
 		/**
 		 * Get a list of all users
 		 */
@@ -774,14 +784,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 */
 		public function get usersWithSkeleton():Vector.<User> {
 			return _usersWithSkeleton;
-		}
-		
-		/**
-		 * Get a list of the supported skeleton joint names
-		 */ 
-		public function get skeletonJointNames():Vector.<String>
-		{
-			return _skeletonJointNames;
 		}
 	}
 }

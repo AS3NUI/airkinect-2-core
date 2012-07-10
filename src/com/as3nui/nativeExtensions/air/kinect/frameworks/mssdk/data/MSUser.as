@@ -8,9 +8,10 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data
 	
 	public class MSUser extends User
 	{
-		public function MSUser(framework:String, userID:uint, trackingID:uint, position:Vector3D, positionRelative:Vector3D, rgbPosition:Point, rgbRelativePosition:Point, depthPosition:Point, depthRelativePosition:Point, hasSkeleton:Boolean, skeletonJoints:Vector.<SkeletonJoint>)
+		public function MSUser()
 		{
-			super(framework, userID, trackingID, position, positionRelative, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition, hasSkeleton, skeletonJoints);
+			super();
+			//super(framework, userID, trackingID, position, positionRelative, rgbPosition, rgbRelativePosition, depthPosition, depthRelativePosition, hasSkeleton, skeletonJoints);
 		}
 	}
 }

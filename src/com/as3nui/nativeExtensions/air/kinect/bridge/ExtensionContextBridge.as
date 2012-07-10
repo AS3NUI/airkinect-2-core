@@ -74,7 +74,7 @@ package com.as3nui.nativeExtensions.air.kinect.bridge
 		/** @private */
 		protected static const EXTENSION_REQUEST_SET_DEPTH_SHOW_USER_COLORS:String = "setDepthShowUserColors";
 		/** @private */
-		protected static const EXTENSION_REQUEST_SET_DEPTH_ENABLE_NEAR_MODE:String = "setDepthEnableNearMode";
+		protected static const EXTENSION_REQUEST_SET_NEAR_MODE_ENABLED:String = "setNearModeEnabled";
 		/** @private */
 		protected static const EXTENSION_REQUEST_SET_RGB_MODE:String = "setRGBMode";
 		/** @private */
@@ -179,9 +179,9 @@ package com.as3nui.nativeExtensions.air.kinect.bridge
 			context.call(EXTENSION_REQUEST_SET_DEPTH_SHOW_USER_COLORS, nr, showUserColors);
 		}
 		
-		public function setDepthEnableNearMode(nr:uint, enableNearMode:Boolean):void
+		public function setNearModeEnabled(nr:uint, enableNearMode:Boolean):void
 		{
-			context.call(EXTENSION_REQUEST_SET_DEPTH_ENABLE_NEAR_MODE, nr, enableNearMode);
+			context.call(EXTENSION_REQUEST_SET_NEAR_MODE_ENABLED, nr, enableNearMode);
 		}
 		
 		public function setPointcloudEnabled(nr:uint, enabled:Boolean):void
@@ -199,16 +199,6 @@ package com.as3nui.nativeExtensions.air.kinect.bridge
 			if (context != null)  context.call(EXTENSION_REQUEST_SET_POINTCLOUD_REGIONS, nr, pointCloudRegions);
 		}
 		
-		public function getSkeletonJointNameIndices(nr:uint):Dictionary
-		{
-			return context.call(EXTENSION_REQUEST_GET_SKELETON_JOINT_NAME_INDICIES, nr) as Dictionary;
-		}
-		
-		public function getSkeletonJointNames(nr:uint):Vector.<String>
-		{
-			return context.call(EXTENSION_REQUEST_GET_SKELETON_JOINT_NAMES, nr) as Vector.<String>;
-		}
-		
 		public function setUserEnabled(nr:uint, enabled:Boolean):void
 		{
 			context.call(EXTENSION_REQUEST_SET_USER_ENABLED, nr, enabled);
@@ -224,9 +214,9 @@ package com.as3nui.nativeExtensions.air.kinect.bridge
 			context.call(EXTENSION_REQUEST_SET_SKELETON_ENABLED, nr, enabled);
 		}
 		
-		public function setSkeletonMode(nr:uint, mirrored:Boolean):void
+		public function setSkeletonMode(nr:uint, mirrored:Boolean, seatedSkeletonEnabled:Boolean):void
 		{
-			context.call(EXTENSION_REQUEST_SET_SKELETON_MODE, nr, mirrored);
+			context.call(EXTENSION_REQUEST_SET_SKELETON_MODE, nr, mirrored, seatedSkeletonEnabled);
 		}
 		
 		public function setUserMaskEnabled(nr:uint, enabled:Boolean):void
