@@ -26,6 +26,7 @@ MSKinectDevice::MSKinectDevice(int nr)
 	capabilities.hasUserMaskSupport						= true;
 	capabilities.hasNearModeSupport						= true;
 	capabilities.hasSeatedSkeletonSupport				= true;
+	capabilities.hasChooseSkeletonsSupport				= true;
 
 	capabilities.maxSensors								= 4;
 	capabilities.framework								= "mssdk";
@@ -37,7 +38,44 @@ MSKinectDevice::MSKinectDevice(int nr)
 	
 	maxSkeletons = NUI_SKELETON_COUNT;
 	
-	numJoints = NUI_SKELETON_POSITION_COUNT;
+    setDefaults();
+	addKinectDeviceStatusListener();
+}
+
+void MSKinectDevice::setNumJointsAndJointNames()
+{
+	if(asSeatedSkeletonEnabled)
+	{
+		setNumJointsAndJointNamesForSeatedSkeletonTracking();
+	}
+	else
+	{
+		setNumJointsAndJointNamesForRegularSkeletonTracking();
+	}
+	
+}
+
+void MSKinectDevice::setNumJointsAndJointNamesForSeatedSkeletonTracking()
+{
+	numJoints = 10;
+	jointNames = new char*[numJoints];
+	jointNames[0] = "neck";
+	jointNames[1] = "head";
+    
+	jointNames[2] = "left_shoulder";
+	jointNames[3] = "left_elbow";
+	jointNames[4] = "left_wrist";
+	jointNames[5] = "left_hand";
+    
+	jointNames[6] = "right_shoulder";
+	jointNames[7] = "right_elbow";
+	jointNames[8] = "right_wrist";
+	jointNames[9] = "right_hand";
+}
+
+void MSKinectDevice::setNumJointsAndJointNamesForRegularSkeletonTracking()
+{
+	numJoints = 20;
 	jointNames = new char*[numJoints];
 	jointNames[0] = "waist";
 	jointNames[1] = "torso";
@@ -63,10 +101,6 @@ MSKinectDevice::MSKinectDevice(int nr)
 	jointNames[17] = "right_knee";
 	jointNames[18] = "right_ankle";
 	jointNames[19] = "right_foot";
-
-	//set default values
-    setDefaults();
-	addKinectDeviceStatusListener();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,27 +196,31 @@ void MSKinectDevice::setDefaults()
 //-------------------
 
 FREObject MSKinectDevice::freSetSkeletonMode(FREObject argv[]) {
+
+	bool previousSeatedSkeletonEnabled = asSeatedSkeletonEnabled;
+	bool previousChooseSkeletonsEnabled = asChooseSkeletonsEnabled;
 	KinectDevice::freSetSkeletonMode(argv);
-
-	unsigned int seatedSkeletonEnabled; FREGetObjectAsBool(argv[2], &seatedSkeletonEnabled);
-	bool newSeatedSkeletonEnabled = (seatedSkeletonEnabled != 0);
-	if(newSeatedSkeletonEnabled != asSeatedSkeletonEnabled) {
-		asSeatedSkeletonEnabled = newSeatedSkeletonEnabled;
-		if(running) {
-			lockUserMutex();
-
-			DWORD skeletonFlags = 0;
-			if(asSeatedSkeletonEnabled) skeletonFlags |= NUI_SKELETON_TRACKING_FLAG_ENABLE_SEATED_SUPPORT;
-			HRESULT hr = nuiSensor->NuiSkeletonTrackingEnable( userEvent, skeletonFlags );
-			//Failed dispatch some message
-			if ( FAILED(hr) ){
-				FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize Skeleton Tracking");
-			}
-
-			unlockUserMutex();
+	if(running && (previousSeatedSkeletonEnabled != asSeatedSkeletonEnabled || previousChooseSkeletonsEnabled != asChooseSkeletonsEnabled)) {
+		lockUserMutex();
+		deallocateUserFrame();
+		setNumJointsAndJointNames();
+		allocateUserFrame();
+		HRESULT hr = setSkeletonTrackingFlags();
+		if ( FAILED(hr) ){
+			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize Skeleton Tracking");
 		}
+		unlockUserMutex();
 	}
 
+	return NULL;
+}
+
+FREObject MSKinectDevice::freChooseSkeletons(FREObject argv[])
+{
+	KinectDevice::freChooseSkeletons(argv);
+	if(started && asChooseSkeletonsEnabled) {
+		nuiSensor->NuiSkeletonSetTrackedSkeletons((DWORD *) chosenSkeletonIds);
+	}
 	return NULL;
 }
 
@@ -329,37 +367,13 @@ void MSKinectDevice::stop()
 	}
 
     //cleanup bytearrays
-    if(depthImageByteArray != 0) delete [] depthImageByteArray;
-	if(depthByteArray != 0) delete [] depthByteArray;
-	if(sceneByteArray != 0) delete [] sceneByteArray;
-	if(asDepthByteArray != 0) delete [] asDepthByteArray;
-
-    if(rgbImageByteArray != 0) delete [] rgbImageByteArray;
-	if(asRGBByteArray != 0) delete [] asRGBByteArray;
-	
-    if(asPointCloudByteArray != 0) delete [] asPointCloudByteArray;
-	if(userIndexColors != 0) delete [] userIndexColors;
-
-	if(asUserMaskByteArray != 0)
-    {
-		for(int i = 0; i < NUI_SKELETON_COUNT; i++)
-        {
-            delete [] asUserMaskByteArray[i];
-        }
-        delete [] asUserMaskByteArray;
-    }
-	
-    if(pointCloudRegions != 0)
-    {
-        delete [] pointCloudRegions;
-    }
+	cleanupByteArrays();
 
 	if (nuiSensor)
     {
         nuiSensor->Release();
         nuiSensor = NULL;
     }
-
     
 	bool hadStarted = started;
 	//reset defaults
@@ -369,6 +383,17 @@ void MSKinectDevice::stop()
 		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "stopped");
     }
 	
+}
+
+void MSKinectDevice::cleanupByteArrays()
+{
+	KinectDevice::cleanupByteArrays();
+
+	if(depthImageByteArray != 0) delete [] depthImageByteArray;
+	if(depthByteArray != 0) delete [] depthByteArray;
+	if(sceneByteArray != 0) delete [] sceneByteArray;
+	if(rgbImageByteArray != 0) delete [] rgbImageByteArray;
+	if(userIndexColors != 0) delete [] userIndexColors;
 }
 
 void MSKinectDevice::dispose()
@@ -428,9 +453,8 @@ void MSKinectDevice::run()
 		if(asSkeletonEnabled || asUserMaskEnabled){
 			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Skeleton Tracking");
 
-			DWORD skeletonFlags = 0;
-			if(asSeatedSkeletonEnabled) skeletonFlags |= NUI_SKELETON_TRACKING_FLAG_ENABLE_SEATED_SUPPORT;
-			hr = nuiSensor->NuiSkeletonTrackingEnable( userEvent, skeletonFlags );
+			hr = setSkeletonTrackingFlags();
+			
 			//Failed dispatch some message
 			if ( FAILED(hr) ){
 				FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize Skeleton Tracking");
@@ -551,6 +575,15 @@ void MSKinectDevice::run()
 			stop();
 		}
 	}
+}
+
+HRESULT MSKinectDevice::setSkeletonTrackingFlags()
+{
+	DWORD skeletonFlags = 0;
+	if(asSeatedSkeletonEnabled) skeletonFlags |= NUI_SKELETON_TRACKING_FLAG_ENABLE_SEATED_SUPPORT;
+	if(asSkeletonEnabled) skeletonFlags |= NUI_SKELETON_TRACKING_FLAG_ENABLE_IN_NEAR_RANGE;
+	if(asChooseSkeletonsEnabled) skeletonFlags |= NUI_SKELETON_TRACKING_FLAG_TITLE_SETS_TRACKED_SKELETONS;
+	return nuiSensor->NuiSkeletonTrackingEnable( userEvent, skeletonFlags );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -929,30 +962,7 @@ void MSKinectDevice::userFrameHandler()
 
 			//Joint Position Calculations
 			if (userFrame.users[i].hasSkeleton){
-				addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 0);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SPINE, 1);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER, 2);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HEAD, 3);
-                
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_LEFT, 4);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT, 5);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT, 6);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT, 7);
-                
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_RIGHT, 8);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT, 9);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT, 10);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT, 11);
-                
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_LEFT, 12);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_LEFT, 13);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_LEFT, 14);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_LEFT, 15);
-                
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_RIGHT, 16);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_RIGHT, 17);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_RIGHT, 18);
-                addJointElement(userFrame.users[i], skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_RIGHT, 19);
+				addJointElements(userFrame.users[i], skeletonData, boneOrientations);
 			}
 
 			//cleanup
@@ -1006,15 +1016,80 @@ void MSKinectDevice::calculateKinectTransform(kinectTransform &kTransform, Vecto
 	kTransform.rgbRelativeY = ((float)colorY)/((float)asRGBHeight);
 }
 
-
-void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint, uint32_t targetIndex)
+void MSKinectDevice::addJointElements(kinectUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
 {
-	Vector4 jointPosition = user.SkeletonPositions[eJoint];
+	if(asSeatedSkeletonEnabled)
+		addJointElementsForSeatedSkeletonTracking(kUser, skeletonData, boneOrientations);
+	else
+		addJointElementsForRegularSkeletonTracking(kUser, skeletonData, boneOrientations);
+}
+
+void MSKinectDevice::addJointElementsForSeatedSkeletonTracking(kinectUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
+{
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER, 0);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HEAD, 1);
+                
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_LEFT, 2);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT, 3);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT, 4);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT, 5);
+                
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_RIGHT, 6);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT, 7);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT, 8);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT, 9);
+}
+
+void MSKinectDevice::addJointElementsForRegularSkeletonTracking(kinectUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
+{
+	addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 0);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SPINE, 1);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER, 2);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HEAD, 3);
+                
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_LEFT, 4);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT, 5);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT, 6);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT, 7);
+                
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_RIGHT, 8);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT, 9);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT, 10);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT, 11);
+                
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_LEFT, 12);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_LEFT, 13);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_LEFT, 14);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_LEFT, 15);
+                
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_RIGHT, 16);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_RIGHT, 17);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_RIGHT, 18);
+    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_RIGHT, 19);
+}
+
+void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint, uint32_t targetIndex)
+{
+	Vector4 jointPosition = skeletonData.SkeletonPositions[eJoint];
 
 	//Transform for User
 	calculateKinectTransform(kUser.joints[targetIndex], jointPosition);
 
-    kUser.joints[targetIndex].orientationConfidence = 1;
+	//skeleton.eSkeletonPositionTrackingState[jointTo]
+
+	kUser.joints[targetIndex].orientationConfidence = 0;
+	kUser.joints[targetIndex].positionConfidence = 0;
+
+	if(skeletonData.eSkeletonPositionTrackingState[eJoint] == NUI_SKELETON_POSITION_INFERRED)
+	{
+		kUser.joints[targetIndex].orientationConfidence = 0.5;
+		kUser.joints[targetIndex].positionConfidence = 0.5;
+	}
+	else if(skeletonData.eSkeletonPositionTrackingState[eJoint] == NUI_SKELETON_POSITION_TRACKED)
+	{
+		kUser.joints[targetIndex].orientationConfidence = 1;
+		kUser.joints[targetIndex].positionConfidence = 1;
+	}
 
 	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M11 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M11;
 	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M12 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M12;

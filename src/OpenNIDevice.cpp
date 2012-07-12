@@ -41,6 +41,7 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
     capabilities.hasUserMaskSupport						= true;
     capabilities.hasNearModeSupport                     = false;
 	capabilities.hasSeatedSkeletonSupport				= false;
+	capabilities.hasChooseSkeletonsSupport				= false;
     
     capabilities.maxSensors								= 1;
     capabilities.framework								= "openni";
@@ -49,8 +50,26 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
 	asJointClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNISkeletonJoint";
 	asUserClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUser";
 	asUserFrameClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUserFrame";
-	numJoints = 16;
+
 	maxSkeletons = 15;
+    
+    //some sensors don't have an RGB camera (asus xtion pro)
+    XnStatus rc;
+    xn::NodeInfoList imageNodes;
+    rc = context.EnumerateProductionTrees(XN_NODE_TYPE_IMAGE, NULL, imageNodes, NULL );
+    if(rc != XN_STATUS_OK)
+    {
+        capabilities.hasRGBCameraSupport = false;
+        capabilities.hasUserMaskSupport = false;
+    }
+    
+    //set default values
+    setDefaults();
+}
+
+void OpenNIDevice::setNumJointsAndJointNames()
+{
+	numJoints = 16;
 	jointNames = new char*[numJoints];
 	jointNames[0] = "head";
 	jointNames[1] = "neck";
@@ -71,19 +90,6 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
 	jointNames[12] = "right_hip";
 	jointNames[13] = "right_knee";
 	jointNames[14] = "right_foot";
-    
-    //some sensors don't have an RGB camera (asus xtion pro)
-    XnStatus rc;
-    xn::NodeInfoList imageNodes;
-    rc = context.EnumerateProductionTrees(XN_NODE_TYPE_IMAGE, NULL, imageNodes, NULL );
-    if(rc != XN_STATUS_OK)
-    {
-        capabilities.hasRGBCameraSupport = false;
-        capabilities.hasUserMaskSupport = false;
-    }
-    
-    //set default values
-    setDefaults();
 }
 
 void OpenNIDevice::setDefaults()
@@ -276,23 +282,10 @@ void OpenNIDevice::stop()
         infraredGenerator.Release();
         infraredGenerator = NULL;
     }
+
     //cleanup bytearrays
-    if(asDepthByteArray != 0) delete [] asDepthByteArray;
-    if(asRGBByteArray != 0) delete [] asRGBByteArray;
-    if(asInfraredByteArray != 0) delete [] asInfraredByteArray;
-    if(asPointCloudByteArray != 0) delete [] asPointCloudByteArray;
-    if(asUserMaskByteArray != 0)
-    {
-        for(int i = 0; i < maxSkeletons; i++)
-        {
-            delete [] asUserMaskByteArray[i];
-        }
-        delete [] asUserMaskByteArray;
-    }
-    if(pointCloudRegions != 0)
-    {
-        delete [] pointCloudRegions;
-    }
+	cleanupByteArrays();
+
     //reset defaults
     setDefaults();
     if(started)
@@ -301,6 +294,13 @@ void OpenNIDevice::stop()
         //send stopped event
         FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "stopped");
     }
+}
+
+void OpenNIDevice::cleanupByteArrays()
+{
+	KinectDevice::cleanupByteArrays();
+
+    if(asInfraredByteArray != 0) delete [] asInfraredByteArray;
 }
 
 void * OpenNIDevice::deviceThread(void *self)

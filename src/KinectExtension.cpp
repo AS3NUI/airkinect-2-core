@@ -78,6 +78,12 @@ extern "C"
         unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
         return kinectDeviceManager.getDevice(nr, ctx)->freSetSkeletonEnabled(argv);
     }
+
+	FREObject Kinect_chooseSkeletons(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+    {
+        unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+        return kinectDeviceManager.getDevice(nr, ctx)->freChooseSkeletons(argv);
+    }
     
     FREObject Kinect_getUserFrame(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
@@ -224,6 +230,7 @@ extern "C"
         { (const uint8_t*) "setUserEnabled", 0, Kinect_setUserEnabled },
         { (const uint8_t*) "setSkeletonMode", 0, Kinect_setSkeletonMode },
         { (const uint8_t*) "setSkeletonEnabled", 0, Kinect_setSkeletonEnabled },
+		{ (const uint8_t*) "chooseSkeletons", 0, Kinect_chooseSkeletons },
         { (const uint8_t*) "getUserFrame", 0, Kinect_getUserFrame },
         { (const uint8_t*) "setUserMaskMode", 0, Kinect_setUserMaskMode },
         { (const uint8_t*) "setUserMaskEnabled", 0, Kinect_setUserMaskEnabled },

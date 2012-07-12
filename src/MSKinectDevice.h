@@ -26,6 +26,7 @@ public:
 
 	//Overridden FRE functions
 	FREObject           freSetSkeletonMode(FREObject argv[]);
+	FREObject			freChooseSkeletons(FREObject argv[]);
     FREObject           freSetUserMaskMode(FREObject argv[]);
     FREObject           freSetDepthMode(FREObject argv[]);
 	FREObject			freSetNearModeEnabled(FREObject argv[]);
@@ -37,6 +38,12 @@ protected:
 	void				setUserColor(int userID, int color, bool useIntensity);
 	void				setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored);
 
+	void				setDefaults();
+	void				cleanupByteArrays();
+	void				setNumJointsAndJointNames();
+	void				setNumJointsAndJointNamesForSeatedSkeletonTracking();
+	void				setNumJointsAndJointNamesForRegularSkeletonTracking();
+
 private:
 
 	NUI_TRANSFORM_SMOOTH_PARAMETERS		transformSmoothingParameters;
@@ -45,13 +52,16 @@ private:
 	static void CALLBACK	statusProcThunk( HRESULT hrStatus, const OLECHAR* instanceName, const OLECHAR* uniqueDeviceName, void * pUserData);
 	void					dispatchError(HRESULT hr);
 
-	void					addJointElement(kinectUser &kUser, NUI_SKELETON_DATA user, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint, uint32_t targetIndex);
+	void					addJointElements(kinectUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
+	void					addJointElementsForSeatedSkeletonTracking(kinectUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
+	void					addJointElementsForRegularSkeletonTracking(kinectUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
+	void					addJointElement(kinectUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint, uint32_t targetIndex);
 	void					calculateKinectTransform(kinectTransform &kTransform, Vector4 skeletonTransform);
+
+	HRESULT					setSkeletonTrackingFlags();
 
 	int						imageFrameTimeout;
 	INuiSensor *            nuiSensor;
-    
-    void                    setDefaults();
 
 	static void             *deviceThread(void *ptr);
 	void                    run();

@@ -38,7 +38,9 @@ public:
 protected:
     
 	void                    setUserColor(int userID, int color, bool useIntensity);
-    void                    setDefaults();
+	void					setDefaults();
+	void					cleanupByteArrays();
+	void					setNumJointsAndJointNames();
     
 private:
     xn::Context             context;

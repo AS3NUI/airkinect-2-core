@@ -11,6 +11,7 @@ void KinectDevice::setDefaults()
     asSkeletonMirrored = false;
     asSkeletonEnabled = false;
 	asSeatedSkeletonEnabled = false;
+	asChooseSkeletonsEnabled = false;
 
 	//
 	// DEPTH IMAGE
@@ -72,12 +73,56 @@ void KinectDevice::setDefaults()
 	pointCloudRegions = 0;
 	numRegions = 0;
 
-	//user frame allocation
+	chosenSkeletonIds = 0;
+	numChosenSkeletons = 0;
+
+	setNumJointsAndJointNames();
+	allocateUserFrame();
+}
+
+void KinectDevice::cleanupByteArrays()
+{
+	if(asDepthByteArray != 0) delete [] asDepthByteArray;
+	if(asRGBByteArray != 0) delete [] asRGBByteArray;
+    if(asPointCloudByteArray != 0) delete [] asPointCloudByteArray;
+	if(asUserMaskByteArray != 0)
+    {
+		for(int i = 0; i < maxSkeletons; i++)
+        {
+            delete [] asUserMaskByteArray[i];
+        }
+        delete [] asUserMaskByteArray;
+    }
+    if(pointCloudRegions != 0)
+    {
+        delete [] pointCloudRegions;
+    }
+	if(chosenSkeletonIds != 0)
+	{
+		delete [] chosenSkeletonIds;
+	}
+}
+
+void KinectDevice::setNumJointsAndJointNames()
+{
+}
+
+void KinectDevice::allocateUserFrame()
+{
 	userFrame.users = new kinectUser[maxSkeletons];
 	for(int i = 0; i < maxSkeletons; i++)
 	{
 		userFrame.users[i].joints = new kinectSkeletonJoint[numJoints];
 	}
+}
+
+void KinectDevice::deallocateUserFrame()
+{
+	for(int i = 0; i < maxSkeletons; i++)
+	{
+		delete [] userFrame.users[i].joints;
+	}
+	delete [] userFrame.users;
 }
 
 //Getter/Setters for FREContext
@@ -132,6 +177,13 @@ FREObject KinectDevice::freSetSkeletonMode(FREObject argv[])
 {
 	unsigned int mirrored; FREGetObjectAsBool(argv[1], &mirrored);
     asSkeletonMirrored = (mirrored != 0);
+
+	unsigned int seatedSkeletonEnabled; FREGetObjectAsBool(argv[2], &seatedSkeletonEnabled);
+	asSeatedSkeletonEnabled = (seatedSkeletonEnabled != 0);
+
+	unsigned int chooseSkeletonsEnabled; FREGetObjectAsBool(argv[3], &chooseSkeletonsEnabled);
+	asChooseSkeletonsEnabled = (chooseSkeletonsEnabled != 0);
+
     return NULL;
 }
 FREObject KinectDevice::freSetSkeletonEnabled(FREObject argv[])
@@ -139,6 +191,29 @@ FREObject KinectDevice::freSetSkeletonEnabled(FREObject argv[])
 	unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
     asSkeletonEnabled = (enabled != 0);
     return NULL;
+}
+FREObject KinectDevice::freChooseSkeletons(FREObject argv[])
+{
+	FREObject asSkeletonIds = argv[1];
+	FREObject asSkeletonId;
+	int skeletonId;
+    
+    uint32_t freNumChosenSkeletonIds;
+    FREGetArrayLength(asSkeletonIds, &freNumChosenSkeletonIds);
+    
+	int *freChosenSkeletonIds = new int[freNumChosenSkeletonIds];
+    
+    for(unsigned int i = 0; i < freNumChosenSkeletonIds; i++)
+    {
+		FREGetArrayElementAt(asSkeletonIds, i, &asSkeletonId);
+		FREGetObjectAsInt32(asSkeletonId, &skeletonId);
+		freChosenSkeletonIds[i] = skeletonId;
+    }
+
+	this->chosenSkeletonIds = freChosenSkeletonIds;
+	this->numChosenSkeletons = freNumChosenSkeletonIds;
+    
+	return NULL;
 }
 FREObject KinectDevice::freGetUserFrame(FREObject argv[])
 {

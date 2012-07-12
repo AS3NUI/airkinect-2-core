@@ -28,7 +28,7 @@ public:
     virtual void				start();
     virtual void				stop();
     
-	//Dispose the Device form memory
+	//Dispose the Device from memory
     virtual void				dispose();
     
     virtual FREObject           freGetCapabilities();
@@ -37,6 +37,7 @@ public:
     virtual FREObject           freSetUserEnabled(FREObject argv[]);
     virtual FREObject           freSetSkeletonMode(FREObject argv[]);
     virtual FREObject           freSetSkeletonEnabled(FREObject argv[]);
+	virtual FREObject			freChooseSkeletons(FREObject argv[]);
     virtual FREObject           freGetUserFrame(FREObject argv[]);
     virtual FREObject           freSetUserMaskMode(FREObject argv[]);
     virtual FREObject           freSetUserMaskEnabled(FREObject argv[]);
@@ -88,6 +89,10 @@ protected:
     virtual void                unlockPointCloudMutex();
 
 	virtual void				setDefaults();
+	virtual void				setNumJointsAndJointNames();
+	virtual void				allocateUserFrame();
+	virtual void				deallocateUserFrame();
+	virtual void				cleanupByteArrays();
 	virtual void				setUserColor(int userID, int color, bool useIntensity);
 
 	virtual void				setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored);
@@ -143,6 +148,7 @@ protected:
 	bool						asSkeletonMirrored;
     bool						asSkeletonEnabled;
 	bool						asSeatedSkeletonEnabled;
+	bool						asChooseSkeletonsEnabled;
 
 	bool						asUserMaskEnabled;
 	int							asUserMaskWidth;
@@ -177,9 +183,13 @@ protected:
 	uint32_t					**asUserMaskByteArray;
 	uint32_t					*asDepthByteArray;
 	uint32_t					*asRGBByteArray;
+
 	short						*asPointCloudByteArray;
 	PointCloudRegion			*pointCloudRegions;
     unsigned int				numRegions;
+
+	int							numChosenSkeletons;
+	int							*chosenSkeletonIds;
 
 };
 
