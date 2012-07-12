@@ -102,21 +102,6 @@ package com.as3nui.nativeExtensions.air.kinect.data
 
 		public function SkeletonJoint()
 		{
-			/*
-			this.name = name;
-			this.position = position;
-			this.positionRelative = positionRelative;
-			this.rgbPosition = rgbPosition;
-			this.rgbRelativePosition = rgbRelativePosition;
-			this.depthPosition = depthPosition;
-			this.depthRelativePosition = depthRelativePosition;
-			this.positionConfidence = positionConfidence;
-			this.absoluteOrientationMatrix = absoluteOrientationMatrix;
-			this.absoluteOrientationQuaternion = absoluteOrientationQuaternion;
-			this.hierarchicalOrientationMatrix = hierarchicalOrientationMatrix;
-			this.hierarchicalOrientationQuaternion = hierarchicalOrientationQuaternion;
-			this.orientationConfidence = orientationConfidence;
-			*/
 		}
 		
 		/**
@@ -125,16 +110,26 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		public function copyFrom(otherJoint:SkeletonJoint):void
 		{
 			name = otherJoint.name;
+			position ||= new Vector3D();
 			position.copyFrom(otherJoint.position);
+			positionRelative ||= new Vector3D();
 			positionRelative.copyFrom(otherJoint.positionRelative);
+			rgbPosition ||= new Point();
 			rgbPosition.copyFrom(otherJoint.rgbPosition);
+			rgbRelativePosition ||= new Point();
 			rgbRelativePosition.copyFrom(otherJoint.rgbRelativePosition);
+			depthPosition ||= new Point();
 			depthPosition.copyFrom(otherJoint.depthPosition);
+			depthRelativePosition ||= new Point();
 			depthRelativePosition.copyFrom(otherJoint.depthRelativePosition);
 			positionConfidence = otherJoint.positionConfidence;
+			absoluteOrientationMatrix ||= new Matrix3D();
 			absoluteOrientationMatrix.copyFrom(otherJoint.absoluteOrientationMatrix);
+			absoluteOrientationQuaternion ||= new Vector3D();
 			absoluteOrientationQuaternion.copyFrom(otherJoint.absoluteOrientationQuaternion);
+			hierarchicalOrientationMatrix ||= new Matrix3D();
 			hierarchicalOrientationMatrix.copyFrom(otherJoint.hierarchicalOrientationMatrix);
+			hierarchicalOrientationQuaternion ||= new Vector3D();
 			hierarchicalOrientationQuaternion.copyFrom(otherJoint.hierarchicalOrientationQuaternion);
 			orientationConfidence = otherJoint.orientationConfidence;
 		}

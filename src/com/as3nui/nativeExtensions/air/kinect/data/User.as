@@ -167,9 +167,23 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			depthPosition.copyFrom(otherUser.depthPosition);
 			depthRelativePosition.copyFrom(otherUser.depthRelativePosition);
 			hasSkeleton = otherUser.hasSkeleton;
+			updateJointCount(otherUser.skeletonJoints.length);
 			for(var i:uint = 0; i < otherUser.skeletonJoints.length; i++)
 			{
 				skeletonJoints[i].copyFrom(otherUser.skeletonJoints[i]);
+			}
+		}
+		
+		/**
+		 * Resizes the skeletonJoints vector
+		 * This may be needed when we switch between seated - normal tracking
+		 */ 
+		private function updateJointCount(count:uint):void
+		{
+			skeletonJoints.length = count;
+			for(var i:uint = 0; i < count; i++)
+			{
+				if(skeletonJoints[i] == null) skeletonJoints[i] = new SkeletonJoint();
 			}
 		}
 	}

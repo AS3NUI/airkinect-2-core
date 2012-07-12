@@ -28,6 +28,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		private var _skeletonEnabled:Boolean 				= false;
 		private var _skeletonMirrored:Boolean 				= true;
 		private var _seatedSkeletonEnabled:Boolean			= false;
+		private var _chooseSkeletonsEnabled:Boolean			= false;
 
 		private var _pointCloudEnabled:Boolean				= false;
 		private var _pointCloudResolution:Point				= CameraResolution.RESOLUTION_320_240;
@@ -60,6 +61,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 			_skeletonEnabled = otherKinectSettings.skeletonEnabled;
 			_skeletonMirrored = otherKinectSettings.skeletonMirrored;
 			_seatedSkeletonEnabled = otherKinectSettings.seatedSkeletonEnabled;
+			_chooseSkeletonsEnabled = otherKinectSettings.chooseSkeletonsEnabled;
 			
 			_pointCloudEnabled = otherKinectSettings.pointCloudEnabled;
 			_pointCloudResolution.copyFrom(otherKinectSettings.pointCloudResolution);
@@ -198,6 +200,14 @@ package com.as3nui.nativeExtensions.air.kinect {
 		
 		public function set seatedSkeletonEnabled(value:Boolean):void {
 			_seatedSkeletonEnabled = value;
+		}
+		
+		public function get chooseSkeletonsEnabled():Boolean {
+			return _chooseSkeletonsEnabled;
+		}
+		
+		public function set chooseSkeletonsEnabled(value:Boolean):void {
+			_chooseSkeletonsEnabled = value;
 		}
 
 		public function get pointCloudEnabled():Boolean {

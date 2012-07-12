@@ -31,7 +31,8 @@ package com.as3nui.nativeExtensions.air.kinect.bridge
 		function setUserEnabled(nr:uint, enabled:Boolean):void;
 		function setUserMode(nr:uint, mirrored:Boolean):void;
 		function setSkeletonEnabled(nr:uint, enabled:Boolean):void;
-		function setSkeletonMode(nr:uint, mirrored:Boolean, seatedSkeletonEnabled:Boolean):void;
+		function setSkeletonMode(nr:uint, mirrored:Boolean, seatedSkeletonEnabled:Boolean, chooseSkeletons:Boolean):void;
+		function chooseSkeletons(nr:uint, trackingIds:Vector.<uint>):void;
 		function setUserMaskEnabled(nr:uint, enabled:Boolean):void;
 		function setUserMaskMode(nr:uint, width:uint, height:uint, mirrored:Boolean):void;
 		function getDepthFrame(nr:uint, imageBytes:ByteArray):void;

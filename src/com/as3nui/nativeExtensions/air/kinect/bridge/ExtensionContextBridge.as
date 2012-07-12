@@ -52,6 +52,8 @@ package com.as3nui.nativeExtensions.air.kinect.bridge
 		/** @private */
 		protected static const EXTENSION_REQUEST_SET_SKELETON_MODE:String = "setSkeletonMode";
 		/** @private */
+		protected static const EXTENSION_REQUEST_CHOOSE_SKELETONS:String = "chooseSkeletons";
+		/** @private */
 		protected static const EXTENSION_REQUEST_SET_SKELETON_ENABLED:String = "setSkeletonEnabled";
 		/** @private */
 		protected static const EXTENSION_REQUEST_GET_USER_FRAME:String = "getUserFrame";
@@ -214,9 +216,14 @@ package com.as3nui.nativeExtensions.air.kinect.bridge
 			context.call(EXTENSION_REQUEST_SET_SKELETON_ENABLED, nr, enabled);
 		}
 		
-		public function setSkeletonMode(nr:uint, mirrored:Boolean, seatedSkeletonEnabled:Boolean):void
+		public function setSkeletonMode(nr:uint, mirrored:Boolean, seatedSkeletonEnabled:Boolean, chooseSkeletons:Boolean):void
 		{
-			context.call(EXTENSION_REQUEST_SET_SKELETON_MODE, nr, mirrored, seatedSkeletonEnabled);
+			context.call(EXTENSION_REQUEST_SET_SKELETON_MODE, nr, mirrored, seatedSkeletonEnabled, chooseSkeletons);
+		}
+		
+		public function chooseSkeletons(nr:uint, trackingIds:Vector.<uint>):void
+		{
+			context.call(EXTENSION_REQUEST_CHOOSE_SKELETONS, nr, trackingIds);
 		}
 		
 		public function setUserMaskEnabled(nr:uint, enabled:Boolean):void

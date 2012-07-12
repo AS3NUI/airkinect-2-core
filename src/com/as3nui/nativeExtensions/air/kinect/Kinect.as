@@ -452,7 +452,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 			contextBridge.setUserEnabled(_nr, _settings.userEnabled);
 			contextBridge.setUserMode(_nr, _settings.userMirrored);
 			contextBridge.setSkeletonEnabled(_nr, _settings.skeletonEnabled);
-			contextBridge.setSkeletonMode(_nr, _settings.skeletonMirrored, _settings.seatedSkeletonEnabled);
+			contextBridge.setSkeletonMode(_nr, _settings.skeletonMirrored, _settings.seatedSkeletonEnabled, _settings.chooseSkeletonsEnabled);
 		}
 		/** @private */
 		private function disposeUserSettings():void {
@@ -497,6 +497,21 @@ package com.as3nui.nativeExtensions.air.kinect {
 		}
 		
 		/**
+		 * Change the skeleton chosing mode while the device is running
+		 */ 
+		public function setChooseSkeletonsEnabled(value:Boolean):void {
+			_settings.chooseSkeletonsEnabled = value;
+			applyUserSettings();
+		}
+		
+		/**
+		 * Only track the skeletons of the given trackingIds
+		 */ 
+		public function chooseSkeletons(trackingIds:Vector.<uint>):void {
+			contextBridge.chooseSkeletons(_nr, trackingIds);
+		}
+		
+		/**
 		 * Change the seated skeleton mode while the device is running
 		 */ 
 		public function setSeatedSkeletonEnabled(value:Boolean):void {
@@ -504,6 +519,9 @@ package com.as3nui.nativeExtensions.air.kinect {
 			applyUserSettings();
 		}
 		
+		/**
+		 * Change the near mode while the device is running
+		 */ 
 		public function setNearModeEnabled(value:Boolean):void {
 			_settings.nearModeEnabled = value;
 			contextBridge.setNearModeEnabled(_nr, _settings.nearModeEnabled);
