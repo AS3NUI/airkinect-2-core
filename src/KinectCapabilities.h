@@ -91,11 +91,9 @@ typedef struct {
 		FRENewObjectFromBool(hasChooseSkeletonsSupport, &freObject);
         FRESetObjectProperty(capabilities, (const uint8_t*)"hasChooseSkeletonsSupport", freObject, NULL);
         
-        //Ints
         FRENewObjectFromUint32(maxSensors, &freObject);
         FRESetObjectProperty(capabilities, (const uint8_t*)"maxSensors", freObject, NULL);
         
-        //Strings
         FRENewObjectFromUTF8(strlen(framework), (const uint8_t *) framework, &freObject);
         FRESetObjectProperty(capabilities, (const uint8_t*)"framework", freObject, NULL);
         

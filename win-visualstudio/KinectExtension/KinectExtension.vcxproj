@@ -216,6 +216,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\ExtensionConfig.h" />
+    <ClInclude Include="..\..\src\FREHelperFunctions.h" />
     <ClInclude Include="..\..\src\KinectCapabilities.h" />
     <ClInclude Include="..\..\src\KinectDevice.h" />
     <ClInclude Include="..\..\src\KinectDeviceManager.h" />
@@ -228,6 +229,7 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\FREHelperFunctions.cpp" />
     <ClCompile Include="..\..\src\KinectDevice.cpp" />
     <ClCompile Include="..\..\src\KinectDeviceManager.cpp" />
     <ClCompile Include="..\..\src\KinectExtension.cpp" />

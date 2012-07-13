@@ -1,5 +1,6 @@
 #include "KinectDevice.h"
 #include "KinectSkeleton.h"
+#include "FREHelperFunctions.h"
 
 void KinectDevice::setDefaults()
 {
@@ -155,41 +156,32 @@ FREObject KinectDevice::freGetCapabilities()
 }
 FREObject KinectDevice::freSetUserMode(FREObject argv[])
 {
-	unsigned int mirrored; FREGetObjectAsBool(argv[1], &mirrored);
-    asUserMirrored = (mirrored != 0);
+	asUserMirrored = createBoolFromFREObject(argv[1]);
     return NULL;
 }
 FREObject KinectDevice::freSetUserColor(FREObject argv[])
 {
 	unsigned int userID; FREGetObjectAsUint32(argv[1], &userID);
     unsigned int color; FREGetObjectAsUint32(argv[2], &color);
-    unsigned int useIntensity; FREGetObjectAsBool(argv[3], &useIntensity);
-    setUserColor(userID, color, (useIntensity != 0));
+    bool useIntensity = createBoolFromFREObject(argv[3]);
+    setUserColor(userID, color, useIntensity);
     return NULL;
 }
 FREObject KinectDevice::freSetUserEnabled(FREObject argv[])
 {
-	unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asUserEnabled = (enabled != 0);
+    asUserEnabled = createBoolFromFREObject(argv[1]);
     return NULL;
 }
 FREObject KinectDevice::freSetSkeletonMode(FREObject argv[])
 {
-	unsigned int mirrored; FREGetObjectAsBool(argv[1], &mirrored);
-    asSkeletonMirrored = (mirrored != 0);
-
-	unsigned int seatedSkeletonEnabled; FREGetObjectAsBool(argv[2], &seatedSkeletonEnabled);
-	asSeatedSkeletonEnabled = (seatedSkeletonEnabled != 0);
-
-	unsigned int chooseSkeletonsEnabled; FREGetObjectAsBool(argv[3], &chooseSkeletonsEnabled);
-	asChooseSkeletonsEnabled = (chooseSkeletonsEnabled != 0);
-
+	asSkeletonMirrored = createBoolFromFREObject(argv[1]);
+	asSeatedSkeletonEnabled = createBoolFromFREObject(argv[2]);
+	asChooseSkeletonsEnabled = createBoolFromFREObject(argv[3]);
     return NULL;
 }
 FREObject KinectDevice::freSetSkeletonEnabled(FREObject argv[])
 {
-	unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asSkeletonEnabled = (enabled != 0);
+    asSkeletonEnabled = createBoolFromFREObject(argv[1]);
     return NULL;
 }
 FREObject KinectDevice::freChooseSkeletons(FREObject argv[])
@@ -303,112 +295,6 @@ FREObject KinectDevice::freGetUserFrame(FREObject argv[])
     return freUserFrame;
 }
 
-FREObject KinectDevice::createFREPoint(double x, double y)
-{
-	FREObject point;
-	FREObject freX, freY;
-	FRENewObjectFromDouble(x, &freX);
-    FRENewObjectFromDouble(y, &freY);
-    FREObject pointParams[] = {freX, freY};
-    FRENewObject( (const uint8_t*) "flash.geom.Point", 2, pointParams, &point, NULL);
-	return point;
-}
-
-FREObject KinectDevice::createFREVector3DFromKinectRotationQuaternion(kinectRotationQuaternion q)
-{
-	return createFREVector3D(q.x, q.y, q.z, q.w);
-}
-
-FREObject KinectDevice::createFREVector3D(double x, double y, double z, double w)
-{
-	FREObject vector;
-	FREObject freX, freY, freZ, freW;
-	FRENewObjectFromDouble(x, &freX);
-	FRENewObjectFromDouble(y, &freY);
-	FRENewObjectFromDouble(z, &freZ);
-	FRENewObjectFromDouble(w, &freW);
-    FREObject vectorParams[] = {freX, freY, freZ, freW};
-    FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 4, vectorParams, &vector, NULL);
-	return vector;
-}
-
-FREObject KinectDevice::createFREMatrix3DFromKinectRotationMatrix(kinectRotationMatrix m)
-{
-	return createFREMatrix3D(
-		m.M11,
-		m.M12,
-		m.M13,
-		m.M14,
-		m.M21,
-		m.M22,
-		m.M23,
-		m.M24,
-		m.M31,
-		m.M32,
-		m.M33,
-		m.M34,
-		m.M41,
-		m.M42,
-		m.M43,
-		m.M44);
-}
-
-FREObject KinectDevice::createFREMatrix3D(double m11, double m12, double m13, double m14, double m21, double m22, double m23, double m24, double m31, double m32, double m33, double m34, double m41, double m42, double m43, double m44)
-{
-	FREObject freM11, freM12, freM13, freM14;
-	FRENewObjectFromDouble(m11, &freM11);
-	FRENewObjectFromDouble(m12, &freM12);
-	FRENewObjectFromDouble(m13, &freM13);
-	FRENewObjectFromDouble(m14, &freM14);
-
-	FREObject freM21, freM22, freM23, freM24;
-	FRENewObjectFromDouble(m21, &freM21);
-	FRENewObjectFromDouble(m22, &freM22);
-	FRENewObjectFromDouble(m23, &freM23);
-	FRENewObjectFromDouble(m24, &freM24);
-
-	FREObject freM31, freM32, freM33, freM34;
-	FRENewObjectFromDouble(m31, &freM31);
-	FRENewObjectFromDouble(m32, &freM32);
-	FRENewObjectFromDouble(m33, &freM33);
-	FRENewObjectFromDouble(m34, &freM34);
-
-	FREObject freM41, freM42, freM43, freM44;
-	FRENewObjectFromDouble(m41, &freM41);
-	FRENewObjectFromDouble(m42, &freM42);
-	FRENewObjectFromDouble(m43, &freM43);
-	FRENewObjectFromDouble(m44, &freM44);
-
-	FREObject freMatrixNumbers;
-	FRENewObject( (const uint8_t*) "Vector.<Number>", 0, NULL, &freMatrixNumbers, NULL);
-
-	FRESetArrayElementAt(freMatrixNumbers, 0, freM11);
-	FRESetArrayElementAt(freMatrixNumbers, 1, freM12);
-	FRESetArrayElementAt(freMatrixNumbers, 2, freM13);
-	FRESetArrayElementAt(freMatrixNumbers, 3, freM14);
-
-	FRESetArrayElementAt(freMatrixNumbers, 4, freM21);
-	FRESetArrayElementAt(freMatrixNumbers, 5, freM22);
-	FRESetArrayElementAt(freMatrixNumbers, 6, freM23);
-	FRESetArrayElementAt(freMatrixNumbers, 7, freM24);
-
-	FRESetArrayElementAt(freMatrixNumbers, 8, freM31);
-	FRESetArrayElementAt(freMatrixNumbers, 9, freM32);
-	FRESetArrayElementAt(freMatrixNumbers, 10, freM33);
-	FRESetArrayElementAt(freMatrixNumbers, 11, freM34);
-
-	FRESetArrayElementAt(freMatrixNumbers, 12, freM41);
-	FRESetArrayElementAt(freMatrixNumbers, 13, freM42);
-	FRESetArrayElementAt(freMatrixNumbers, 14, freM43);
-	FRESetArrayElementAt(freMatrixNumbers, 15, freM44);
-
-	FREObject matrix;
-	FREObject matrixParams[] = {freMatrixNumbers};
-    FRENewObject( (const uint8_t*) "flash.geom.Matrix3D", 1, matrixParams, &matrix, NULL);
-
-	return matrix;
-}
-
 FREObject KinectDevice::freGetSkeletonJointNameIndices(FREObject argv[])
 {
 	FREObject skeletonJointNameIndices, jointIndex;
@@ -435,14 +321,13 @@ FREObject KinectDevice::freSetUserMaskMode(FREObject argv[])
 {
 	unsigned int width; FREGetObjectAsUint32(argv[1], &width);
     unsigned int height; FREGetObjectAsUint32(argv[2], &height);
-    unsigned int mirrored; FREGetObjectAsBool(argv[3], &mirrored);
     
     lockUserMaskMutex();
     
     asUserMaskWidth = width;
     asUserMaskHeight = height;
     asUserMaskPixelCount = asUserMaskWidth * asUserMaskHeight;
-    asUserMaskMirrored = (mirrored != 0);
+    asUserMaskMirrored = createBoolFromFREObject(argv[3]);
     userMaskScale = userMaskWidth / asUserMaskWidth;
     
     //reset bytearray
@@ -465,8 +350,7 @@ FREObject KinectDevice::freSetUserMaskMode(FREObject argv[])
 }
 FREObject KinectDevice::freSetUserMaskEnabled(FREObject argv[])
 {
-	unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asUserMaskEnabled = (enabled != 0);
+    asUserMaskEnabled = createBoolFromFREObject(argv[1]);
     return NULL;
 }
 FREObject KinectDevice::freGetUserMaskFrame(FREObject argv[])
@@ -494,14 +378,13 @@ FREObject KinectDevice::freSetDepthMode(FREObject argv[])
 {
 	unsigned int width; FREGetObjectAsUint32(argv[1], &width);
     unsigned int height; FREGetObjectAsUint32(argv[2], &height);
-    unsigned int mirrored; FREGetObjectAsBool(argv[3], &mirrored);
     
     lockDepthMutex();
     
     asDepthWidth = width;
     asDepthHeight = height;
     asDepthPixelCount = asDepthWidth * asDepthHeight;
-    asDepthMirrored = (mirrored != 0);
+    asDepthMirrored = createBoolFromFREObject(argv[3]);
     depthScale = depthWidth / asDepthWidth;
     
     //reset bytearray
@@ -513,8 +396,7 @@ FREObject KinectDevice::freSetDepthMode(FREObject argv[])
 }
 FREObject KinectDevice::freSetDepthEnabled(FREObject argv[])
 {
-	unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asDepthEnabled = (enabled != 0);
+    asDepthEnabled = createBoolFromFREObject(argv[1]);
     return NULL;
 }
 FREObject KinectDevice::freGetDepthFrame(FREObject argv[])
@@ -536,25 +418,22 @@ FREObject KinectDevice::freGetDepthFrame(FREObject argv[])
 }
 FREObject KinectDevice::freSetDepthShowUserColors(FREObject argv[])
 {
-	unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asDepthShowUserColors = (enabled != 0);
+    asDepthShowUserColors = createBoolFromFREObject(argv[1]);
     return NULL;
 }
 FREObject KinectDevice::freSetNearModeEnabled(FREObject argv[])
 {
-	unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asNearModeEnabled = (enabled != 0);
+    asNearModeEnabled = createBoolFromFREObject(argv[1]);
     return NULL;
 }
 FREObject KinectDevice::freSetRGBMode(FREObject argv[])
 {
 	unsigned int width; FREGetObjectAsUint32(argv[1], &width);
     unsigned int height; FREGetObjectAsUint32(argv[2], &height);
-    unsigned int mirrored; FREGetObjectAsBool(argv[3], &mirrored);
     
     lockRGBMutex();
 
-	setRGBMode(rgbWidth, rgbHeight, width, height, (mirrored != 0));
+	setRGBMode(rgbWidth, rgbHeight, width, height, createBoolFromFREObject(argv[3]));
     
     //reset bytearray
     if(asRGBByteArray != 0) delete [] asRGBByteArray;
@@ -565,8 +444,7 @@ FREObject KinectDevice::freSetRGBMode(FREObject argv[])
 }
 FREObject KinectDevice::freSetRGBEnabled(FREObject argv[])
 {
-	unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asRGBEnabled = (enabled != 0);
+    asRGBEnabled = createBoolFromFREObject(argv[1]);
     return NULL;
 }
 FREObject KinectDevice::freGetRGBFrame(FREObject argv[])
@@ -604,16 +482,15 @@ FREObject KinectDevice::freSetPointCloudMode(FREObject argv[])
     
     unsigned int width; FREGetObjectAsUint32(argv[1], &width);
     unsigned int height; FREGetObjectAsUint32(argv[2], &height);
-    unsigned int mirrored; FREGetObjectAsBool(argv[3], &mirrored);
+
     unsigned int density; FREGetObjectAsUint32(argv[4], &density);
-    unsigned int includeRGB; FREGetObjectAsBool(argv[5], &includeRGB);
     
     asPointCloudWidth = width;
     asPointCloudHeight = height;
     asPointCloudDensity = density;
-    asPointCloudIncludeRGB = (includeRGB != 0);
+    asPointCloudIncludeRGB = createBoolFromFREObject(argv[5]);
     asPointCloudPixelCount = (asPointCloudWidth * asPointCloudHeight) / asPointCloudDensity;
-    asPointCloudMirrored = (mirrored != 0);
+    asPointCloudMirrored = createBoolFromFREObject(argv[3]);
     pointCloudScale = pointCloudWidth / asPointCloudWidth;
     
     if(asPointCloudByteArray != 0) delete [] asPointCloudByteArray;
@@ -632,8 +509,7 @@ FREObject KinectDevice::freSetPointCloudMode(FREObject argv[])
 }
 FREObject KinectDevice::freSetPointCloudEnabled(FREObject argv[])
 {
-	unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asPointCloudEnabled = (enabled != 0);
+    asPointCloudEnabled = createBoolFromFREObject(argv[1]);
     return NULL;
 }
 FREObject KinectDevice::freGetPointCloudFrame(FREObject argv[])
