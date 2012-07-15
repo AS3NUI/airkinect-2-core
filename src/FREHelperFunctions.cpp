@@ -1,4 +1,5 @@
 #include "FREHelperFunctions.h"
+#include <stdlib.h>
 
 FREObject createFREPoint(double x, double y)
 {
