@@ -19,6 +19,18 @@
     <Filter Include="Source Files\Core">
       <UniqueIdentifier>{5fb308c3-eef8-49e6-aba9-add4a1dab40b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\MSSDK">
+      <UniqueIdentifier>{f57ceb70-8072-431f-a208-f9dc460884f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\OpenNI">
+      <UniqueIdentifier>{a7d1a263-f2cc-4513-bf8b-8a0f1e69ba71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MSSDK">
+      <UniqueIdentifier>{8d348ae3-3eee-4085-89b2-d90df48efedb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\OpenNI">
+      <UniqueIdentifier>{fe07468c-fbbb-4b22-af3e-25cc29636a4f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FlashRuntimeExtensions.h">
@@ -27,7 +39,13 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\AKImageBytesGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\ExtensionConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\FREHelperFunctions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\KinectCapabilities.h">
@@ -48,19 +66,34 @@
     <ClInclude Include="..\..\src\PointCloudRegion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\MSKinectDevice.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\src\MSSDK\MSKinectDevice.h">
+      <Filter>Header Files\MSSDK</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\OpenNIDevice.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\src\OpenNI\OpenNIDevice.h">
+      <Filter>Header Files\OpenNI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\FREHelperFunctions.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIRGBParser.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKRGBParser.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKDepthParser.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIDepthParser.h">
+      <Filter>Header Files\OpenNI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\AKImageBytesGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\FREHelperFunctions.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\KinectDevice.cpp">
       <Filter>Source Files</Filter>
@@ -74,14 +107,23 @@
     <ClCompile Include="..\..\src\PointCloudRegion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\MSKinectDevice.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\src\MSSDK\MSKinectDevice.cpp">
+      <Filter>Source Files\MSSDK</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\OpenNIDevice.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\src\OpenNI\OpenNIDevice.cpp">
+      <Filter>Source Files\OpenNI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\FREHelperFunctions.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIRGBParser.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKRGBParser.cpp">
+      <Filter>Source Files\MSSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKDepthParser.cpp">
+      <Filter>Source Files\MSSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIDepthParser.cpp">
+      <Filter>Source Files\OpenNI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

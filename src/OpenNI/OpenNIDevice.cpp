@@ -69,7 +69,7 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
 
 void OpenNIDevice::setNumJointsAndJointNames()
 {
-	numJoints = 16;
+	numJoints = 15;
 	jointNames = new char*[numJoints];
 	jointNames[0] = "head";
 	jointNames[1] = "neck";
@@ -95,13 +95,19 @@ void OpenNIDevice::setNumJointsAndJointNames()
 void OpenNIDevice::setDefaults()
 {
     KinectDevice::setDefaults();
-    //set some default values
     
     userCallbacksRegistered = false;
     
     depthGenerator = NULL;    
     imageGenerator = NULL;
     userGenerator = NULL;
+
+	//openni mirroring is inverse from MS SDK
+	rgbImageBytesGenerator->setSourceMirrored(true);
+	depthImageBytesGenerator->setSourceMirrored(true);
+
+	rgbParser = new AKOpenNIRGBParser();
+	depthParser = new AKOpenNIDepthParser();
     
     asInfraredWidth = 320;
     asInfraredHeight = 240;
@@ -292,7 +298,7 @@ void OpenNIDevice::stop()
     {
         started = false;
         //send stopped event
-        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "stopped");
+        dispatchStatusMessage((const uint8_t*) "stopped");
     }
 }
 
@@ -300,7 +306,17 @@ void OpenNIDevice::cleanupByteArrays()
 {
 	KinectDevice::cleanupByteArrays();
 
-    if(asInfraredByteArray != 0) delete [] asInfraredByteArray;
+	if(rgbParser != 0)
+		delete rgbParser;
+	rgbParser = 0;
+
+	if(depthParser != 0)
+		delete depthParser;
+	depthParser = 0;
+
+    if(asInfraredByteArray != 0) 
+		delete [] asInfraredByteArray;
+	asInfraredByteArray = 0;
 }
 
 void * OpenNIDevice::deviceThread(void *self)
@@ -312,24 +328,22 @@ void * OpenNIDevice::deviceThread(void *self)
 
 void OpenNIDevice::run()
 {
-    printf("OpenNIDevice::run(), %s\n", (running) ? "true" : "false");
     if(running)
     {  
-        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Device");
+        dispatchInfoMessage((const uint8_t*) "Starting Device");
         XnStatus rc;
         
         XnMapOutputMode depthMode;
-        depthMode.nXRes = depthWidth;
-        depthMode.nYRes = depthHeight;
+		depthMode.nXRes = depthImageBytesGenerator->getSourceWidth();
+		depthMode.nYRes = depthImageBytesGenerator->getSourceHeight();
         depthMode.nFPS = 30;
         
         bool depthGeneratorCreated = false;
-        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Creating Depth Generator");
+        dispatchInfoMessage((const uint8_t*) "Creating Depth Generator");
         rc = depthGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
-            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Create DepthGenerator Failed");
-            //printf("OpenNIDevice create depthGenerator failed: %s\n", xnGetStatusString(rc));
+            dispatchErrorMessage((const uint8_t*) "Create DepthGenerator Failed");
         }
         else
         {
@@ -346,17 +360,16 @@ void OpenNIDevice::run()
         }  
         
         XnMapOutputMode rgbMode;
-        rgbMode.nXRes = rgbWidth;
-        rgbMode.nYRes = rgbHeight;
+        rgbMode.nXRes = rgbImageBytesGenerator->getSourceWidth();
+        rgbMode.nYRes = rgbImageBytesGenerator->getSourceHeight();
         rgbMode.nFPS = 30;
         
         bool imageGeneratorCreated = false;
-        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Creating Image Generator");
+        dispatchInfoMessage((const uint8_t*) "Creating Image Generator");
         rc = imageGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
-            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Create ImageGenerator Failed");
-            //printf("OpenNIDevice create imageGenerator failed: %s\n", xnGetStatusString(rc));
+            dispatchErrorMessage((const uint8_t*) "Create ImageGenerator Failed");
         }
         else
         {
@@ -378,12 +391,11 @@ void OpenNIDevice::run()
         infraredMode.nFPS = 30;
         
         bool infraredGeneratorCreated = false;
-        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Creating Infrared Generator");
+        dispatchInfoMessage((const uint8_t*) "Creating Infrared Generator");
         rc = infraredGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
-            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Create Infrared Generator Failed");
-            //printf("OpenNIDevice create infraredGenerator failed: %s\n", xnGetStatusString(rc));
+            dispatchErrorMessage((const uint8_t*) "Create Infrared Generator Failed");
         }
         else
         {
@@ -407,12 +419,11 @@ void OpenNIDevice::run()
         
         //initialize the user generator
         bool userGeneratorCreated = false;
-        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Creating User Generator");
+        dispatchInfoMessage((const uint8_t*) "Creating User Generator");
         rc = userGenerator.Create(context);
         if(rc != XN_STATUS_OK)
         {
-            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Create Infrared Generator Failed");
-            //printf("OpenNIDevice create userGenerator failed: %s\n", xnGetStatusString(rc));
+            dispatchErrorMessage((const uint8_t*) "Create Infrared Generator Failed");
         }
         else
         {
@@ -439,7 +450,7 @@ void OpenNIDevice::run()
         
         if (!userGenerator.IsCapabilitySupported(XN_CAPABILITY_SKELETON))
         {
-            printf("Supplied user generator doesn't support skeleton\n");
+			dispatchErrorMessage((const uint8_t*) "Supplied user generator doesn't support skeleton");
         }
         
         if (userGenerator.GetSkeletonCap().NeedPoseForCalibration())
@@ -447,7 +458,7 @@ void OpenNIDevice::run()
             needPose = true;
             if (!userGenerator.IsCapabilitySupported(XN_CAPABILITY_POSE_DETECTION))
             {
-                printf("Pose required, but not supported\n");
+				dispatchErrorMessage((const uint8_t*) "Pose required, but not supported");
             }
             else
             {
@@ -471,43 +482,39 @@ void OpenNIDevice::run()
         
         if(depthGeneratorCreated && (asDepthEnabled || asPointCloudEnabled))
         {
-            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Depth Generator");
+            dispatchInfoMessage((const uint8_t*) "Starting Depth Generator");
             rc = depthGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Starting Depth Generator Failed");
-                //printf("OpenNIDevice start depthGenerator failed: %s\n", xnGetStatusString(rc));
+                dispatchErrorMessage((const uint8_t*) "Starting Depth Generator Failed");
             }
         }
         if(imageGeneratorCreated && (asRGBEnabled || asUserMaskEnabled || asPointCloudEnabled))
         {
-            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Image Generator");
+            dispatchInfoMessage((const uint8_t*) "Starting Image Generator");
             rc = imageGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Starting Image Generator Failed");
-                //printf("OpenNIDevice start imageGenerator failed: %s\n", xnGetStatusString(rc));
+                dispatchErrorMessage((const uint8_t*) "Starting Image Generator Failed");
             }
         }
         if(userGeneratorCreated && ((asDepthEnabled && asDepthShowUserColors) || asUserMaskEnabled || asUserEnabled || asSkeletonEnabled))
         {
-            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting User Generator");
+            dispatchInfoMessage((const uint8_t*) "Starting User Generator");
             rc = userGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Starting User Generator Failed");
-                //printf("OpenNIDevice start userGenerator failed: %s\n", xnGetStatusString(rc));
+                dispatchErrorMessage((const uint8_t*) "Starting User Generator Failed");
             }
         }
         //you cant have both infrared and rgb
         if(infraredGeneratorCreated && (asInfraredEnabled && !(imageGeneratorCreated && imageGenerator.IsGenerating())))
         {
-            FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Infrared Generator");
+            dispatchInfoMessage((const uint8_t*) "Starting Infrared Generator");
             rc = infraredGenerator.StartGenerating();
             if(rc != XN_STATUS_OK)
             {
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Infrared Generator Failed");
-                //printf("OpenNIDevice start infraredGenerator failed: %s\n", xnGetStatusString(rc));
+                dispatchInfoMessage((const uint8_t*) "Starting Infrared Generator Failed");
             }
         }
         
@@ -520,7 +527,7 @@ void OpenNIDevice::run()
         
         //send started event
         started = true;
-        FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "started");
+        dispatchStatusMessage((const uint8_t*) "started");
         while(running)
         {
             XnStatus rc = XN_STATUS_OK;
@@ -531,12 +538,11 @@ void OpenNIDevice::run()
                 rc = imageGenerator.WaitAndUpdateData();
                 if (rc != XN_STATUS_OK)
                 {
-                    printf("RGB read failed: %s\n", xnGetStatusString(rc));
+                    dispatchErrorMessage((const uint8_t*) "RGB Read Failed");
                     break;
                 }
-                
-                //get the rgb metadata
-                imageGenerator.GetMetaData(imageMetaData);
+
+				imageGenerator.GetMetaData(imageMetaData);
             }
             
             if(depthGeneratorCreated && depthGenerator.IsGenerating())
@@ -545,14 +551,12 @@ void OpenNIDevice::run()
                 rc = depthGenerator.WaitAndUpdateData();
                 if (rc != XN_STATUS_OK)
                 {
-                    printf("Depth read failed: %s\n", xnGetStatusString(rc));
+                    dispatchErrorMessage((const uint8_t*) "Depth Read Failed");
                     break;
                 }
                 
                 //get the depth metadata
                 depthGenerator.GetMetaData(depthMetaData);
-                //calculate the histogram
-                calculateHistogram();
             }
             
             if(infraredGeneratorCreated && infraredGenerator.IsGenerating())
@@ -561,7 +565,7 @@ void OpenNIDevice::run()
                 rc = infraredGenerator.WaitAndUpdateData();
                 if (rc != XN_STATUS_OK)
                 {
-                    printf("IR read failed: %s\n", xnGetStatusString(rc));
+                    dispatchErrorMessage((const uint8_t*) "IR Read Failed");
                     break;
                 }
                 
@@ -576,6 +580,20 @@ void OpenNIDevice::run()
                 //get the user pixels
                 userGenerator.GetUserPixels(0, sceneMetaData);
             }
+
+			if(imageGeneratorCreated && imageGenerator.IsGenerating())
+			{
+				lockRGBMutex();
+                readRGBFrame();
+                unlockRGBMutex();
+			}
+
+			if(depthGeneratorCreated && depthGenerator.IsGenerating())
+            {
+				lockDepthMutex();
+				readDepthFrame();
+				unlockDepthMutex();
+			}
             
             //rgb image
             if(asRGBEnabled && imageGeneratorCreated)
@@ -583,24 +601,17 @@ void OpenNIDevice::run()
                 lockRGBMutex();
                 rgbFrameHandler();
                 unlockRGBMutex();
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "RGBFrame");
+                dispatchStatusMessage((const uint8_t*) "RGBFrame");
             }
             
             //depth image
             if(asDepthEnabled && depthGeneratorCreated)
             {
                 lockDepthMutex();
-                if(asDepthShowUserColors)
-                {
-                    depthFrameWithUserColorsHandler();
-                }
-                else
-                {
-                    depthFrameHandler();
-                }
+				depthFrameHandler();
                 unlockDepthMutex();
                 //dispatch depth frame event
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "depthFrame");
+                dispatchStatusMessage((const uint8_t*) "depthFrame");
             }
             
             //infrared image - not available when rgb is enabled
@@ -610,7 +621,7 @@ void OpenNIDevice::run()
                 infraredHandler();
                 unlockInfraredMutex();
                 //dispatch infrared frame event
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "infraredFrame");
+                dispatchStatusMessage((const uint8_t*) "infraredFrame");
             }
             
             //point cloud
@@ -626,7 +637,7 @@ void OpenNIDevice::run()
                     pointCloudHandler();
                 }
                 unlockPointCloudMutex();
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "pointCloudFrame");
+                dispatchStatusMessage((const uint8_t*) "pointCloudFrame");
             }
             
             //user information
@@ -635,7 +646,7 @@ void OpenNIDevice::run()
                 lockUserMutex();
                 userHandler();
                 unlockUserMutex();
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "userFrame");
+                dispatchStatusMessage((const uint8_t*) "userFrame");
             }
             
             //user mask image
@@ -645,136 +656,45 @@ void OpenNIDevice::run()
                 userMaskHandler();
                 unlockUserMaskMutex();
                 //dispatch user mask frame event
-                FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "userMaskFrame");
+                dispatchStatusMessage((const uint8_t*) "userMaskFrame");
             }
         }
     }
+}
+
+void OpenNIDevice::readRGBFrame()
+{
+	rgbParser->setImageSize(rgbImageBytesGenerator->getSourceWidth(), rgbImageBytesGenerator->getSourceHeight());
+	rgbParser->setImageMetaData(&imageMetaData);
+	rgbParser->parseData();
+}
+
+void OpenNIDevice::readDepthFrame()
+{
+	depthParser->setImageSize(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
+	depthParser->setDepthMetaData(&depthMetaData);
+	depthParser->setSceneMetaData(&sceneMetaData);
+	depthParser->setShowUserColors(asDepthShowUserColors);
+	depthParser->setUserIndexColors(userIndexColors);
+	depthParser->parseData();
 }
 
 void OpenNIDevice::rgbFrameHandler()
 {
-    RGBFrameBuffer = imageMetaData.RGB24Data();
-    
-    uint32_t *rgbRun = asRGBByteArray;
-    int direction = asRGBMirrored ? -1 : 1;
-    int directionFactor = asRGBMirrored ? 1 : 0;
-    
-    for(int y = 0; y < asRGBHeight; y++)
-    {
-        const XnRGB24Pixel *pRGBBuffer = RGBFrameBuffer + ((y + directionFactor) * (rgbWidth * rgbScale)) - directionFactor;
-        
-        for(int x = 0; x < asRGBWidth; x++)
-        {
-            *rgbRun = 0xff << 24 | ((*pRGBBuffer).nBlue + ((*pRGBBuffer).nGreen << 8) + ((*pRGBBuffer).nRed << 16));
-            rgbRun++;
-            pRGBBuffer += (rgbScale * direction);
-        }
-    }
+	rgbImageBytesGenerator->setSourceBytes(rgbParser->getImageByteArray());
+	rgbImageBytesGenerator->generateTargetBytes();
 }
 
 void OpenNIDevice::depthFrameHandler()
 {
-    depthFrameBuffer = depthMetaData.Data();
-    
-    uint32_t *depthRun = asDepthByteArray;
-    int direction = asDepthMirrored ? -1 : 1;
-    int directionFactor = asDepthMirrored ? 1 : 0;
-    
-    unsigned int red, green, blue;
-    float value;
-    
-    for(int y = 0; y < asDepthHeight; y++)
-    {
-        const XnDepthPixel *pDepthBuffer = depthFrameBuffer + ((y + directionFactor) * (depthWidth * depthScale)) - directionFactor;
-        
-        for(int x = 0; x < asDepthWidth; x++)
-        {
-            //get histogram pixel
-            value = 0;
-            
-            if (*pDepthBuffer != 0)
-            {
-                value = depthHistogram[*pDepthBuffer];
-            }
-            
-            red = ((int) (value * 1)) << 16;
-            green = ((int) (value * 1)) << 8;
-            blue = ((int) (value * 1));
-            
-            *depthRun = 0xff << 24 | (red + green + blue);
-            
-            pDepthBuffer += (depthScale * direction);
-            depthRun++;
-        }
-    }
-}
-
-void OpenNIDevice::depthFrameWithUserColorsHandler()
-{
-    depthFrameBuffer = depthMetaData.Data();
-    sceneFrameBuffer = sceneMetaData.Data();
-    
-    uint32_t *depthRun = asDepthByteArray;
-    int direction = asDepthMirrored ? -1 : 1;
-    int directionFactor = asDepthMirrored ? 1 : 0;
-    
-    unsigned int red, green, blue;
-    float value;
-    
-    for(int y = 0; y < asDepthHeight; y++)
-    {
-        const XnDepthPixel *pDepthBuffer = depthFrameBuffer + ((y + directionFactor) * (depthWidth * depthScale)) - directionFactor;
-        
-        const XnLabel *pSceneBuffer = sceneFrameBuffer + ((y + directionFactor) * (depthWidth * depthScale)) - directionFactor;
-        
-        for(int x = 0; x < asDepthWidth; x++)
-        {
-            //get histogram pixel
-            value = 0;
-            
-            if (*pDepthBuffer != 0)
-            {
-                value = depthHistogram[*pDepthBuffer];
-            }
-            
-            short label = *pSceneBuffer;
-            
-            if(label == 0)
-            {
-                red = ((int) value) << 16;
-                green = ((int) value) << 8;
-                blue = ((int) value);
-            }
-            else
-            {
-                if(userIndexColors[label][3] == 1)
-                {
-                    red = ((int) (value * userIndexColors[label][0])) << 16;
-                    green = ((int) (value * userIndexColors[label][1])) << 8;
-                    blue = ((int) (value * userIndexColors[label][2]));
-                }
-                else
-                {
-                    red = ((int) (0xFF && userIndexColors[label][0])) << 16;
-                    green = ((int) (0xFF && userIndexColors[label][1])) << 8;
-                    blue = ((int) (0xFF && userIndexColors[label][2]));
-                }
-            }
-            
-            *depthRun = 0xff << 24 | (red + green + blue);
-            
-            pDepthBuffer += (depthScale * direction);
-            pSceneBuffer += (depthScale * direction);
-            depthRun++;
-        }
-    }
+	depthImageBytesGenerator->setSourceBytes(depthParser->getImageByteArray());
+	depthImageBytesGenerator->generateTargetBytes();
 }
 
 void OpenNIDevice::userMaskHandler()
 {
     //we need depth, rgb & scene info
-    RGBFrameBuffer = imageMetaData.RGB24Data();
-    sceneFrameBuffer = sceneMetaData.Data();
+    const XnLabel* sceneFrameBuffer = sceneMetaData.Data();
     
     int direction = asUserMaskMirrored ? -1 : 1;
     int directionFactor = asUserMaskMirrored ? 1 : 0;
@@ -782,8 +702,8 @@ void OpenNIDevice::userMaskHandler()
     int pixelNr = 0;
     for(int y = 0; y < asUserMaskHeight; y++)
     {
-        const XnRGB24Pixel *pRGBBuffer = RGBFrameBuffer + ((y + directionFactor) * (rgbWidth * userMaskScale)) - directionFactor;
-        const XnLabel *pSceneBuffer = sceneFrameBuffer + ((y + directionFactor) * (depthWidth * userMaskScale)) - directionFactor;
+		const uint32_t* pRGBBuffer = rgbParser->getImageByteArray() + ((y + directionFactor) * (rgbImageBytesGenerator->getSourceWidth() * userMaskScale)) - directionFactor;
+        const XnLabel *pSceneBuffer = sceneFrameBuffer + ((y + directionFactor) * (depthImageBytesGenerator->getSourceWidth() * userMaskScale)) - directionFactor;
         for(int x = 0; x < asUserMaskWidth; x++)
         {
             XnLabel label = *pSceneBuffer;
@@ -794,7 +714,7 @@ void OpenNIDevice::userMaskHandler()
             }
             if(label > 0)
             {
-                asUserMaskByteArray[label - 1][pixelNr] = 0xff << 24 | ((*pRGBBuffer).nBlue + ((*pRGBBuffer).nGreen << 8) + ((*pRGBBuffer).nRed << 16));
+                asUserMaskByteArray[label - 1][pixelNr] = 0xff << 24 | *pRGBBuffer;
             }
             
             pRGBBuffer += (userMaskScale * direction);
@@ -838,8 +758,6 @@ void OpenNIDevice::infraredHandler()
 
 void OpenNIDevice::pointCloudHandler()
 {
-    depthFrameBuffer = depthMetaData.Data();
-    
     short *pointCloudRun = asPointCloudByteArray;
     int direction = asPointCloudMirrored ? -1 : 1;
     int directionFactor = asPointCloudMirrored ? 1 : 0;
@@ -858,7 +776,7 @@ void OpenNIDevice::pointCloudHandler()
     
     for(int y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
     {
-        const XnDepthPixel *pDepthBuffer = depthFrameBuffer + ((y + directionFactor) * (pointCloudWidth * pointCloudScale)) - directionFactor;
+		const XnDepthPixel *pDepthBuffer = depthParser->getDepthByteArray() + ((y + directionFactor) * (pointCloudWidth * pointCloudScale)) - directionFactor;
         
         for(int x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
         {
@@ -890,9 +808,6 @@ void OpenNIDevice::pointCloudHandler()
 
 void OpenNIDevice::pointCloudWithRGBHandler()
 {
-    RGBFrameBuffer = imageMetaData.RGB24Data();
-    depthFrameBuffer = depthMetaData.Data();
-    
     short *pointCloudRun = asPointCloudByteArray;
     int direction = asPointCloudMirrored ? -1 : 1;
     int directionFactor = asPointCloudMirrored ? 1 : 0;
@@ -911,8 +826,8 @@ void OpenNIDevice::pointCloudWithRGBHandler()
     
     for(int y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
     {
-        const XnRGB24Pixel *pRGBBuffer = RGBFrameBuffer + ((y + directionFactor) * (rgbWidth * pointCloudScale)) - directionFactor;
-        const XnDepthPixel *pDepthBuffer = depthFrameBuffer + ((y + directionFactor) * (pointCloudWidth * pointCloudScale)) - directionFactor;
+		const uint32_t* pRGBBuffer = rgbParser->getImageByteArray() + ((y + directionFactor) * (rgbImageBytesGenerator->getSourceWidth() * pointCloudScale)) - directionFactor;
+        const XnDepthPixel *pDepthBuffer = depthParser->getDepthByteArray() + ((y + directionFactor) * (pointCloudWidth * pointCloudScale)) - directionFactor;
         
         for(int x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
         {
@@ -923,12 +838,14 @@ void OpenNIDevice::pointCloudWithRGBHandler()
             pointCloudRun++;
             *pointCloudRun = *pDepthBuffer;
             pointCloudRun++;
-            *pointCloudRun = (*pRGBBuffer).nRed;
-            pointCloudRun++;
-            *pointCloudRun = (*pRGBBuffer).nGreen;
-            pointCloudRun++;
-            *pointCloudRun = (*pRGBBuffer).nBlue;
-            pointCloudRun++;
+
+			uint32_t rgbValue = *pRGBBuffer;
+			* pointCloudRun = (short) (0xff & (rgbValue >> 16));
+			pointCloudRun++;
+			* pointCloudRun = (short) (0xff & (rgbValue >> 8));
+			pointCloudRun++;
+			* pointCloudRun = (short) (0xff & rgbValue);
+			pointCloudRun++;
             
             //check regions
             for(unsigned int i = 0; i < numRegions; i++)
@@ -951,11 +868,9 @@ void OpenNIDevice::pointCloudWithRGBHandler()
 
 void OpenNIDevice::userHandler()
 {
-    //clear the current users
     memset(&userFrame.users[0], 0, sizeof(userFrame.users));
     
 	XnUserID *aUsers = new XnUserID[maxSkeletons];
-    //XnUserID aUsers[maxSkeletons];
     XnUInt16 nUsers = maxSkeletons;
     XnUInt16 trackedUsers = userGenerator.GetNumberOfUsers();
     XnPoint3D position;
@@ -974,38 +889,36 @@ void OpenNIDevice::userHandler()
             userFrame.users[i].isTracking = true;
             userFrame.users[i].userID = aUsers[i];
             userFrame.users[i].trackingID = aUsers[i];
+
             userFrame.users[i].hasSkeleton = (asSkeletonEnabled && userGenerator.GetSkeletonCap().IsTracking(aUsers[i]));
-            
+
             userFrame.users[i].worldX = position.X;
             userFrame.users[i].worldY = position.Y;
             userFrame.users[i].worldZ = position.Z;
             
-            userFrame.users[i].worldRelativeX = (depthWidth - position.X) / (depthWidth * 2) - .5;
-            //if(asSkeletonMirrored) skeleton.joints[targetIndex].x = .5 - skeleton.joints[targetIndex].x;
-            userFrame.users[i].worldRelativeY = -1 * (((depthHeight - position.Y) / (depthHeight * 2)) - .5);
+			userFrame.users[i].worldRelativeX = (depthImageBytesGenerator->getSourceWidth() - position.X) / (depthImageBytesGenerator->getSourceWidth() * 2) - .5;
+			userFrame.users[i].worldRelativeY = -1 * (((depthImageBytesGenerator->getSourceHeight() - position.Y) / (depthImageBytesGenerator->getSourceHeight() * 2)) - .5);
             userFrame.users[i].worldRelativeZ = (position.Z * 7.8125) / MAX_DEPTH;
-            
             
             //depth & rgb space are the same, as we aligned the depth & image streams
             XnPoint3D pt[1];
             pt[0] = position;
             depthGenerator.ConvertRealWorldToProjective(1, pt, pt);
             
-            userFrame.users[i].rgbRelativeX = userFrame.users[i].depthRelativeX = pt[0].X / depthWidth;
-            userFrame.users[i].rgbRelativeY = userFrame.users[i].depthRelativeY = pt[0].Y / depthHeight;
+			userFrame.users[i].rgbRelativeX = userFrame.users[i].depthRelativeX = pt[0].X / depthImageBytesGenerator->getSourceWidth();
+			userFrame.users[i].rgbRelativeY = userFrame.users[i].depthRelativeY = pt[0].Y / depthImageBytesGenerator->getSourceHeight();
             
-            //take mirrored rgb / depth images into account
-            if(asRGBMirrored) userFrame.users[i].rgbRelativeX = 1 - userFrame.users[i].rgbRelativeX;
-            if(asDepthMirrored) userFrame.users[i].depthRelativeX = 1 - userFrame.users[i].depthRelativeX;
+            if(rgbImageBytesGenerator->getTargetMirrored()) userFrame.users[i].rgbRelativeX = 1 - userFrame.users[i].rgbRelativeX;
+			if(depthImageBytesGenerator->getTargetMirrored()) userFrame.users[i].depthRelativeX = 1 - userFrame.users[i].depthRelativeX;
             
-            userFrame.users[i].rgbX = (int) (userFrame.users[i].rgbRelativeX * asRGBWidth);
-            userFrame.users[i].rgbY = (int) (userFrame.users[i].rgbRelativeY * asRGBHeight);
-            userFrame.users[i].depthX = (int) (userFrame.users[i].depthRelativeX * asDepthWidth);
-            userFrame.users[i].depthY = (int) (userFrame.users[i].depthRelativeY * asDepthHeight);
+            userFrame.users[i].rgbX = (int) (userFrame.users[i].rgbRelativeX * rgbImageBytesGenerator->getTargetWidth());
+            userFrame.users[i].rgbY = (int) (userFrame.users[i].rgbRelativeY * rgbImageBytesGenerator->getTargetHeight());
+			userFrame.users[i].depthX = (int) (userFrame.users[i].depthRelativeX * depthImageBytesGenerator->getTargetWidth());
+			userFrame.users[i].depthY = (int) (userFrame.users[i].depthRelativeY * depthImageBytesGenerator->getTargetHeight());
             
             if (userFrame.users[i].hasSkeleton)
             {
-                //in openni, left/right are in screen space, rather than user space
+                //in openni, left/right are in device space, rather than user space
                 //that's why we switch LEFT/RIGHT here, to match MS SDK (user space)
                 addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_HEAD, 0, 0);
                 addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_NECK, 1, 1);
@@ -1116,8 +1029,8 @@ void OpenNIDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJ
     kUser.joints[targetIndex].worldY = jointPositionY;
     kUser.joints[targetIndex].worldZ = jointPositionZ;
     
-    kUser.joints[targetIndex].worldRelativeX = (depthWidth - jointPositionX) / (depthWidth * 2) - .5;
-    kUser.joints[targetIndex].worldRelativeY = -1 * (((depthHeight - jointPositionY) / (depthHeight * 2)) - .5);
+	kUser.joints[targetIndex].worldRelativeX = (depthImageBytesGenerator->getSourceWidth() - jointPositionX) / (depthImageBytesGenerator->getSourceWidth() * 2) - .5;
+	kUser.joints[targetIndex].worldRelativeY = -1 * (((depthImageBytesGenerator->getSourceHeight() - jointPositionY) / (depthImageBytesGenerator->getSourceHeight() * 2)) - .5);
     kUser.joints[targetIndex].worldRelativeZ = (jointPositionZ * 7.8125) / MAX_DEPTH;
     
     //relative position / depth & rgb are aligned
@@ -1125,50 +1038,17 @@ void OpenNIDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJ
     pt[0] = jointPosition.position;
     depthGenerator.ConvertRealWorldToProjective(1, pt, pt);
     
-    kUser.joints[targetIndex].rgbRelativeX = kUser.joints[targetIndex].depthRelativeX = pt[0].X / depthWidth;
-    kUser.joints[targetIndex].rgbRelativeY = kUser.joints[targetIndex].depthRelativeY = pt[0].Y / depthHeight;
+	kUser.joints[targetIndex].rgbRelativeX = kUser.joints[targetIndex].depthRelativeX = pt[0].X / depthImageBytesGenerator->getSourceWidth();
+	kUser.joints[targetIndex].rgbRelativeY = kUser.joints[targetIndex].depthRelativeY = pt[0].Y / depthImageBytesGenerator->getSourceHeight();
     
     //take mirrored rgb / depth images into account
-    if(asRGBMirrored) kUser.joints[targetIndex].rgbRelativeX = 1 - kUser.joints[targetIndex].rgbRelativeX;
-    if(asDepthMirrored) kUser.joints[targetIndex].depthRelativeX = 1 - kUser.joints[targetIndex].depthRelativeX;
+    if(rgbImageBytesGenerator->getTargetMirrored()) kUser.joints[targetIndex].rgbRelativeX = 1 - kUser.joints[targetIndex].rgbRelativeX;
+	if(depthImageBytesGenerator->getTargetMirrored()) kUser.joints[targetIndex].depthRelativeX = 1 - kUser.joints[targetIndex].depthRelativeX;
     
-    kUser.joints[targetIndex].rgbX = (int) (kUser.joints[targetIndex].rgbRelativeX * asRGBWidth);
-    kUser.joints[targetIndex].rgbY = (int) (kUser.joints[targetIndex].rgbRelativeY * asRGBHeight);
-    kUser.joints[targetIndex].depthX = (int) (kUser.joints[targetIndex].depthRelativeX * asDepthWidth);
-    kUser.joints[targetIndex].depthY = (int) (kUser.joints[targetIndex].depthRelativeY * asDepthHeight);
-}
-
-void OpenNIDevice::calculateHistogram()
-{
-    depthFrameBuffer = depthMetaData.Data();
-    
-    xnOSMemSet(depthHistogram, 0, MAX_DEPTH*sizeof(float));
-    
-    unsigned int nNumberOfPoints = 0;
-    for (int y = 0; y < depthHeight; ++y)
-    {
-        for (int x = 0; x < depthWidth; ++x, ++depthFrameBuffer)
-        {
-            
-            if (*depthFrameBuffer != 0)
-            {
-                depthHistogram[*depthFrameBuffer]++;
-                nNumberOfPoints++;
-                
-            }
-        }
-    }
-    for (int nIndex=1; nIndex<MAX_DEPTH; nIndex++)
-    {
-        depthHistogram[nIndex] += depthHistogram[nIndex-1];
-    }
-    if (nNumberOfPoints)
-    {
-        for (int nIndex=1; nIndex<MAX_DEPTH; nIndex++)
-        {
-            depthHistogram[nIndex] = (unsigned int)(256.0 * (1.0f - (depthHistogram[nIndex] / nNumberOfPoints)));
-        }
-    }
+    kUser.joints[targetIndex].rgbX = (int) (kUser.joints[targetIndex].rgbRelativeX * rgbImageBytesGenerator->getTargetWidth());
+    kUser.joints[targetIndex].rgbY = (int) (kUser.joints[targetIndex].rgbRelativeY * rgbImageBytesGenerator->getTargetHeight());
+	kUser.joints[targetIndex].depthX = (int) (kUser.joints[targetIndex].depthRelativeX * depthImageBytesGenerator->getTargetWidth());
+	kUser.joints[targetIndex].depthY = (int) (kUser.joints[targetIndex].depthRelativeY * depthImageBytesGenerator->getTargetHeight());
 }
 
 void OpenNIDevice::dispose()

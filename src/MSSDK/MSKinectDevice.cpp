@@ -109,7 +109,7 @@ void MSKinectDevice::setNumJointsAndJointNamesForRegularSkeletonTracking()
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 void MSKinectDevice::addKinectDeviceStatusListener() {
-	FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Added Device Status");
+	dispatchInfoMessage((const uint8_t*) "Added Device Status");
 	MSKinectDevice *pThis = NULL;
 	pThis = reinterpret_cast<MSKinectDevice*>(this);
 	NuiSetDeviceStatusCallback(&statusProcThunk, pThis );
@@ -122,16 +122,17 @@ void CALLBACK MSKinectDevice::statusProcThunk( HRESULT hrStatus, const OLECHAR* 
 
 void CALLBACK MSKinectDevice::statusProc( HRESULT hrStatus, const OLECHAR* instanceName, const OLECHAR* uniqueDeviceName )
 {
-	const uint8_t* statusCode = (const uint8_t*) "status";
 	const uint8_t* level = (const uint8_t*) "unknown";
-	
-	if (SUCCEEDED(hrStatus)) {
+	if (SUCCEEDED(hrStatus))
+	{
 		level = (const uint8_t*) "reconnected";
-	}else{
+	}
+	else
+	{
 		this->dispose();
 		level = (const uint8_t*) "disconnected";
 	}
-	FREDispatchStatusEventAsync(freContext, statusCode, level);
+	dispatchStatusMessage(level);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,23 +145,21 @@ void MSKinectDevice::setDefaults()
 	//set the defaults from the base class
 	KinectDevice::setDefaults();
 
+	rgbImageBytesGenerator->setSourceMirrored(false);
+	depthImageBytesGenerator->setSourceMirrored(false);
+
 	//set specific defaults for MS SDK
     imageFrameTimeout = 0;
     
 	//----------------
 	// Depth Image
 	//----------------
-	asDepthResolution = getResolutionFrom(asDepthWidth, asDepthHeight);
-	depthResolution = getResolutionFrom(depthWidth, depthHeight);
-	depthImageByteArray = 0;
-	depthByteArray = 0;
-	sceneByteArray = 0;
+	asDepthResolution = getResolutionFrom(depthImageBytesGenerator->getTargetWidth(), depthImageBytesGenerator->getTargetHeight());
+	depthResolution = getResolutionFrom(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
 	depthPlayerIndexEnabled = false;
-    
-	//----------------
-	// RGB Image
-	//----------------
-    rgbImageByteArray = 0;
+
+	depthParser = new AKMSSDKDepthParser();
+	rgbParser = new AKMSSDKRGBParser();
     
 	//----------------
 	// User Masked Image
@@ -207,7 +206,7 @@ FREObject MSKinectDevice::freSetSkeletonMode(FREObject argv[]) {
 		allocateUserFrame();
 		HRESULT hr = setSkeletonTrackingFlags();
 		if ( FAILED(hr) ){
-			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize Skeleton Tracking");
+			dispatchErrorMessage((const uint8_t*) "Failed to Initalize Skeleton Tracking");
 		}
 		unlockUserMutex();
 	}
@@ -232,7 +231,7 @@ FREObject MSKinectDevice::freSetUserMaskMode(FREObject argv[]) {
 
 FREObject MSKinectDevice::freSetDepthMode(FREObject argv[]) {
 	KinectDevice::freSetDepthMode(argv);
-	asDepthResolution = getResolutionFrom(asDepthWidth, asDepthHeight);
+	asDepthResolution = getResolutionFrom(depthImageBytesGenerator->getTargetWidth(), depthImageBytesGenerator->getTargetHeight());
     return NULL;
 }
 
@@ -260,12 +259,12 @@ FREObject MSKinectDevice::freSetNearModeEnabled(FREObject argv[])
 
 FREObject MSKinectDevice::freCameraElevationGetAngle(FREObject argv[])
 {
-	FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "[MSKinectDevice] Camera Elevation Get Angle Called");
+	dispatchInfoMessage((const uint8_t*) "[MSKinectDevice] Camera Elevation Get Angle Called");
 	FREObject asCameraAngle;
 	long degrees;
 	HRESULT hr = nuiSensor->NuiCameraElevationGetAngle(&degrees);
 	if ( FAILED(hr) ){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to get sensor angle");
+		dispatchErrorMessage((const uint8_t*) "Failed to get sensor angle");
 	}
 	FRENewObjectFromInt32 ((int) degrees, &asCameraAngle );
 	return asCameraAngle;
@@ -273,11 +272,11 @@ FREObject MSKinectDevice::freCameraElevationGetAngle(FREObject argv[])
 
 FREObject MSKinectDevice::freCameraElevationSetAngle(FREObject argv[])
 {
-	FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "[MSKinectDevice] Camera Elevation Set Angle Called");
+	dispatchInfoMessage((const uint8_t*) "[MSKinectDevice] Camera Elevation Set Angle Called");
 	int degrees; FREGetObjectAsInt32(argv[1], &degrees);
 	HRESULT hr = nuiSensor->NuiCameraElevationSetAngle((long) degrees);
 	if ( FAILED(hr) ){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to set sensor angle");
+		dispatchErrorMessage((const uint8_t*) "Failed to set sensor angle");
 	}
 	return NULL;
 }
@@ -298,47 +297,47 @@ void MSKinectDevice::start()
 
 void MSKinectDevice::dispatchError(HRESULT hr){
 	if(hr == E_NUI_DEVICE_NOT_CONNECTED){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Device Not Connected");
+		dispatchErrorMessage((const uint8_t*) "Device Not Connected");
 	}else if(hr == E_NUI_DEVICE_NOT_READY){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Device Not Ready");
+		dispatchErrorMessage((const uint8_t*) "Device Not Ready");
 	}else if(hr == E_NUI_ALREADY_INITIALIZED){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Device Already Initalized");
+		dispatchErrorMessage((const uint8_t*) "Device Already Initalized");
 	}else if(hr == E_NUI_NO_MORE_ITEMS){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "No More Items");
+		dispatchErrorMessage((const uint8_t*) "No More Items");
 	}else if(hr == E_NUI_FRAME_NO_DATA){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "No Frame Data");
+		dispatchErrorMessage((const uint8_t*) "No Frame Data");
 	}else if(hr == E_NUI_STREAM_NOT_ENABLED){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Stream Not Enabled");
+		dispatchErrorMessage((const uint8_t*) "Stream Not Enabled");
 	}else if(hr == E_NUI_IMAGE_STREAM_IN_USE){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Image Stream In-Use");
+		dispatchErrorMessage((const uint8_t*) "Image Stream In-Use");
 	}else if(hr == E_NUI_FRAME_LIMIT_EXCEEDED){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Frame Limit Exceeded");
+		dispatchErrorMessage((const uint8_t*) "Frame Limit Exceeded");
 	}else if(hr == E_NUI_FEATURE_NOT_INITIALIZED){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Feature Not Initialized");
+		dispatchErrorMessage((const uint8_t*) "Feature Not Initialized");
 	}else if(hr == E_NUI_DATABASE_NOT_FOUND){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Database Not Found");
+		dispatchErrorMessage((const uint8_t*) "Database Not Found");
 	}else if(hr == E_NUI_DATABASE_VERSION_MISMATCH){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Database Version MisMatch");
+		dispatchErrorMessage((const uint8_t*) "Database Version MisMatch");
 	}else if(hr == E_NUI_NOTCONNECTED){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "NUI Not Connected");
+		dispatchErrorMessage((const uint8_t*) "NUI Not Connected");
 	}else if(hr == E_NUI_NOTREADY){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "NUI Not Ready");
+		dispatchErrorMessage((const uint8_t*) "NUI Not Ready");
 	}else if(hr == E_NUI_SKELETAL_ENGINE_BUSY){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "NUI Skeltal Engine Busy");
+		dispatchErrorMessage((const uint8_t*) "NUI Skeltal Engine Busy");
 	}else if(hr == E_NUI_NOTPOWERED){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "NUI Not Powered");
+		dispatchErrorMessage((const uint8_t*) "NUI Not Powered");
 	}else if(hr == E_NUI_BADIINDEX){
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Bad Index");
+		dispatchErrorMessage((const uint8_t*) "Bad Index");
 	}else{
 		char errorMessage[100];
 		sprintf_s(errorMessage, "0x%x", hr);
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) errorMessage);
+		dispatchErrorMessage((const uint8_t*) errorMessage);
 	}
 }
 
 void MSKinectDevice::stop()
 {
-	FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Stopping Kinect");
+	dispatchInfoMessage((const uint8_t*) "Stopping Kinect");
 	if(running)
     {
         running = false;
@@ -380,7 +379,7 @@ void MSKinectDevice::stop()
 	setDefaults();
     if(hadStarted) {
         //send stopped event
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "stopped");
+		dispatchStatusMessage((const uint8_t*) "stopped");
     }
 	
 }
@@ -389,16 +388,22 @@ void MSKinectDevice::cleanupByteArrays()
 {
 	KinectDevice::cleanupByteArrays();
 
-	if(depthImageByteArray != 0) delete [] depthImageByteArray;
-	if(depthByteArray != 0) delete [] depthByteArray;
-	if(sceneByteArray != 0) delete [] sceneByteArray;
-	if(rgbImageByteArray != 0) delete [] rgbImageByteArray;
-	if(userIndexColors != 0) delete [] userIndexColors;
+	if(depthParser != 0)
+		delete depthParser;
+	depthParser = 0;
+
+	if(rgbParser != 0)
+		delete rgbParser;
+	rgbParser = 0;
+
+	if(userIndexColors != 0)
+		delete [] userIndexColors;
+	userIndexColors = 0;
 }
 
 void MSKinectDevice::dispose()
 {
-	FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Disposing Kinect");
+	dispatchInfoMessage((const uint8_t*) "Disposing Kinect");
     printf("MSKinectDevice::dispose()\n");
     //make sure threads are stopped
     stop();
@@ -418,12 +423,12 @@ void MSKinectDevice::run()
 {
     if(running)
     { 
-		FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Device");
+		dispatchInfoMessage((const uint8_t*) "Starting Device");
 	
 		HRESULT hr = NuiCreateSensorByIndex(this->nr, &nuiSensor);
 		//Failed dispatch some message
 		if ( FAILED(hr) ){
-			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to create Sensor");
+			dispatchErrorMessage((const uint8_t*) "Failed to create Sensor");
 			stop();
 			return;
 		}
@@ -442,22 +447,19 @@ void MSKinectDevice::run()
 
 		hr = nuiSensor->NuiInitialize(dwFlags);	
 		if (FAILED(hr)) {
-			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to initialize Sensor");
+			dispatchErrorMessage((const uint8_t*) "Failed to initialize Sensor");
 			dispatchError(hr);
 			this->dispose();
-			stop();
 			return;
 		}
 
 		userEvent	= CreateEvent( NULL, TRUE, FALSE, NULL );
 		if(asSkeletonEnabled || asUserMaskEnabled){
-			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Skeleton Tracking");
+			dispatchInfoMessage((const uint8_t*) "Starting Skeleton Tracking");
 
 			hr = setSkeletonTrackingFlags();
-			
-			//Failed dispatch some message
 			if ( FAILED(hr) ){
-				FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize Skeleton Tracking");
+				dispatchErrorMessage((const uint8_t*) "Failed to Initalize Skeleton Tracking");
 				stop();
 				return;
 			}
@@ -465,11 +467,11 @@ void MSKinectDevice::run()
 
 		rgbFrameEvent	= CreateEvent( NULL, TRUE, FALSE, NULL );
 		if(asRGBEnabled || asPointCloudEnabled || asUserMaskEnabled) {
-			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting RGB Camera");
+			dispatchInfoMessage((const uint8_t*) "Starting RGB Camera");
+
 			hr = nuiSensor->NuiImageStreamOpen( NUI_IMAGE_TYPE_COLOR, rgbResolution, 0, 2, rgbFrameEvent, &rgbFrameHandle );
-			//Failed dispatch some message
 			if ( FAILED(hr) ){
-				FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize RGB Camera");
+				dispatchErrorMessage((const uint8_t*) "Failed to Initalize RGB Camera");
 				stop();
 				return;
 			}
@@ -478,7 +480,7 @@ void MSKinectDevice::run()
 		depthFrameEvent	= CreateEvent( NULL, TRUE, FALSE, NULL );
 	
 		if(asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled) {
-			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Depth Camera");
+			dispatchInfoMessage((const uint8_t*) "Starting Depth Camera");
 			if(depthPlayerIndexEnabled){
 				hr = nuiSensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_DEPTH_AND_PLAYER_INDEX, depthResolution, 0, 2, depthFrameEvent, &depthFrameHandle );
 			}else{
@@ -492,7 +494,7 @@ void MSKinectDevice::run()
 		
 			//Failed dispatch some message
 			if ( FAILED(hr) ){
-				FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", (const uint8_t*) "Failed to Initalize Depth Camera");
+				dispatchErrorMessage((const uint8_t*) "Failed to Initalize Depth Camera");
 				stop();
 				return;
 			}
@@ -502,14 +504,14 @@ void MSKinectDevice::run()
 		updateConfigScale();
 
 		if(asSkeletonEnabled || asRGBEnabled || asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled){
-			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", (const uint8_t*) "Starting Kinect Thread");
+			dispatchInfoMessage((const uint8_t*) "Starting Kinect Thread");
 
 			const int numEvents = 3;
 			HANDLE hEvents[numEvents] = { depthFrameEvent, rgbFrameEvent, userEvent };
 			int    nEventIdx;
 
 			started = true;
-			FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "started");
+			dispatchStatusMessage((const uint8_t*) "started");
 
 			while(running) {
 				nEventIdx = WaitForMultipleObjects(numEvents, hEvents, FALSE, 100);
@@ -518,55 +520,17 @@ void MSKinectDevice::run()
 					case WAIT_TIMEOUT:
 						continue;
 					case WAIT_OBJECT_0:
-
 						readDepthFrame();
-
-						if(asDepthEnabled) {
-							lockDepthMutex();
-							depthFrameHandler();
-							unlockDepthMutex();
-							FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "depthFrame");
-						}
-
-						//point cloud
-						if(asPointCloudEnabled)
-						{
-							lockPointCloudMutex();
-							if(asPointCloudIncludeRGB)
-							{
-								pointCloudWithRGBHandler();
-							}
-							else
-							{
-								pointCloudHandler();
-							}
-							unlockPointCloudMutex();
-							FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "pointCloudFrame");
-						}
-
-						//user mask
-						if(asUserMaskEnabled)
-						{
-							lockUserMaskMutex();
-							userMaskHandler();
-							unlockUserMaskMutex();
-							FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "userMaskFrame");
-						}
-
+						dispatchDepthIfNeeded();
+						dispatchPointCloudIfNeeded();
+						dispatchUserMaskIfNeeded();
 						break;
 					case WAIT_OBJECT_0 +1:
 						readRGBFrame();
-
-						lockRGBMutex();
-						rgbFrameHandler();
-						unlockRGBMutex();
-						FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "RGBFrame");
+						dispatchRGBIfNeeded();
 						break;
 					case WAIT_OBJECT_0 +2:
-						lockUserMutex();
-						userFrameHandler();
-						unlockUserMutex();
-						FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", (const uint8_t*) "userFrame");
+						dispatchUserFrameIfNeeded();
 						break;
 				}
 			}
@@ -595,291 +559,235 @@ HRESULT MSKinectDevice::setSkeletonTrackingFlags()
 
 void MSKinectDevice::readRGBFrame()
 {
-	//Init RGB Byte Array
-	if(rgbImageByteArray == 0) rgbImageByteArray = new uint32_t[rgbPixelCount];
-	uint32_t *rgbrun = rgbImageByteArray;
-	//get image stream
-	NUI_IMAGE_FRAME rgbImageFrame;
-	HRESULT hr = nuiSensor->NuiImageStreamGetNextFrame(rgbFrameHandle, imageFrameTimeout, &rgbImageFrame );
-	if (FAILED(hr)) return;
-	//get texture
-	INuiFrameTexture * pTexture = rgbImageFrame.pFrameTexture;
-	NUI_LOCKED_RECT LockedRect;
-	pTexture->LockRect( 0, &LockedRect, NULL, 0 );
-	if( LockedRect.Pitch != 0 ) {
-		//put the camera feed bgr data into the rgbImageByteArray
-		int numRGBBytes = rgbPixelCount *4;
-		for( int x = 0 ; x < numRGBBytes ; x+=4 ) {
-			* rgbrun = 0xff << 24 | LockedRect.pBits[x+2] << 16 | LockedRect.pBits[x+1] << 8 | LockedRect.pBits[x];
-			rgbrun++;
-		}
-		//release the frame
-		nuiSensor->NuiImageStreamReleaseFrame( rgbFrameHandle, &rgbImageFrame );
-	}
+	rgbParser->setImageSize(rgbImageBytesGenerator->getSourceWidth(), rgbImageBytesGenerator->getSourceHeight());
+	rgbParser->setNuiSensor(nuiSensor);
+	rgbParser->setImageFrameTimeout(imageFrameTimeout);
+	rgbParser->setRGBFrameHandle(rgbFrameHandle);
+
+	rgbParser->parseData();
 }
 
 void MSKinectDevice::readDepthFrame()
 {
-	NUI_IMAGE_FRAME depthImageFrame;
-	HRESULT hr = nuiSensor->NuiImageStreamGetNextFrame(depthFrameHandle, imageFrameTimeout, &depthImageFrame );
-	if(FAILED(hr)) return;
+	depthParser->setImageSize(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
+	depthParser->setNuiSensor(nuiSensor);
+	depthParser->setDepthFrameTimeout(imageFrameTimeout);
+	depthParser->setDepthFrameHandle(depthFrameHandle);
+	depthParser->setUserIndexColors(userIndexColors);
 
-	INuiFrameTexture * pTexture = depthImageFrame.pFrameTexture;
-	NUI_LOCKED_RECT LockedRect;
-	pTexture->LockRect( 0, &LockedRect, NULL, 0 );
+	depthParser->parseData();
+}
 
-	if( LockedRect.Pitch != 0 ) {
-		//put the depth image camera feed into the depthImageByteArray
-		if(depthImageByteArray == 0) depthImageByteArray = new uint32_t[depthPixelCount];
-		uint32_t *depthImageRun = depthImageByteArray;
-
-		//put the depth info into the depthByteArray
-		if(depthByteArray == 0) depthByteArray = new USHORT[depthPixelCount];
-		USHORT *depthRun = depthByteArray;
-
-		//put user/scene info into the sceneByteArray
-		if(sceneByteArray == 0) sceneByteArray = new USHORT[depthPixelCount];
-		USHORT *sceneRun = sceneByteArray;
-
-		USHORT depth;
-		RGBQUAD quad;
-		int numDepthBytes = depthPixelCount *2;
-		for( int x = 0 ; x < numDepthBytes ; x+=2 ) {
-			//depth info
-			depth = (USHORT) (LockedRect.pBits[x] | (LockedRect.pBits[x+1] << 8));
-			*depthRun = depth;
-			depthRun++;
-			//scene info
-			*sceneRun = (USHORT) LockedRect.pBits[x] & 7;
-			sceneRun++;
-			//depth image
-			quad = ShortToQuad_Depth(depth, depthPlayerIndexEnabled);
-			* depthImageRun = 0xff << 24 | quad.rgbReserved << 24 | quad.rgbRed <<16 | quad.rgbGreen << 8| quad.rgbBlue;
-			depthImageRun++;
-		}
-		//release the frame
-		nuiSensor->NuiImageStreamReleaseFrame( depthFrameHandle, &depthImageFrame );
+void MSKinectDevice::dispatchRGBIfNeeded()
+{
+	if(asRGBEnabled)
+	{
+		lockRGBMutex();
+		rgbImageBytesGenerator->setSourceBytes(rgbParser->getImageByteArray());
+		rgbImageBytesGenerator->generateTargetBytes();
+		unlockRGBMutex();
+		dispatchStatusMessage((const uint8_t*) "RGBFrame");
 	}
 }
 
-void MSKinectDevice::rgbFrameHandler()
+void MSKinectDevice::dispatchDepthIfNeeded()
 {
-	if(rgbImageByteArray != 0) {
-		uint32_t *asRGBrun = asRGBByteArray;
-
-		int direction = asRGBMirrored ? 1 : -1;
-		int directionFactor = (direction == -1) ? 1 : 0;
-		int scaledWidth = rgbWidth * rgbScale;
-    
-		for(int y = 0; y < asRGBHeight; y++)
-		{
-			const uint32_t *pRGBBuffer = rgbImageByteArray + ((y + directionFactor) * scaledWidth) - directionFactor;
-        
-			for(int x = 0; x < asRGBWidth; x++)
-			{
-				*asRGBrun = *pRGBBuffer;
-				asRGBrun++;
-				pRGBBuffer += (rgbScale * direction);
-			}
-		}
+	if(asDepthEnabled) 
+	{
+		lockDepthMutex();
+		depthImageBytesGenerator->setSourceBytes(depthParser->getImageByteArray());
+		depthImageBytesGenerator->generateTargetBytes();
+		unlockDepthMutex();
+		dispatchStatusMessage((const uint8_t*) "depthFrame");
 	}
 }
 
-void MSKinectDevice::depthFrameHandler()
+void MSKinectDevice::dispatchPointCloudIfNeeded()
 {
-	if(depthImageByteArray != 0 ) {
-		uint32_t *asDepthrun = asDepthByteArray;
-
-		int direction = asDepthMirrored ? 1 : -1;
-		int directionFactor = (direction == -1) ? 1 : 0;
-		int scaledWidth = depthWidth * depthScale;
-    
-		for(int y = 0; y < asDepthHeight; y++)
+	if(asPointCloudEnabled)
+	{
+		lockPointCloudMutex();
+		if(asPointCloudIncludeRGB)
 		{
-			const uint32_t *pDepthBuffer = depthImageByteArray + ((y + directionFactor) * scaledWidth) - directionFactor;
-        
-			for(int x = 0; x < asDepthWidth; x++)
-			{
-				*asDepthrun = *pDepthBuffer;
-				asDepthrun++;
-				pDepthBuffer += (depthScale * direction);
-			}
+			pointCloudWithRGBHandler();
 		}
+		else
+		{
+			pointCloudHandler();
+		}
+		unlockPointCloudMutex();
+		dispatchStatusMessage((const uint8_t*) "pointCloudFrame");
 	}
 }
 
 void MSKinectDevice::pointCloudWithRGBHandler()
 {
-	if(depthByteArray != 0 && rgbImageByteArray != 0)
-	{
-		short *pointCloudRun = asPointCloudByteArray;
-		int direction = asPointCloudMirrored ? 1 : -1;
-		int directionFactor = (direction == -1) ? 1 : 0;
+	short *pointCloudRun = asPointCloudByteArray;
+	int direction = asPointCloudMirrored ? 1 : -1;
+	int directionFactor = (direction == -1) ? 1 : 0;
     
-		if(pointCloudRegions != 0)
+	if(pointCloudRegions != 0)
+	{
+		for(unsigned int i = 0; i < numRegions; i++)
 		{
+			pointCloudRegions[i].numPoints = 0;
+		}
+	}
+	else
+	{
+		numRegions = 0;
+	}
+    
+	uint32_t rgbValue;
+	int rgbIndex;
+	long depthX, depthY, rgbX, rgbY;
+	USHORT packedDepth, realDepth;
+	for(int y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
+	{
+		depthY = y * pointCloudScale;
+
+		const USHORT *pDepthBuffer = depthParser->getDepthByteArray() + ((y + directionFactor) * (depthImageBytesGenerator->getSourceWidth() * pointCloudScale)) - directionFactor;
+			
+		for(int x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
+		{
+			packedDepth = *pDepthBuffer;
+			realDepth = NuiDepthPixelToDepth(packedDepth);
+
+			//write to point cloud
+			*pointCloudRun = x;
+			pointCloudRun++;
+			*pointCloudRun = y;
+			pointCloudRun++;
+			*pointCloudRun = realDepth;
+			pointCloudRun++;
+
+			//calculate mirrored x
+			depthX = (direction * x * pointCloudScale) + (directionFactor * depthImageBytesGenerator->getSourceWidth());
+
+			nuiSensor->NuiImageGetColorPixelCoordinatesFromDepthPixelAtResolution(
+				rgbResolution,
+				depthResolution,
+				0,
+				depthX, 
+				depthY, 
+				packedDepth,
+				&rgbX,
+				&rgbY
+			);
+				
+			rgbIndex = (rgbX + (rgbY * rgbImageBytesGenerator->getSourceWidth()));
+
+			if(rgbIndex > rgbImageBytesGenerator->getSourcePixelCount())
+			{
+				* pointCloudRun = 0;
+				pointCloudRun++;
+				* pointCloudRun = 0;
+				pointCloudRun++;
+				* pointCloudRun = 0;
+				pointCloudRun++;
+			}
+			else
+			{
+				rgbValue = rgbParser->getImageByteArray()[rgbIndex];
+				* pointCloudRun = (USHORT) (0xff & (rgbValue >> 16));
+				pointCloudRun++;
+				* pointCloudRun = (USHORT) (0xff & (rgbValue >> 8));
+				pointCloudRun++;
+				* pointCloudRun = (USHORT) (0xff & rgbValue);
+				pointCloudRun++;
+			}
+            
+			//check regions
 			for(unsigned int i = 0; i < numRegions; i++)
 			{
-				pointCloudRegions[i].numPoints = 0;
+				if(
+					x >= pointCloudRegions[i].x && x <= pointCloudRegions[i].maxX &&
+					y >= pointCloudRegions[i].y && y <= pointCloudRegions[i].maxY &&
+					realDepth >= pointCloudRegions[i].z && realDepth <= pointCloudRegions[i].maxZ
+					)
+				{
+					pointCloudRegions[i].numPoints++;
+				}
 			}
-		}
-		else
-		{
-			numRegions = 0;
-		}
-    
-		uint32_t rgbValue;
-		unsigned int rgbIndex;
-		long depthX, depthY, rgbX, rgbY;
-		USHORT packedDepth, realDepth;
-		for(int y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
-		{
-			depthY = y * pointCloudScale;
 
-			const USHORT *pDepthBuffer = depthByteArray + ((y + directionFactor) * (depthWidth * pointCloudScale)) - directionFactor;
-			
-			for(int x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
-			{
-				packedDepth = *pDepthBuffer;
-				realDepth = NuiDepthPixelToDepth(packedDepth);
-
-				//write to point cloud
-				*pointCloudRun = x;
-				pointCloudRun++;
-				*pointCloudRun = y;
-				pointCloudRun++;
-				*pointCloudRun = realDepth;
-				pointCloudRun++;
-
-				//calculate mirrored x
-				depthX = (direction * x * pointCloudScale) + (directionFactor * depthWidth);
-
-				nuiSensor->NuiImageGetColorPixelCoordinatesFromDepthPixelAtResolution(
-					rgbResolution,
-					depthResolution,
-					0,
-					depthX, 
-					depthY, 
-					packedDepth,
-					&rgbX,
-					&rgbY
-				);
-				
-				rgbIndex = (rgbX + (rgbY * rgbWidth));
-
-				if(rgbIndex > rgbPixelCount)
-				{
-					* pointCloudRun = 0;
-					pointCloudRun++;
-					* pointCloudRun = 0;
-					pointCloudRun++;
-					* pointCloudRun = 0;
-					pointCloudRun++;
-				}
-				else
-				{
-					rgbValue = rgbImageByteArray[rgbIndex];
-					* pointCloudRun = (USHORT) (0xff & (rgbValue >> 16));
-					pointCloudRun++;
-					* pointCloudRun = (USHORT) (0xff & (rgbValue >> 8));
-					pointCloudRun++;
-					* pointCloudRun = (USHORT) (0xff & rgbValue);
-					pointCloudRun++;
-				}
-            
-				//check regions
-				for(unsigned int i = 0; i < numRegions; i++)
-				{
-					if(
-					   x >= pointCloudRegions[i].x && x <= pointCloudRegions[i].maxX &&
-					   y >= pointCloudRegions[i].y && y <= pointCloudRegions[i].maxY &&
-					   realDepth >= pointCloudRegions[i].z && realDepth <= pointCloudRegions[i].maxZ
-					   )
-					{
-						pointCloudRegions[i].numPoints++;
-					}
-				}
-
-				pDepthBuffer += (pointCloudScale * direction * asPointCloudDensity);
-			}
+			pDepthBuffer += (pointCloudScale * direction * asPointCloudDensity);
 		}
 	}
 }
 
 void MSKinectDevice::pointCloudHandler()
 {
-	if(depthByteArray != 0 && rgbImageByteArray != 0)
-	{
-		short *pointCloudRun = asPointCloudByteArray;
-		int direction = asPointCloudMirrored ? 1 : -1;
-		int directionFactor = (direction == -1) ? 1 : 0;
+	short *pointCloudRun = asPointCloudByteArray;
+	int direction = asPointCloudMirrored ? 1 : -1;
+	int directionFactor = (direction == -1) ? 1 : 0;
     
-		if(pointCloudRegions != 0)
+	if(pointCloudRegions != 0)
+	{
+		for(unsigned int i = 0; i < numRegions; i++)
 		{
+			pointCloudRegions[i].numPoints = 0;
+		}
+	}
+	else
+	{
+		numRegions = 0;
+	}
+
+	USHORT realDepth;
+	for(int y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
+	{
+		const USHORT *pDepthBuffer = depthParser->getDepthByteArray() + ((y + directionFactor) * (depthImageBytesGenerator->getSourceWidth() * pointCloudScale)) - directionFactor;
+        
+		for(int x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
+		{
+			realDepth = NuiDepthPixelToDepth(*pDepthBuffer);
+			//write to point cloud
+			*pointCloudRun = x;
+			pointCloudRun++;
+			*pointCloudRun = y;
+			pointCloudRun++;
+			*pointCloudRun = realDepth;
+			pointCloudRun++;
+            
+			//check regions
 			for(unsigned int i = 0; i < numRegions; i++)
 			{
-				pointCloudRegions[i].numPoints = 0;
-			}
-		}
-		else
-		{
-			numRegions = 0;
-		}
-
-		USHORT realDepth;
-		for(int y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
-		{
-			const USHORT *pDepthBuffer = depthByteArray + ((y + directionFactor) * (depthWidth * pointCloudScale)) - directionFactor;
-        
-			for(int x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
-			{
-				realDepth = NuiDepthPixelToDepth(*pDepthBuffer);
-				//write to point cloud
-				*pointCloudRun = x;
-				pointCloudRun++;
-				*pointCloudRun = y;
-				pointCloudRun++;
-				*pointCloudRun = realDepth;
-				pointCloudRun++;
-            
-				//check regions
-				for(unsigned int i = 0; i < numRegions; i++)
+				if(
+					x >= pointCloudRegions[i].x && x <= pointCloudRegions[i].maxX &&
+					y >= pointCloudRegions[i].y && y <= pointCloudRegions[i].maxY &&
+					realDepth >= pointCloudRegions[i].z && realDepth <= pointCloudRegions[i].maxZ
+					)
 				{
-					if(
-					   x >= pointCloudRegions[i].x && x <= pointCloudRegions[i].maxX &&
-					   y >= pointCloudRegions[i].y && y <= pointCloudRegions[i].maxY &&
-					   realDepth >= pointCloudRegions[i].z && realDepth <= pointCloudRegions[i].maxZ
-					   )
-					{
-						pointCloudRegions[i].numPoints++;
-					}
+					pointCloudRegions[i].numPoints++;
 				}
-
-				pDepthBuffer += (pointCloudScale * direction * asPointCloudDensity);
 			}
+
+			pDepthBuffer += (pointCloudScale * direction * asPointCloudDensity);
 		}
 	}
 }
 
-void MSKinectDevice::userMaskHandler()
+void MSKinectDevice::dispatchUserMaskIfNeeded()
 {
-	if(depthByteArray != 0 && rgbImageByteArray != 0)
+	if(asUserMaskEnabled)
 	{
+		lockUserMaskMutex();
+
 		int direction = asUserMaskMirrored ? 1 : -1;
 		int directionFactor = (direction == -1) ? 1 : 0;
     
 		int pixelNr = 0;
 		uint32_t rgbValue;
-		unsigned int rgbIndex;
+		int rgbIndex;
 		long depthX, depthY, rgbX, rgbY;
 		USHORT packedDepth;
 		for(int y = 0; y < asUserMaskHeight; y++)
 		{
 			depthY = y * userMaskScale;
 
-			const USHORT *pDepthBuffer = depthByteArray + ((y + directionFactor) * (depthWidth * userMaskScale)) - directionFactor;
-			const uint32_t *pRGBBuffer = rgbImageByteArray + ((y + directionFactor) * (rgbWidth * userMaskScale)) - directionFactor;
-			const USHORT *pSceneBuffer = sceneByteArray + ((y + directionFactor) * (depthWidth * userMaskScale)) - directionFactor;
+			const USHORT *pDepthBuffer = depthParser->getDepthByteArray() + ((y + directionFactor) * (depthImageBytesGenerator->getSourceWidth() * userMaskScale)) - directionFactor;
+			const uint32_t *pRGBBuffer = rgbParser->getImageByteArray() + ((y + directionFactor) * (rgbImageBytesGenerator->getSourceWidth() * userMaskScale)) - directionFactor;
+			const USHORT *pSceneBuffer = depthParser->getSceneByteArray() + ((y + directionFactor) * (depthImageBytesGenerator->getSourceWidth() * userMaskScale)) - directionFactor;
 			for(int x = 0; x < asUserMaskWidth; x++)
 			{
 				for(int i = 0; i < maxSkeletons; i++)
@@ -890,7 +798,7 @@ void MSKinectDevice::userMaskHandler()
 				if(userIndex > 0)
 				{
 					//calculate mirrored x
-					depthX = (direction * x * userMaskScale) + (directionFactor * depthWidth);
+					depthX = (direction * x * userMaskScale) + (directionFactor * depthImageBytesGenerator->getSourceWidth());
 
 					packedDepth = *pDepthBuffer;
 					nuiSensor->NuiImageGetColorPixelCoordinatesFromDepthPixelAtResolution(
@@ -904,16 +812,16 @@ void MSKinectDevice::userMaskHandler()
 						&rgbY
 					);
 				
-					rgbIndex = (rgbX + (rgbY * rgbWidth));
+					rgbIndex = (rgbX + (rgbY * rgbImageBytesGenerator->getSourceWidth()));
 					rgbValue = 0;
 
-					if(rgbIndex > rgbPixelCount)
+					if(rgbIndex > rgbImageBytesGenerator->getSourcePixelCount())
 					{
 						rgbValue = 0;
 					}
 					else
 					{
-						rgbValue = rgbImageByteArray[rgbIndex];
+						rgbValue = rgbParser->getImageByteArray()[rgbIndex];
 					}
 
 					asUserMaskByteArray[userIndex - 1][pixelNr] = 0xff << 24 | rgbValue;
@@ -924,18 +832,24 @@ void MSKinectDevice::userMaskHandler()
 				pixelNr++;
 			}
 		}
+
+		unlockUserMaskMutex();
+		dispatchStatusMessage((const uint8_t*) "userMaskFrame");
 	}
 }
 
-void MSKinectDevice::userFrameHandler()
+void MSKinectDevice::dispatchUserFrameIfNeeded()
 {
-	//clear the current users
-    memset(&userFrame.users[0], 0, sizeof(userFrame.users));
+	lockUserMutex();
 
-    //OutputDebugString( "AIRKinect Adapter :: onuserFrame\n" );
+    memset(&userFrame.users[0], 0, sizeof(userFrame.users));
 	NUI_SKELETON_FRAME skeletonFrame = {0};
 	HRESULT hr = nuiSensor->NuiSkeletonGetNextFrame( 0, &skeletonFrame );
-	if(FAILED(hr)) return;
+	if(FAILED(hr))
+	{
+		unlockUserMutex();
+		return;
+	}
 
 	nuiSensor->NuiTransformSmooth(&skeletonFrame, &transformSmoothingParameters);
 
@@ -973,6 +887,9 @@ void MSKinectDevice::userFrameHandler()
 	}
 
 	previousSkeletonFrame = &skeletonFrame;
+
+	unlockUserMutex();
+	dispatchStatusMessage((const uint8_t*) "userFrame");
 }
 
 void MSKinectDevice::calculateKinectTransform(kinectTransform &kTransform, Vector4 skeletonTransform){
@@ -991,7 +908,7 @@ void MSKinectDevice::calculateKinectTransform(kinectTransform &kTransform, Vecto
     kTransform.worldRelativeZ = mSkeletonPosition.z;
 
 	//User to Pixel Positions on Images
-	if(asDepthMirrored){
+	if(depthImageBytesGenerator->getTargetMirrored()){
 		NuiTransformSkeletonToDepthImage(mSkeletonPosition, &depthX, &depthY, &depthValue,asDepthResolution);
 	}else{
 		NuiTransformSkeletonToDepthImage(skeletonTransform, &depthX, &depthY, &depthValue,asDepthResolution);
@@ -999,10 +916,10 @@ void MSKinectDevice::calculateKinectTransform(kinectTransform &kTransform, Vecto
 	kTransform.depthX = depthX;
 	kTransform.depthY = depthY;
 
-	kTransform.depthRelativeX = ((float)depthX)/((float)asDepthWidth);
-	kTransform.depthRelativeY = ((float)depthY)/((float)asDepthHeight);
+	kTransform.depthRelativeX = ((float)depthX)/((float)depthImageBytesGenerator->getTargetWidth());
+	kTransform.depthRelativeY = ((float)depthY)/((float)depthImageBytesGenerator->getTargetHeight());
 
-	if(asRGBMirrored){
+	if(rgbImageBytesGenerator->getTargetMirrored()){
 		NuiTransformSkeletonToDepthImage(mSkeletonPosition, &depthX, &depthY, &depthValue,asDepthResolution);
 	}else{
 		NuiTransformSkeletonToDepthImage(skeletonTransform, &depthX, &depthY, &depthValue,asDepthResolution);
@@ -1012,8 +929,8 @@ void MSKinectDevice::calculateKinectTransform(kinectTransform &kTransform, Vecto
 	kTransform.rgbX = (int)colorX;
 	kTransform.rgbY = (int)colorY;
 
-	kTransform.rgbRelativeX = ((float)colorX)/((float)asRGBWidth);
-	kTransform.rgbRelativeY = ((float)colorY)/((float)asRGBHeight);
+	kTransform.rgbRelativeX = ((float)colorX)/((float)rgbImageBytesGenerator->getTargetWidth());
+	kTransform.rgbRelativeY = ((float)colorY)/((float)rgbImageBytesGenerator->getTargetHeight());
 }
 
 void MSKinectDevice::addJointElements(kinectUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
@@ -1167,27 +1084,6 @@ POINT MSKinectDevice::getDepthPixelPointFromJointCoordinate(Vector4 jointCoordin
 	return depthPoint;
 }
 
-RGBQUAD MSKinectDevice::ShortToQuad_Depth( USHORT s, BOOLEAN usePlayer ) {
-	RGBQUAD color;
-	USHORT realDepth = NuiDepthPixelToDepth(s);
-	USHORT playerIndex = NuiDepthPixelToPlayerIndex(s);
-
-	if(playerIndex == 0){
-		color.rgbRed = color.rgbGreen = color.rgbBlue = realDepth >> 4;
-	}else{
-		float depthRatio = (float)(realDepth-DEPTH_MIN) / (float)(DEPTH_RANGE);
-		depthRatio = abs(1 - depthRatio);
-		USHORT colorIndex = (playerIndex-1) * 4;
-		bool useIntensity = (USHORT) userIndexColors[colorIndex+3] != 0;
-
-		color.rgbRed  = useIntensity ? (USHORT)(depthRatio * userIndexColors[colorIndex]) :userIndexColors[colorIndex];
-		color.rgbGreen = useIntensity ? (USHORT)(depthRatio * userIndexColors[colorIndex+1]) : userIndexColors[colorIndex+1];
-		color.rgbBlue = useIntensity ? (USHORT)(depthRatio * userIndexColors[colorIndex+2]) : userIndexColors[colorIndex+2];
-	}
-
-	return color;
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                      INTERNAL HELPER FUNCTIONS         
@@ -1220,46 +1116,10 @@ void MSKinectDevice::setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int
 	rgbResolution = getResolutionFrom(rgbWidth, rgbHeight);
 }
 
-void MSKinectDevice::updateConfigScale(){
-	rgbScale = rgbWidth / asRGBWidth;
-	depthScale = depthWidth / asDepthWidth;
-	userMaskScale = depthWidth / asUserMaskWidth;
-	pointCloudScale = depthWidth / asPointCloudWidth;
-}
-
-Vector4 MSKinectDevice::QuaternionToEuler(Vector4 q){
-	Vector4 v; 
- 
-	v.x = (float)atan2  
-	( 
-		2 * q.y * q.w - 2 * q.x * q.z, 
-			1 - 2 * pow(q.y, 2) - 2 * pow(q.z, 2) 
-	); 
- 
-	v.y = (float)asin 
-	( 
-		2 * q.x * q.y + 2 * q.z * q.w
-	); 
- 
-	v.z = (float)atan2 
-	( 
-		2 * q.x * q.w - 2 * q.y * q.z, 
-		1 - 2 * pow(q.x, 2) - 2 * pow(q.z, 2) 
-	); 
- 
-	if (q.x * q.y + q.z * q.w == 0.5) 
-	{ 
-		v.x = (float)(2 * atan2(q.x, q.w)); 
-		v.z = 0;
-	} 
- 
-	else if (q.x * q.y + q.z * q.w == -0.5) 
-	{ 
-		v.x = (float)(-2 * atan2(q.x, q.w)); 
-		v.z = 0; 
-	} 
- 
-	return v;
+void MSKinectDevice::updateConfigScale()
+{
+	userMaskScale = depthImageBytesGenerator->getSourceWidth() / asUserMaskWidth;
+	pointCloudScale = depthImageBytesGenerator->getSourceWidth() / asPointCloudWidth;
 }
 
 #endif

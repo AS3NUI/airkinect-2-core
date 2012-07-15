@@ -215,6 +215,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\AKImageBytesGenerator.h" />
     <ClInclude Include="..\..\src\ExtensionConfig.h" />
     <ClInclude Include="..\..\src\FREHelperFunctions.h" />
     <ClInclude Include="..\..\src\KinectCapabilities.h" />
@@ -222,19 +223,28 @@
     <ClInclude Include="..\..\src\KinectDeviceManager.h" />
     <ClInclude Include="..\..\src\KinectExtension.h" />
     <ClInclude Include="..\..\src\KinectSkeleton.h" />
-    <ClInclude Include="..\..\src\MSKinectDevice.h" />
-    <ClInclude Include="..\..\src\OpenNIDevice.h" />
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKDepthParser.h" />
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKRGBParser.h" />
+    <ClInclude Include="..\..\src\MSSDK\MSKinectDevice.h" />
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIDepthParser.h" />
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIRGBParser.h" />
+    <ClInclude Include="..\..\src\OpenNI\OpenNIDevice.h" />
     <ClInclude Include="..\..\src\PointCloudRegion.h" />
     <ClInclude Include="FlashRuntimeExtensions.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\AKImageBytesGenerator.cpp" />
     <ClCompile Include="..\..\src\FREHelperFunctions.cpp" />
     <ClCompile Include="..\..\src\KinectDevice.cpp" />
     <ClCompile Include="..\..\src\KinectDeviceManager.cpp" />
     <ClCompile Include="..\..\src\KinectExtension.cpp" />
-    <ClCompile Include="..\..\src\MSKinectDevice.cpp" />
-    <ClCompile Include="..\..\src\OpenNIDevice.cpp" />
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKDepthParser.cpp" />
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKRGBParser.cpp" />
+    <ClCompile Include="..\..\src\MSSDK\MSKinectDevice.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIDepthParser.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIRGBParser.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\OpenNIDevice.cpp" />
     <ClCompile Include="..\..\src\PointCloudRegion.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>

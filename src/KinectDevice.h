@@ -17,6 +17,8 @@
 #include "KinectSkeleton.h"
 #include "PointCloudRegion.h"
 
+#include "AKImageBytesGenerator.h"
+
 class KinectDevice
 {
 public:
@@ -103,6 +105,10 @@ protected:
 	FREContext					freContext;
 	KinectCapabilities			capabilities;
 
+	void						dispatchErrorMessage(const uint8_t* errorMessage);
+	void						dispatchInfoMessage(const uint8_t* infoMessage);
+	void						dispatchStatusMessage(const uint8_t* statusMessage);
+
 	int							nr;
 	bool						running;
 	bool						started;
@@ -120,16 +126,6 @@ protected:
 	int							userMaskHeight;
 	unsigned int				userMaskPixelCount;
 	int							userMaskScale;
-
-	int							depthWidth;
-    int							depthHeight;
-    unsigned int				depthPixelCount;
-	int							depthScale;
-
-	int							rgbWidth;
-    int							rgbHeight;
-    unsigned int				rgbPixelCount;
-	int							rgbScale;
 
 	int							pointCloudWidth;
 	int							pointCloudHeight;
@@ -152,18 +148,10 @@ protected:
 
 	bool						asDepthEnabled;
     bool						asDepthShowUserColors;
-	int							asDepthWidth;
-    int							asDepthHeight;
-    int							asDepthPixelCount;
-    bool						asDepthMirrored;
 
 	bool						asNearModeEnabled;
 
 	bool						asRGBEnabled;
-	int							asRGBWidth;
-    int							asRGBHeight;
-    int							asRGBPixelCount;
-    bool						asRGBMirrored;
 
 	bool						asPointCloudEnabled;
 	int							asPointCloudWidth;
@@ -173,10 +161,11 @@ protected:
     int							asPointCloudDensity;
     bool						asPointCloudIncludeRGB;
 
+	AKImageBytesGenerator*		rgbImageBytesGenerator;
+	AKImageBytesGenerator*		depthImageBytesGenerator;
+
 	kinectUserFrame				userFrame;
 	uint32_t					**asUserMaskByteArray;
-	uint32_t					*asDepthByteArray;
-	uint32_t					*asRGBByteArray;
 
 	short						*asPointCloudByteArray;
 	PointCloudRegion			*pointCloudRegions;

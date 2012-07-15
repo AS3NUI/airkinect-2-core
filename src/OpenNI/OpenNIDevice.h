@@ -16,6 +16,8 @@
 #include "KinectSkeleton.h"
 #include "KinectCapabilities.h"
 #include "PointCloudRegion.h"
+#include "AKOpenNIRGBParser.h"
+#include "AKOpenNIDepthParser.h"
 
 class OpenNIDevice : KinectDevice
 {
@@ -66,8 +68,6 @@ private:
     void                    userHandler();
     void                    addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex, int targetOrientationIndex);
     
-    float                   depthHistogram[MAX_DEPTH];
-    
     float                   **userIndexColors;//[MAX_SKELETONS][4];
     
     int                     asInfraredWidth;
@@ -93,18 +93,17 @@ private:
     xn::SceneMetaData       sceneMetaData;
     xn::IRMetaData          infraredMetaData;
     
-    const XnRGB24Pixel      *RGBFrameBuffer;
+	void					readRGBFrame();
+	void					readDepthFrame();
+
     void                    rgbFrameHandler();
-    
-    const XnDepthPixel      *depthFrameBuffer;
-    const XnLabel           *sceneFrameBuffer;
+	AKOpenNIRGBParser*		rgbParser;
     
     const XnIRPixel         *infraredFrameBuffer;
     void                    infraredHandler();
     
-    void                    calculateHistogram();
     void                    depthFrameHandler();
-    void                    depthFrameWithUserColorsHandler();
+	AKOpenNIDepthParser*	depthParser;
     
     void                    userMaskHandler();
     void                    pointCloudHandler();

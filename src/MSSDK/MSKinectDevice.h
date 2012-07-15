@@ -9,12 +9,11 @@
 #include "PointCloudRegion.h"
 #include "KinectCapabilities.h"
 #include "KinectDevice.h"
+#include "AKMSSDKRGBParser.h"
+#include "AKMSSDKDepthParser.h"
 
 class MSKinectDevice : public KinectDevice
 {
-	static const int			DEPTH_MIN = 800;
-	static const int			DEPTH_MAX = 4000;
-	static const int			DEPTH_RANGE = DEPTH_MAX - DEPTH_MIN;
 public:
 
 	MSKinectDevice(int nr);
@@ -61,7 +60,7 @@ private:
 	HRESULT					setSkeletonTrackingFlags();
 
 	int						imageFrameTimeout;
-	INuiSensor *            nuiSensor;
+	INuiSensor*             nuiSensor;
 
 	static void             *deviceThread(void *ptr);
 	void                    run();
@@ -80,14 +79,10 @@ private:
     
 	NUI_IMAGE_RESOLUTION	asDepthResolution;
 	NUI_IMAGE_RESOLUTION	depthResolution;
-	uint32_t                *depthImageByteArray;
-	USHORT					*depthByteArray;
-	USHORT					*sceneByteArray;
 	bool					depthPlayerIndexEnabled;
     
 	NUI_IMAGE_RESOLUTION	asRGBResolution;
 	NUI_IMAGE_RESOLUTION	rgbResolution;
-	uint32_t                *rgbImageByteArray;
     
 	NUI_IMAGE_RESOLUTION	asUserMaskResolution;
 
@@ -96,19 +91,22 @@ private:
 
 	//Handlers
 	void					readRGBFrame();
-	void					readDepthFrame();
+	AKMSSDKRGBParser*		rgbParser;
 
-	void					userFrameHandler();
-	void					rgbFrameHandler();
-	void					depthFrameHandler();
+	void					readDepthFrame();
+	AKMSSDKDepthParser*		depthParser;
+
+	void					dispatchUserFrameIfNeeded();
+	void					dispatchRGBIfNeeded();
+	void					dispatchDepthIfNeeded();
+	void					dispatchPointCloudIfNeeded();
+	void					dispatchUserMaskIfNeeded();
+
 	void					pointCloudHandler();
 	void					pointCloudWithRGBHandler();
-	void					userMaskHandler();
     
 	NUI_IMAGE_RESOLUTION getResolutionFrom(int width, int height);
 	POINT getDepthPixelPointFromJointCoordinate(Vector4 jointCoordinates);
-	RGBQUAD ShortToQuad_Depth( USHORT s, BOOLEAN usePlayer );
-	Vector4 QuaternionToEuler(Vector4 q);
 };
 
 #endif

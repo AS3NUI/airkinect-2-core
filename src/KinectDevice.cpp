@@ -14,30 +14,19 @@ void KinectDevice::setDefaults()
 	asSeatedSkeletonEnabled = false;
 	asChooseSkeletonsEnabled = false;
 
-	//
-	// DEPTH IMAGE
-	//
-	asDepthWidth = 320;
-    asDepthHeight = 240;
-    asDepthPixelCount = asDepthWidth * asDepthHeight;
-    asDepthMirrored = false;
+	depthImageBytesGenerator = new AKImageBytesGenerator();
+	depthImageBytesGenerator->setTargetSize(320, 240);
+	depthImageBytesGenerator->setTargetMirrored(false);
+	depthImageBytesGenerator->setSourceSize(640, 480);
+
     asDepthEnabled = false;
     asDepthShowUserColors = false;
-	asDepthByteArray = 0;
-
 	asNearModeEnabled = false;
 
-	depthWidth = 640;
-    depthHeight = 480;
-    depthPixelCount = depthWidth * depthHeight;
-    depthScale = depthWidth / asDepthWidth;
+	rgbImageBytesGenerator = new AKImageBytesGenerator();
 
-	//
-	// RGB IMAGE
-	//
 	setRGBMode(640, 480, 640, 480, false);
     asRGBEnabled = false;
-	asRGBByteArray = 0;
 
 	//
 	// USER MASK IMAGE
@@ -81,11 +70,35 @@ void KinectDevice::setDefaults()
 	allocateUserFrame();
 }
 
+void KinectDevice::dispatchErrorMessage(const uint8_t* errorMessage)
+{
+	FREDispatchStatusEventAsync(freContext, (const uint8_t*) "error", errorMessage);
+}
+
+void KinectDevice::dispatchInfoMessage(const uint8_t* infoMessage)
+{
+	FREDispatchStatusEventAsync(freContext, (const uint8_t*) "info", infoMessage);
+}
+
+void KinectDevice::dispatchStatusMessage(const uint8_t* statusMessage)
+{
+	FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", statusMessage);
+}
+
 void KinectDevice::cleanupByteArrays()
 {
-	if(asDepthByteArray != 0) delete [] asDepthByteArray;
-	if(asRGBByteArray != 0) delete [] asRGBByteArray;
-    if(asPointCloudByteArray != 0) delete [] asPointCloudByteArray;
+	if(rgbImageBytesGenerator != 0) 
+		delete rgbImageBytesGenerator;
+	rgbImageBytesGenerator = 0;
+
+	if(depthImageBytesGenerator != 0) 
+		delete depthImageBytesGenerator;
+	depthImageBytesGenerator = 0;
+
+    if(asPointCloudByteArray != 0) 
+		delete [] asPointCloudByteArray;
+	asPointCloudByteArray = 0;
+
 	if(asUserMaskByteArray != 0)
     {
 		for(int i = 0; i < maxSkeletons; i++)
@@ -94,14 +107,15 @@ void KinectDevice::cleanupByteArrays()
         }
         delete [] asUserMaskByteArray;
     }
+	asUserMaskByteArray = 0;
+
     if(pointCloudRegions != 0)
-    {
-        delete [] pointCloudRegions;
-    }
+		delete [] pointCloudRegions;
+	pointCloudRegions = 0;
+
 	if(chosenSkeletonIds != 0)
-	{
 		delete [] chosenSkeletonIds;
-	}
+	chosenSkeletonIds = 0;
 }
 
 void KinectDevice::setNumJointsAndJointNames()
@@ -380,18 +394,10 @@ FREObject KinectDevice::freSetDepthMode(FREObject argv[])
     unsigned int height; FREGetObjectAsUint32(argv[2], &height);
     
     lockDepthMutex();
-    
-    asDepthWidth = width;
-    asDepthHeight = height;
-    asDepthPixelCount = asDepthWidth * asDepthHeight;
-    asDepthMirrored = createBoolFromFREObject(argv[3]);
-    depthScale = depthWidth / asDepthWidth;
-    
-    //reset bytearray
-    if(asDepthByteArray != 0) delete [] asDepthByteArray;
-    asDepthByteArray = new uint32_t[asDepthPixelCount];
-    
+	depthImageBytesGenerator->setTargetSize(width, height);
+	depthImageBytesGenerator->setTargetMirrored(createBoolFromFREObject(argv[3]));
     unlockDepthMutex();
+
     return NULL;
 }
 FREObject KinectDevice::freSetDepthEnabled(FREObject argv[])
@@ -401,7 +407,7 @@ FREObject KinectDevice::freSetDepthEnabled(FREObject argv[])
 }
 FREObject KinectDevice::freGetDepthFrame(FREObject argv[])
 {
-	const unsigned int numDepthBytes = asDepthPixelCount * 4;
+	const unsigned int numDepthBytes = depthImageBytesGenerator->getTargetPixelCount() * 4;
     
     FREObject objectByteArray = argv[1];
     FREByteArray byteArray;			
@@ -410,7 +416,7 @@ FREObject KinectDevice::freGetDepthFrame(FREObject argv[])
     FRESetObjectProperty(objectByteArray, (const uint8_t*) "length", length, NULL);
     FREAcquireByteArray(objectByteArray, &byteArray);
     lockDepthMutex();
-    memcpy(byteArray.bytes, asDepthByteArray, numDepthBytes);
+	memcpy(byteArray.bytes, depthImageBytesGenerator->getTargetBytes(), numDepthBytes);
     unlockDepthMutex();
     FREReleaseByteArray(objectByteArray);
     
@@ -432,13 +438,7 @@ FREObject KinectDevice::freSetRGBMode(FREObject argv[])
     unsigned int height; FREGetObjectAsUint32(argv[2], &height);
     
     lockRGBMutex();
-
-	setRGBMode(rgbWidth, rgbHeight, width, height, createBoolFromFREObject(argv[3]));
-    
-    //reset bytearray
-    if(asRGBByteArray != 0) delete [] asRGBByteArray;
-    asRGBByteArray = new uint32_t[asRGBPixelCount];
-    
+	setRGBMode(rgbImageBytesGenerator->getSourceWidth(), rgbImageBytesGenerator->getSourceHeight(), width, height, createBoolFromFREObject(argv[3]));
     unlockRGBMutex();
     return NULL;
 }
@@ -449,7 +449,7 @@ FREObject KinectDevice::freSetRGBEnabled(FREObject argv[])
 }
 FREObject KinectDevice::freGetRGBFrame(FREObject argv[])
 {
-	const unsigned int numRGBBytes = asRGBPixelCount * 4;
+	const unsigned int numRGBBytes = rgbImageBytesGenerator->getTargetPixelCount() * 4;
     
     FREObject objectByteArray = argv[1];
     FREByteArray byteArray;			
@@ -458,7 +458,7 @@ FREObject KinectDevice::freGetRGBFrame(FREObject argv[])
     FRESetObjectProperty(objectByteArray, (const uint8_t*) "length", length, NULL);
     FREAcquireByteArray(objectByteArray, &byteArray);
     lockRGBMutex();
-    memcpy(byteArray.bytes, asRGBByteArray, numRGBBytes);
+	memcpy(byteArray.bytes, rgbImageBytesGenerator->getTargetBytes(), numRGBBytes);
     unlockRGBMutex();
     FREReleaseByteArray(objectByteArray);
     
@@ -681,14 +681,7 @@ void KinectDevice::setUserColor(int userID, int color, bool useIntensity)
 
 void KinectDevice::setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored)
 {
-	this->rgbWidth = rgbWidth;
-    this->rgbHeight = rgbHeight;
-	this->asRGBWidth = asRGBWidth;
-    this->asRGBHeight = asRGBHeight;
-	this->asRGBMirrored = asRGBMirrored;
-
-	rgbPixelCount = rgbWidth * rgbHeight;
-    rgbScale = rgbWidth / asRGBWidth;
-
-    asRGBPixelCount = asRGBWidth * asRGBHeight;
+	rgbImageBytesGenerator->setSourceSize(rgbWidth, rgbHeight);
+	rgbImageBytesGenerator->setTargetSize(asRGBWidth, asRGBHeight);
+	rgbImageBytesGenerator->setTargetMirrored(asRGBMirrored);
 }

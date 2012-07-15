@@ -1,10 +1,10 @@
 #include "KinectDeviceManager.h"
 
 #ifdef AIRKINECT_TARGET_MSSDK
-    #include "MSKinectDevice.h"
+    #include "MSSDK/MSKinectDevice.h"
 #endif
 #ifdef AIRKINECT_TARGET_OPENNI
-    #include "OpenNIDevice.h"
+    #include "OpenNI/OpenNIDevice.h"
 #endif
 
 #include <iostream>
