@@ -84,6 +84,24 @@
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIDepthParser.h">
       <Filter>Header Files\OpenNI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKPointCloudGenerator.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\AKPointCloudGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIPointCloudGenerator.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\AKUserMasksGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserMasksGenerator.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -124,6 +142,24 @@
     </ClCompile>
     <ClCompile Include="..\..\src\OpenNI\AKOpenNIDepthParser.cpp">
       <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKPointCloudGenerator.cpp">
+      <Filter>Source Files\MSSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\AKPointCloudGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIPointCloudGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\AKUserMasksGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIUserMasksGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.cpp">
+      <Filter>Source Files\MSSDK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

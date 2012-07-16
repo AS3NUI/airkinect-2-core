@@ -6,6 +6,9 @@
     #include <math.h>
 #endif
 
+#include "AKOpenNIPointCloudGenerator.h"
+#include "AKOpenNIUserMasksGenerator.h"
+
 XnBool needPose = FALSE;
 XnChar strPose[20] = "";
 
@@ -92,6 +95,16 @@ void OpenNIDevice::setNumJointsAndJointNames()
 	jointNames[14] = "right_foot";
 }
 
+void OpenNIDevice::createPointCloudGenerator()
+{
+	pointCloudGenerator = new AKOpenNIPointCloudGenerator();
+}
+
+void OpenNIDevice::createUserMasksGenerator()
+{
+	userMasksGenerator = new AKOpenNIUserMasksGenerator();
+}
+
 void OpenNIDevice::setDefaults()
 {
     KinectDevice::setDefaults();
@@ -101,10 +114,23 @@ void OpenNIDevice::setDefaults()
     depthGenerator = NULL;    
     imageGenerator = NULL;
     userGenerator = NULL;
+	infraredGenerator = NULL;
+
+	depthGeneratorCreated = false;
+	imageGeneratorCreated = false;
+	userGeneratorCreated = false;
+	infraredGeneratorCreated = false;
 
 	//openni mirroring is inverse from MS SDK
 	rgbImageBytesGenerator->setSourceMirrored(true);
 	depthImageBytesGenerator->setSourceMirrored(true);
+
+	pointCloudGenerator->setSourceRGBMirrored(true);
+	pointCloudGenerator->setSourceDepthMirrored(true);
+
+	userMasksGenerator->setSourceRGBMirrored(true);
+	userMasksGenerator->setSourceDepthMirrored(true);
+	userMasksGenerator->setSourceSceneMirrored(true);
 
 	rgbParser = new AKOpenNIRGBParser();
 	depthParser = new AKOpenNIDepthParser();
@@ -119,8 +145,6 @@ void OpenNIDevice::setDefaults()
     infraredHeight = 480;
     infraredPixelCount = infraredWidth * infraredHeight;
     infraredScale = infraredWidth / asInfraredWidth;
-    
-    infraredGenerator = NULL;
     
     asInfraredByteArray = 0;
     
@@ -209,18 +233,6 @@ FREObject OpenNIDevice::freGetInfraredFrame(FREObject argv[])
 }
 
 // END FRE FUNCTIONS
-
-int OpenNIDevice::getAsPointCloudByteArrayLength()
-{
-    if(asPointCloudIncludeRGB)
-    {
-        return (asPointCloudWidth * asPointCloudHeight * sizeof(short) * 6) / asPointCloudDensity;
-    }
-    else
-    {
-        return (asPointCloudWidth * asPointCloudHeight * sizeof(short) * 3) / asPointCloudDensity;
-    }
-}
 
 void OpenNIDevice::start()
 {
@@ -338,7 +350,6 @@ void OpenNIDevice::run()
 		depthMode.nYRes = depthImageBytesGenerator->getSourceHeight();
         depthMode.nFPS = 30;
         
-        bool depthGeneratorCreated = false;
         dispatchInfoMessage((const uint8_t*) "Creating Depth Generator");
         rc = depthGenerator.Create(context);
         if(rc != XN_STATUS_OK)
@@ -364,7 +375,6 @@ void OpenNIDevice::run()
         rgbMode.nYRes = rgbImageBytesGenerator->getSourceHeight();
         rgbMode.nFPS = 30;
         
-        bool imageGeneratorCreated = false;
         dispatchInfoMessage((const uint8_t*) "Creating Image Generator");
         rc = imageGenerator.Create(context);
         if(rc != XN_STATUS_OK)
@@ -390,7 +400,6 @@ void OpenNIDevice::run()
         infraredMode.nYRes = infraredHeight;
         infraredMode.nFPS = 30;
         
-        bool infraredGeneratorCreated = false;
         dispatchInfoMessage((const uint8_t*) "Creating Infrared Generator");
         rc = infraredGenerator.Create(context);
         if(rc != XN_STATUS_OK)
@@ -418,7 +427,6 @@ void OpenNIDevice::run()
         }
         
         //initialize the user generator
-        bool userGeneratorCreated = false;
         dispatchInfoMessage((const uint8_t*) "Creating User Generator");
         rc = userGenerator.Create(context);
         if(rc != XN_STATUS_OK)
@@ -534,50 +542,40 @@ void OpenNIDevice::run()
             
             if(imageGeneratorCreated && imageGenerator.IsGenerating())
             {
-                //read a new RGB frame
                 rc = imageGenerator.WaitAndUpdateData();
                 if (rc != XN_STATUS_OK)
                 {
                     dispatchErrorMessage((const uint8_t*) "RGB Read Failed");
                     break;
                 }
-
 				imageGenerator.GetMetaData(imageMetaData);
             }
             
             if(depthGeneratorCreated && depthGenerator.IsGenerating())
             {
-                //read a new Depth frame
                 rc = depthGenerator.WaitAndUpdateData();
                 if (rc != XN_STATUS_OK)
                 {
                     dispatchErrorMessage((const uint8_t*) "Depth Read Failed");
                     break;
                 }
-                
-                //get the depth metadata
                 depthGenerator.GetMetaData(depthMetaData);
             }
             
             if(infraredGeneratorCreated && infraredGenerator.IsGenerating())
             {
-                //read a new Infrared frame
                 rc = infraredGenerator.WaitAndUpdateData();
                 if (rc != XN_STATUS_OK)
                 {
                     dispatchErrorMessage((const uint8_t*) "IR Read Failed");
                     break;
                 }
-                
-                //get the depth metadata
                 infraredGenerator.GetMetaData(infraredMetaData);
             }
             
             if(userGeneratorCreated && userGenerator.IsGenerating())
             {
-                //read a new User frame
                 userGenerator.WaitAndUpdateData();
-                //get the user pixels
                 userGenerator.GetUserPixels(0, sceneMetaData);
             }
 
@@ -594,70 +592,13 @@ void OpenNIDevice::run()
 				readDepthFrame();
 				unlockDepthMutex();
 			}
-            
-            //rgb image
-            if(asRGBEnabled && imageGeneratorCreated)
-            {
-                lockRGBMutex();
-                rgbFrameHandler();
-                unlockRGBMutex();
-                dispatchStatusMessage((const uint8_t*) "RGBFrame");
-            }
-            
-            //depth image
-            if(asDepthEnabled && depthGeneratorCreated)
-            {
-                lockDepthMutex();
-				depthFrameHandler();
-                unlockDepthMutex();
-                //dispatch depth frame event
-                dispatchStatusMessage((const uint8_t*) "depthFrame");
-            }
-            
-            //infrared image - not available when rgb is enabled
-            if(asInfraredEnabled && infraredGeneratorCreated && !(imageGeneratorCreated && imageGenerator.IsGenerating()))
-            {
-                lockInfraredMutex();
-                infraredHandler();
-                unlockInfraredMutex();
-                //dispatch infrared frame event
-                dispatchStatusMessage((const uint8_t*) "infraredFrame");
-            }
-            
-            //point cloud
-            if(asPointCloudEnabled)
-            {
-                lockPointCloudMutex();
-                if(asPointCloudIncludeRGB)
-                {
-                    pointCloudWithRGBHandler();
-                }
-                else
-                {
-                    pointCloudHandler();
-                }
-                unlockPointCloudMutex();
-                dispatchStatusMessage((const uint8_t*) "pointCloudFrame");
-            }
-            
-            //user information
-            if((asUserEnabled || asSkeletonEnabled || asUserMaskEnabled) && userGeneratorCreated)
-            {
-                lockUserMutex();
-                userHandler();
-                unlockUserMutex();
-                dispatchStatusMessage((const uint8_t*) "userFrame");
-            }
-            
-            //user mask image
-            if(asUserMaskEnabled)
-            {
-                lockUserMaskMutex();
-                userMaskHandler();
-                unlockUserMaskMutex();
-                //dispatch user mask frame event
-                dispatchStatusMessage((const uint8_t*) "userMaskFrame");
-            }
+
+			dispatchRGBIfNeeded();
+			dispatchDepthIfNeeded();
+			dispatchInfraredIfNeeded();
+			dispatchPointCloudIfNeeded();
+			dispatchUserFrameIfNeeded();
+			dispatchUserMaskIfNeeded();
         }
     }
 }
@@ -679,302 +620,219 @@ void OpenNIDevice::readDepthFrame()
 	depthParser->parseData();
 }
 
-void OpenNIDevice::rgbFrameHandler()
+void OpenNIDevice::dispatchRGBIfNeeded()
 {
-	rgbImageBytesGenerator->setSourceBytes(rgbParser->getImageByteArray());
-	rgbImageBytesGenerator->generateTargetBytes();
-}
-
-void OpenNIDevice::depthFrameHandler()
-{
-	depthImageBytesGenerator->setSourceBytes(depthParser->getImageByteArray());
-	depthImageBytesGenerator->generateTargetBytes();
-}
-
-void OpenNIDevice::userMaskHandler()
-{
-    //we need depth, rgb & scene info
-    const XnLabel* sceneFrameBuffer = sceneMetaData.Data();
-    
-    int direction = asUserMaskMirrored ? -1 : 1;
-    int directionFactor = asUserMaskMirrored ? 1 : 0;
-    
-    int pixelNr = 0;
-    for(int y = 0; y < asUserMaskHeight; y++)
+	if(asRGBEnabled && imageGeneratorCreated)
     {
-		const uint32_t* pRGBBuffer = rgbParser->getImageByteArray() + ((y + directionFactor) * (rgbImageBytesGenerator->getSourceWidth() * userMaskScale)) - directionFactor;
-        const XnLabel *pSceneBuffer = sceneFrameBuffer + ((y + directionFactor) * (depthImageBytesGenerator->getSourceWidth() * userMaskScale)) - directionFactor;
-        for(int x = 0; x < asUserMaskWidth; x++)
-        {
-            XnLabel label = *pSceneBuffer;
-            
-            for(int i = 0; i < maxSkeletons; i++)
-            {
-                asUserMaskByteArray[i][pixelNr] = 0;
-            }
-            if(label > 0)
-            {
-                asUserMaskByteArray[label - 1][pixelNr] = 0xff << 24 | *pRGBBuffer;
-            }
-            
-            pRGBBuffer += (userMaskScale * direction);
-            pSceneBuffer += (userMaskScale * direction);
-            pixelNr++;
-        }
+        lockRGBMutex();
+        rgbImageBytesGenerator->setSourceBytes(rgbParser->getImageByteArray());
+		rgbImageBytesGenerator->generateTargetBytes();
+        unlockRGBMutex();
+        dispatchStatusMessage((const uint8_t*) "RGBFrame");
     }
-    
 }
 
-void OpenNIDevice::infraredHandler()
+void OpenNIDevice::dispatchDepthIfNeeded()
 {
-    infraredFrameBuffer = infraredMetaData.Data();
-    
-    uint32_t *depthRun = asInfraredByteArray;
-    int direction = asInfraredMirrored ? -1 : 1;
-    int directionFactor = asInfraredMirrored ? 1 : 0;
-    
-    unsigned int red, green, blue;
-    float value;
-    
-    for(int y = 0; y < asInfraredHeight; y++)
+	if(asDepthEnabled && depthGeneratorCreated)
     {
-        const XnIRPixel *pInfraredBuffer = infraredFrameBuffer + ((y + directionFactor) * (infraredWidth * infraredScale)) - directionFactor;
+        lockDepthMutex();
+		depthImageBytesGenerator->setSourceBytes(depthParser->getImageByteArray());
+		depthImageBytesGenerator->generateTargetBytes();
+        unlockDepthMutex();
+        dispatchStatusMessage((const uint8_t*) "depthFrame");
+    }
+}
+
+void OpenNIDevice::dispatchInfraredIfNeeded()
+{
+	if(asInfraredEnabled && infraredGeneratorCreated && !(imageGeneratorCreated && imageGenerator.IsGenerating()))
+    {
+        lockInfraredMutex();
+        infraredFrameBuffer = infraredMetaData.Data();
+		uint32_t *depthRun = asInfraredByteArray;
+		int direction = asInfraredMirrored ? -1 : 1;
+		int directionFactor = asInfraredMirrored ? 1 : 0;
+    
+		unsigned int red, green, blue;
+		float value;
+    
+		for(int y = 0; y < asInfraredHeight; y++)
+		{
+			const XnIRPixel *pInfraredBuffer = infraredFrameBuffer + ((y + directionFactor) * (infraredWidth * infraredScale)) - directionFactor;
         
-        for(int x = 0; x < asInfraredWidth; x++)
-        {
-            value = *pInfraredBuffer;
+			for(int x = 0; x < asInfraredWidth; x++)
+			{
+				value = *pInfraredBuffer;
             
-            red = ((int) (value * 1)) << 16;
-            green = ((int) (value * 1)) << 8;
-            blue = ((int) (value * 1));
+				red = ((int) (value * 1)) << 16;
+				green = ((int) (value * 1)) << 8;
+				blue = ((int) (value * 1));
             
-            *depthRun = 0xff << 24 | (red + green + blue);
+				*depthRun = 0xff << 24 | (red + green + blue);
             
-            pInfraredBuffer += (infraredScale * direction);
-            depthRun++;
-        }
+				pInfraredBuffer += (infraredScale * direction);
+				depthRun++;
+			}
+		}
+        unlockInfraredMutex();
+        dispatchStatusMessage((const uint8_t*) "infraredFrame");
     }
 }
 
-void OpenNIDevice::pointCloudHandler()
+void OpenNIDevice::dispatchPointCloudIfNeeded()
 {
-    short *pointCloudRun = asPointCloudByteArray;
-    int direction = asPointCloudMirrored ? -1 : 1;
-    int directionFactor = asPointCloudMirrored ? 1 : 0;
-    
-    if(pointCloudRegions != 0)
-    {
-        for(unsigned int i = 0; i < numRegions; i++)
-        {
-            pointCloudRegions[i].numPoints = 0;
-        }
-    }
-    else
-    {
-        numRegions = 0;
-    }
-    
-    for(int y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
-    {
-		const XnDepthPixel *pDepthBuffer = depthParser->getDepthByteArray() + ((y + directionFactor) * (pointCloudWidth * pointCloudScale)) - directionFactor;
-        
-        for(int x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
-        {
-            //write to point cloud
-            *pointCloudRun = x;
-            pointCloudRun++;
-            *pointCloudRun = y;
-            pointCloudRun++;
-            *pointCloudRun = *pDepthBuffer;
-            pointCloudRun++;
-            
-            //check regions
-            for(unsigned int i = 0; i < numRegions; i++)
-            {
-                if(
-                   x >= pointCloudRegions[i].x && x <= pointCloudRegions[i].maxX &&
-                   y >= pointCloudRegions[i].y && y <= pointCloudRegions[i].maxY &&
-                   *pDepthBuffer >= pointCloudRegions[i].z && *pDepthBuffer <= pointCloudRegions[i].maxZ
-                )
-                {
-                    pointCloudRegions[i].numPoints++;
-                }
-            }
-            
-            pDepthBuffer += (pointCloudScale * direction * asPointCloudDensity);
-        }
-    }
+	if(asPointCloudEnabled)
+	{
+		lockPointCloudMutex();
+
+		pointCloudGenerator->setNumRegions(numRegions);
+		pointCloudGenerator->setPointCloudRegions(pointCloudRegions);
+		pointCloudGenerator->setSourceDepthBytes(depthParser->getDepthByteArray());
+		pointCloudGenerator->setSourceDepthSize(depthParser->getWidth(), depthParser->getHeight());
+		pointCloudGenerator->setSourceRGBBytes(rgbParser->getImageByteArray());
+		pointCloudGenerator->setSourceRGBSize(rgbParser->getWidth(), rgbParser->getHeight());
+
+		pointCloudGenerator->generateTargetBytes();
+
+		unlockPointCloudMutex();
+		dispatchStatusMessage((const uint8_t*) "pointCloudFrame");
+	}
 }
 
-void OpenNIDevice::pointCloudWithRGBHandler()
+void OpenNIDevice::dispatchUserFrameIfNeeded()
 {
-    short *pointCloudRun = asPointCloudByteArray;
-    int direction = asPointCloudMirrored ? -1 : 1;
-    int directionFactor = asPointCloudMirrored ? 1 : 0;
+	if((asUserEnabled || asSkeletonEnabled || asUserMaskEnabled) && userGeneratorCreated)
+	{
+		lockUserMutex();
+		
+		memset(&userFrame.users[0], 0, sizeof(userFrame.users));
     
-    if(pointCloudRegions != 0)
-    {
-        for(unsigned int i = 0; i < numRegions; i++)
-        {
-            pointCloudRegions[i].numPoints = 0;
-        }
-    }
-    else
-    {
-        numRegions = 0;
-    }
+		XnUserID *aUsers = new XnUserID[maxSkeletons];
+		XnUInt16 nUsers = maxSkeletons;
+		XnUInt16 trackedUsers = userGenerator.GetNumberOfUsers();
+		XnPoint3D position;
+		XnStatus rc;
     
-    for(int y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
-    {
-		const uint32_t* pRGBBuffer = rgbParser->getImageByteArray() + ((y + directionFactor) * (rgbImageBytesGenerator->getSourceWidth() * pointCloudScale)) - directionFactor;
-        const XnDepthPixel *pDepthBuffer = depthParser->getDepthByteArray() + ((y + directionFactor) * (pointCloudWidth * pointCloudScale)) - directionFactor;
-        
-        for(int x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
-        {
-            //write to point cloud
-            *pointCloudRun = x;
-            pointCloudRun++;
-            *pointCloudRun = y;
-            pointCloudRun++;
-            *pointCloudRun = *pDepthBuffer;
-            pointCloudRun++;
+		userGenerator.GetUsers(aUsers, nUsers);
+    
+		userFrame.frameNumber = userGenerator.GetFrameID();
+		userFrame.timeStamp = (int) (userGenerator.GetTimestamp() / 1000);
+    
+		for (int i = 0; i < maxSkeletons; ++i)
+		{
+			if(i < trackedUsers)
+			{
+				rc = userGenerator.GetCoM(aUsers[i], position);
+				userFrame.users[i].isTracking = true;
+				userFrame.users[i].userID = aUsers[i];
+				userFrame.users[i].trackingID = aUsers[i];
 
-			uint32_t rgbValue = *pRGBBuffer;
-			* pointCloudRun = (short) (0xff & (rgbValue >> 16));
-			pointCloudRun++;
-			* pointCloudRun = (short) (0xff & (rgbValue >> 8));
-			pointCloudRun++;
-			* pointCloudRun = (short) (0xff & rgbValue);
-			pointCloudRun++;
+				userFrame.users[i].hasSkeleton = (asSkeletonEnabled && userGenerator.GetSkeletonCap().IsTracking(aUsers[i]));
+
+				userFrame.users[i].worldX = position.X;
+				userFrame.users[i].worldY = position.Y;
+				userFrame.users[i].worldZ = position.Z;
             
-            //check regions
-            for(unsigned int i = 0; i < numRegions; i++)
-            {
-                if(
-                   x >= pointCloudRegions[i].x && x <= pointCloudRegions[i].maxX &&
-                   y >= pointCloudRegions[i].y && y <= pointCloudRegions[i].maxY &&
-                   *pDepthBuffer >= pointCloudRegions[i].z && *pDepthBuffer <= pointCloudRegions[i].maxZ
-                   )
-                {
-                    pointCloudRegions[i].numPoints++;
-                }
-            }
+				userFrame.users[i].worldRelativeX = (depthImageBytesGenerator->getSourceWidth() - position.X) / (depthImageBytesGenerator->getSourceWidth() * 2) - .5;
+				userFrame.users[i].worldRelativeY = -1 * (((depthImageBytesGenerator->getSourceHeight() - position.Y) / (depthImageBytesGenerator->getSourceHeight() * 2)) - .5);
+				userFrame.users[i].worldRelativeZ = (position.Z * 7.8125) / MAX_DEPTH;
             
-            pRGBBuffer += (pointCloudScale * direction * asPointCloudDensity);
-            pDepthBuffer += (pointCloudScale * direction * asPointCloudDensity);
-        }
-    }
+				//depth & rgb space are the same, as we aligned the depth & image streams
+				XnPoint3D pt[1];
+				pt[0] = position;
+				depthGenerator.ConvertRealWorldToProjective(1, pt, pt);
+            
+				userFrame.users[i].rgbRelativeX = userFrame.users[i].depthRelativeX = pt[0].X / depthImageBytesGenerator->getSourceWidth();
+				userFrame.users[i].rgbRelativeY = userFrame.users[i].depthRelativeY = pt[0].Y / depthImageBytesGenerator->getSourceHeight();
+            
+				if(rgbImageBytesGenerator->getTargetMirrored()) userFrame.users[i].rgbRelativeX = 1 - userFrame.users[i].rgbRelativeX;
+				if(depthImageBytesGenerator->getTargetMirrored()) userFrame.users[i].depthRelativeX = 1 - userFrame.users[i].depthRelativeX;
+            
+				userFrame.users[i].rgbX = (int) (userFrame.users[i].rgbRelativeX * rgbImageBytesGenerator->getTargetWidth());
+				userFrame.users[i].rgbY = (int) (userFrame.users[i].rgbRelativeY * rgbImageBytesGenerator->getTargetHeight());
+				userFrame.users[i].depthX = (int) (userFrame.users[i].depthRelativeX * depthImageBytesGenerator->getTargetWidth());
+				userFrame.users[i].depthY = (int) (userFrame.users[i].depthRelativeY * depthImageBytesGenerator->getTargetHeight());
+            
+				if (userFrame.users[i].hasSkeleton)
+				{
+					//in openni, left/right are in device space, rather than user space
+					//that's why we switch LEFT/RIGHT here, to match MS SDK (user space)
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_HEAD, 0, 0);
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_NECK, 1, 1);
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_TORSO, 2, 2);
+                
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_SHOULDER, 3, 3);
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_ELBOW, 4, 4);
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_HAND, 5, 5);
+                
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_SHOULDER, 6, 6);
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_ELBOW, 7, 7);
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_HAND, 8, 8);
+                
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_HIP, 9, 9);
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_KNEE, 10, 10);
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_FOOT, 11, 11);
+                
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_HIP, 12, 12);
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_KNEE, 13, 13);
+					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_FOOT, 14, 14);
+                
+					//set joint orientation matrices for joints with no orientation confidence
+					for(int j = 0; j < numJoints; j++)
+					{
+						if(userFrame.users[i].joints[j].orientationConfidence == 0.0)
+						{
+							//set it to the identity matrix
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M11 = 1.0;
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M12 = 0.0;
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M13 = 0.0;
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M14 = 0.0;
+                        
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M21 = 0.0;
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M22 = 1.0;
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M23 = 0.0;
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M24 = 0.0;
+                        
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M31 = 0.0;
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M32 = 0.0;
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M33 = 1.0;
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M34 = 0.0;
+                        
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M41 = 0.0;
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M42 = 0.0;
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M43 = 0.0;
+							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M44 = 1.0;
+						}
+					}
+				}
+			}
+			else
+			{
+				userFrame.users[i].isTracking = false;
+			}
+		}
+
+
+		unlockUserMutex();
+		dispatchStatusMessage((const uint8_t*) "userFrame");
+	}
 }
 
-void OpenNIDevice::userHandler()
+void OpenNIDevice::dispatchUserMaskIfNeeded()
 {
-    memset(&userFrame.users[0], 0, sizeof(userFrame.users));
-    
-	XnUserID *aUsers = new XnUserID[maxSkeletons];
-    XnUInt16 nUsers = maxSkeletons;
-    XnUInt16 trackedUsers = userGenerator.GetNumberOfUsers();
-    XnPoint3D position;
-    XnStatus rc;
-    
-    userGenerator.GetUsers(aUsers, nUsers);
-    
-    userFrame.frameNumber = userGenerator.GetFrameID();
-    userFrame.timeStamp = (int) (userGenerator.GetTimestamp() / 1000);
-    
-    for (int i = 0; i < maxSkeletons; ++i)
-    {
-        if(i < trackedUsers)
-        {
-            rc = userGenerator.GetCoM(aUsers[i], position);
-            userFrame.users[i].isTracking = true;
-            userFrame.users[i].userID = aUsers[i];
-            userFrame.users[i].trackingID = aUsers[i];
+	if(asUserMaskEnabled)
+	{
+		lockUserMaskMutex();
+		
+		((AKOpenNIUserMasksGenerator*) userMasksGenerator)->setSceneMetaData(&sceneMetaData);
+		userMasksGenerator->setSourceDepthBytes(depthParser->getDepthByteArray());
+		userMasksGenerator->setSourceRGBBytes(rgbParser->getImageByteArray());
+		userMasksGenerator->generateTargetBytes();
 
-            userFrame.users[i].hasSkeleton = (asSkeletonEnabled && userGenerator.GetSkeletonCap().IsTracking(aUsers[i]));
-
-            userFrame.users[i].worldX = position.X;
-            userFrame.users[i].worldY = position.Y;
-            userFrame.users[i].worldZ = position.Z;
-            
-			userFrame.users[i].worldRelativeX = (depthImageBytesGenerator->getSourceWidth() - position.X) / (depthImageBytesGenerator->getSourceWidth() * 2) - .5;
-			userFrame.users[i].worldRelativeY = -1 * (((depthImageBytesGenerator->getSourceHeight() - position.Y) / (depthImageBytesGenerator->getSourceHeight() * 2)) - .5);
-            userFrame.users[i].worldRelativeZ = (position.Z * 7.8125) / MAX_DEPTH;
-            
-            //depth & rgb space are the same, as we aligned the depth & image streams
-            XnPoint3D pt[1];
-            pt[0] = position;
-            depthGenerator.ConvertRealWorldToProjective(1, pt, pt);
-            
-			userFrame.users[i].rgbRelativeX = userFrame.users[i].depthRelativeX = pt[0].X / depthImageBytesGenerator->getSourceWidth();
-			userFrame.users[i].rgbRelativeY = userFrame.users[i].depthRelativeY = pt[0].Y / depthImageBytesGenerator->getSourceHeight();
-            
-            if(rgbImageBytesGenerator->getTargetMirrored()) userFrame.users[i].rgbRelativeX = 1 - userFrame.users[i].rgbRelativeX;
-			if(depthImageBytesGenerator->getTargetMirrored()) userFrame.users[i].depthRelativeX = 1 - userFrame.users[i].depthRelativeX;
-            
-            userFrame.users[i].rgbX = (int) (userFrame.users[i].rgbRelativeX * rgbImageBytesGenerator->getTargetWidth());
-            userFrame.users[i].rgbY = (int) (userFrame.users[i].rgbRelativeY * rgbImageBytesGenerator->getTargetHeight());
-			userFrame.users[i].depthX = (int) (userFrame.users[i].depthRelativeX * depthImageBytesGenerator->getTargetWidth());
-			userFrame.users[i].depthY = (int) (userFrame.users[i].depthRelativeY * depthImageBytesGenerator->getTargetHeight());
-            
-            if (userFrame.users[i].hasSkeleton)
-            {
-                //in openni, left/right are in device space, rather than user space
-                //that's why we switch LEFT/RIGHT here, to match MS SDK (user space)
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_HEAD, 0, 0);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_NECK, 1, 1);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_TORSO, 2, 2);
-                
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_SHOULDER, 3, 3);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_ELBOW, 4, 4);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_HAND, 5, 5);
-                
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_SHOULDER, 6, 6);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_ELBOW, 7, 7);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_HAND, 8, 8);
-                
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_HIP, 9, 9);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_KNEE, 10, 10);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_FOOT, 11, 11);
-                
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_HIP, 12, 12);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_KNEE, 13, 13);
-                addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_FOOT, 14, 14);
-                
-                //set joint orientation matrices for joints with no orientation confidence
-                for(int j = 0; j < numJoints; j++)
-                {
-                    if(userFrame.users[i].joints[j].orientationConfidence == 0.0)
-                    {
-                        //set it to the identity matrix
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M11 = 1.0;
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M12 = 0.0;
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M13 = 0.0;
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M14 = 0.0;
-                        
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M21 = 0.0;
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M22 = 1.0;
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M23 = 0.0;
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M24 = 0.0;
-                        
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M31 = 0.0;
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M32 = 0.0;
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M33 = 1.0;
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M34 = 0.0;
-                        
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M41 = 0.0;
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M42 = 0.0;
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M43 = 0.0;
-                        userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M44 = 1.0;
-                    }
-                }
-            }
-        }
-        else
-        {
-            userFrame.users[i].isTracking = false;
-        }
-    }
-    
+		unlockUserMaskMutex();
+		dispatchStatusMessage((const uint8_t*) "userMaskFrame");
+	}
 }
 
 void OpenNIDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex, int targetOrientationIndex)

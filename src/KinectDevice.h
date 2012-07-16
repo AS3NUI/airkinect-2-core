@@ -18,6 +18,8 @@
 #include "PointCloudRegion.h"
 
 #include "AKImageBytesGenerator.h"
+#include "AKPointCloudGenerator.h"
+#include "AKUserMasksGenerator.h"
 
 class KinectDevice
 {
@@ -108,6 +110,7 @@ protected:
 	void						dispatchErrorMessage(const uint8_t* errorMessage);
 	void						dispatchInfoMessage(const uint8_t* infoMessage);
 	void						dispatchStatusMessage(const uint8_t* statusMessage);
+	void						trace(const uint8_t* traceMessage);
 
 	int							nr;
 	bool						running;
@@ -121,16 +124,6 @@ protected:
     boost::mutex				userMaskMutex;
     boost::mutex				pointCloudMutex;
     boost::mutex                infraredMutex;
-	
-	int							userMaskWidth;
-	int							userMaskHeight;
-	unsigned int				userMaskPixelCount;
-	int							userMaskScale;
-
-	int							pointCloudWidth;
-	int							pointCloudHeight;
-	unsigned int				pointCloudPixelCount;
-	int							pointCloudScale;
 
     bool						asUserMirrored;
     bool						asUserEnabled;
@@ -141,10 +134,6 @@ protected:
 	bool						asChooseSkeletonsEnabled;
 
 	bool						asUserMaskEnabled;
-	int							asUserMaskWidth;
-    int							asUserMaskHeight;
-    int							asUserMaskPixelCount;
-    bool						asUserMaskMirrored;
 
 	bool						asDepthEnabled;
     bool						asDepthShowUserColors;
@@ -153,26 +142,24 @@ protected:
 
 	bool						asRGBEnabled;
 
-	bool						asPointCloudEnabled;
-	int							asPointCloudWidth;
-    int							asPointCloudHeight;
-    int							asPointCloudPixelCount;
-    bool						asPointCloudMirrored;
-    int							asPointCloudDensity;
-    bool						asPointCloudIncludeRGB;
-
 	AKImageBytesGenerator*		rgbImageBytesGenerator;
 	AKImageBytesGenerator*		depthImageBytesGenerator;
 
-	kinectUserFrame				userFrame;
-	uint32_t					**asUserMaskByteArray;
+	AKPointCloudGenerator*		pointCloudGenerator;
+	virtual void				createPointCloudGenerator();
 
-	short						*asPointCloudByteArray;
-	PointCloudRegion			*pointCloudRegions;
+	bool						asPointCloudEnabled;
+
+	kinectUserFrame				userFrame;
+
+	AKUserMasksGenerator*		userMasksGenerator;
+	virtual void				createUserMasksGenerator();
+
+	PointCloudRegion*			pointCloudRegions;
     unsigned int				numRegions;
 
 	int							numChosenSkeletons;
-	int							*chosenSkeletonIds;
+	int*						chosenSkeletonIds;
 
 };
 

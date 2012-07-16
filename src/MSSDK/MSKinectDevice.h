@@ -26,7 +26,6 @@ public:
 	//Overridden FRE functions
 	FREObject           freSetSkeletonMode(FREObject argv[]);
 	FREObject			freChooseSkeletons(FREObject argv[]);
-    FREObject           freSetUserMaskMode(FREObject argv[]);
     FREObject           freSetDepthMode(FREObject argv[]);
 	FREObject			freSetNearModeEnabled(FREObject argv[]);
 	FREObject           freCameraElevationGetAngle(FREObject argv[]);
@@ -42,6 +41,9 @@ protected:
 	void				setNumJointsAndJointNames();
 	void				setNumJointsAndJointNamesForSeatedSkeletonTracking();
 	void				setNumJointsAndJointNamesForRegularSkeletonTracking();
+
+	void				createPointCloudGenerator();
+	void				createUserMasksGenerator();
 
 private:
 
@@ -83,11 +85,6 @@ private:
     
 	NUI_IMAGE_RESOLUTION	asRGBResolution;
 	NUI_IMAGE_RESOLUTION	rgbResolution;
-    
-	NUI_IMAGE_RESOLUTION	asUserMaskResolution;
-
-	//Requested Image to Actual Image Scaling
-	void					updateConfigScale();
 
 	//Handlers
 	void					readRGBFrame();
@@ -101,9 +98,6 @@ private:
 	void					dispatchDepthIfNeeded();
 	void					dispatchPointCloudIfNeeded();
 	void					dispatchUserMaskIfNeeded();
-
-	void					pointCloudHandler();
-	void					pointCloudWithRGBHandler();
     
 	NUI_IMAGE_RESOLUTION getResolutionFrom(int width, int height);
 	POINT getDepthPixelPointFromJointCoordinate(Vector4 jointCoordinates);

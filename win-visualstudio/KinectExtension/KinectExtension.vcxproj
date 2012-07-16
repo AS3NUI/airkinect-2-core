@@ -216,6 +216,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\AKImageBytesGenerator.h" />
+    <ClInclude Include="..\..\src\AKPointCloudGenerator.h" />
+    <ClInclude Include="..\..\src\AKUserMasksGenerator.h" />
     <ClInclude Include="..\..\src\ExtensionConfig.h" />
     <ClInclude Include="..\..\src\FREHelperFunctions.h" />
     <ClInclude Include="..\..\src\KinectCapabilities.h" />
@@ -224,10 +226,14 @@
     <ClInclude Include="..\..\src\KinectExtension.h" />
     <ClInclude Include="..\..\src\KinectSkeleton.h" />
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKDepthParser.h" />
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKPointCloudGenerator.h" />
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKRGBParser.h" />
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.h" />
     <ClInclude Include="..\..\src\MSSDK\MSKinectDevice.h" />
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIDepthParser.h" />
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIPointCloudGenerator.h" />
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIRGBParser.h" />
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserMasksGenerator.h" />
     <ClInclude Include="..\..\src\OpenNI\OpenNIDevice.h" />
     <ClInclude Include="..\..\src\PointCloudRegion.h" />
     <ClInclude Include="FlashRuntimeExtensions.h" />
@@ -235,15 +241,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\AKImageBytesGenerator.cpp" />
+    <ClCompile Include="..\..\src\AKPointCloudGenerator.cpp" />
+    <ClCompile Include="..\..\src\AKUserMasksGenerator.cpp" />
     <ClCompile Include="..\..\src\FREHelperFunctions.cpp" />
     <ClCompile Include="..\..\src\KinectDevice.cpp" />
     <ClCompile Include="..\..\src\KinectDeviceManager.cpp" />
     <ClCompile Include="..\..\src\KinectExtension.cpp" />
     <ClCompile Include="..\..\src\MSSDK\AKMSSDKDepthParser.cpp" />
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKPointCloudGenerator.cpp" />
     <ClCompile Include="..\..\src\MSSDK\AKMSSDKRGBParser.cpp" />
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.cpp" />
     <ClCompile Include="..\..\src\MSSDK\MSKinectDevice.cpp" />
     <ClCompile Include="..\..\src\OpenNI\AKOpenNIDepthParser.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIPointCloudGenerator.cpp" />
     <ClCompile Include="..\..\src\OpenNI\AKOpenNIRGBParser.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIUserMasksGenerator.cpp" />
     <ClCompile Include="..\..\src\OpenNI\OpenNIDevice.cpp" />
     <ClCompile Include="..\..\src\PointCloudRegion.cpp" />
     <ClCompile Include="dllmain.cpp">

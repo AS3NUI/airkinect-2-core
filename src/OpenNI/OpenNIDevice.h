@@ -43,11 +43,12 @@ protected:
 	void					setDefaults();
 	void					cleanupByteArrays();
 	void					setNumJointsAndJointNames();
+
+	void					createPointCloudGenerator();
+	void					createUserMasksGenerator();
     
 private:
     xn::Context             context;
-    
-    int                     getAsPointCloudByteArrayLength();
     
     void                    run();
     
@@ -65,7 +66,6 @@ private:
     
     bool                    userCallbacksRegistered;
     
-    void                    userHandler();
     void                    addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex, int targetOrientationIndex);
     
     float                   **userIndexColors;//[MAX_SKELETONS][4];
@@ -87,6 +87,11 @@ private:
     xn::DepthGenerator      depthGenerator;
     xn::UserGenerator       userGenerator;
     xn::IRGenerator         infraredGenerator;
+
+	bool					imageGeneratorCreated;
+	bool					depthGeneratorCreated;
+	bool					userGeneratorCreated;
+	bool					infraredGeneratorCreated;
     
     xn::ImageMetaData       imageMetaData;
     xn::DepthMetaData       depthMetaData;
@@ -96,18 +101,17 @@ private:
 	void					readRGBFrame();
 	void					readDepthFrame();
 
-    void                    rgbFrameHandler();
 	AKOpenNIRGBParser*		rgbParser;
     
     const XnIRPixel         *infraredFrameBuffer;
-    void                    infraredHandler();
-    
-    void                    depthFrameHandler();
 	AKOpenNIDepthParser*	depthParser;
-    
-    void                    userMaskHandler();
-    void                    pointCloudHandler();
-    void                    pointCloudWithRGBHandler();
+
+	void					dispatchRGBIfNeeded();
+	void					dispatchDepthIfNeeded();
+	void					dispatchInfraredIfNeeded();
+	void					dispatchPointCloudIfNeeded();
+	void					dispatchUserMaskIfNeeded();
+	void					dispatchUserFrameIfNeeded();
 };
 
 #endif

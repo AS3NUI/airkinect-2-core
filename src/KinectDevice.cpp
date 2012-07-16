@@ -2,6 +2,14 @@
 #include "KinectSkeleton.h"
 #include "FREHelperFunctions.h"
 
+void KinectDevice::createPointCloudGenerator()
+{
+}
+
+void KinectDevice::createUserMasksGenerator()
+{
+}
+
 void KinectDevice::setDefaults()
 {
 	started = false;
@@ -28,37 +36,23 @@ void KinectDevice::setDefaults()
 	setRGBMode(640, 480, 640, 480, false);
     asRGBEnabled = false;
 
-	//
-	// USER MASK IMAGE
-	//
-	asUserMaskWidth = 320;
-    asUserMaskHeight = 240;
-    asUserMaskPixelCount = asUserMaskWidth * asUserMaskHeight;
-    asUserMaskMirrored = false;
-    asUserMaskEnabled = false;
-	asUserMaskByteArray = 0;
+	asUserMaskEnabled = false;
+	createUserMasksGenerator();
+	userMasksGenerator->setTargetSize(320, 240);
+	userMasksGenerator->setMaxUsers(maxSkeletons);
+	userMasksGenerator->setTargetMirrored(false);
+	userMasksGenerator->setSourceDepthSize(640, 480);
+	userMasksGenerator->setSourceSceneSize(640, 480);
+	userMasksGenerator->setSourceRGBSize(640, 480);
 
-	userMaskWidth = 640;
-    userMaskHeight = 480;
-    userMaskPixelCount = userMaskWidth * userMaskHeight;
-    userMaskScale = userMaskWidth / asUserMaskWidth;
-
-	//
-	// POINT CLOUD IMAGE
-	//
-	asPointCloudWidth = 320;
-    asPointCloudHeight = 240;
-    asPointCloudPixelCount = asPointCloudWidth * asPointCloudHeight;
-    asPointCloudMirrored = false;
-    asPointCloudEnabled = false;
-    asPointCloudDensity = 1;
-    asPointCloudIncludeRGB = false;
-	asPointCloudByteArray = 0;
-
-	pointCloudWidth = 640;
-    pointCloudHeight = 480;
-    pointCloudPixelCount = pointCloudWidth * pointCloudHeight;
-    pointCloudScale = pointCloudWidth / asPointCloudWidth;
+	asPointCloudEnabled = false;
+	createPointCloudGenerator();
+	pointCloudGenerator->setTargetSize(320, 240);
+	pointCloudGenerator->setTargetMirrored(false);
+	pointCloudGenerator->setTargetDensity(1);
+	pointCloudGenerator->setIncludeRGB(false);
+	pointCloudGenerator->setSourceDepthSize(640, 480);
+	pointCloudGenerator->setSourceRGBSize(640, 480);
 
 	pointCloudRegions = 0;
 	numRegions = 0;
@@ -85,6 +79,12 @@ void KinectDevice::dispatchStatusMessage(const uint8_t* statusMessage)
 	FREDispatchStatusEventAsync(freContext, (const uint8_t*) "status", statusMessage);
 }
 
+void KinectDevice::trace(const uint8_t* traceMessage)
+{
+	FREDispatchStatusEventAsync(freContext, (const uint8_t*) "trace", traceMessage);
+}
+
+
 void KinectDevice::cleanupByteArrays()
 {
 	if(rgbImageBytesGenerator != 0) 
@@ -95,19 +95,13 @@ void KinectDevice::cleanupByteArrays()
 		delete depthImageBytesGenerator;
 	depthImageBytesGenerator = 0;
 
-    if(asPointCloudByteArray != 0) 
-		delete [] asPointCloudByteArray;
-	asPointCloudByteArray = 0;
+	if(pointCloudGenerator != 0)
+		delete pointCloudGenerator;
+	pointCloudGenerator = 0;
 
-	if(asUserMaskByteArray != 0)
-    {
-		for(int i = 0; i < maxSkeletons; i++)
-        {
-            delete [] asUserMaskByteArray[i];
-        }
-        delete [] asUserMaskByteArray;
-    }
-	asUserMaskByteArray = 0;
+	if(userMasksGenerator != 0)
+		delete userMasksGenerator;
+	userMasksGenerator = 0;
 
     if(pointCloudRegions != 0)
 		delete [] pointCloudRegions;
@@ -337,29 +331,10 @@ FREObject KinectDevice::freSetUserMaskMode(FREObject argv[])
     unsigned int height; FREGetObjectAsUint32(argv[2], &height);
     
     lockUserMaskMutex();
-    
-    asUserMaskWidth = width;
-    asUserMaskHeight = height;
-    asUserMaskPixelCount = asUserMaskWidth * asUserMaskHeight;
-    asUserMaskMirrored = createBoolFromFREObject(argv[3]);
-    userMaskScale = userMaskWidth / asUserMaskWidth;
-    
-    //reset bytearray
-    if(asUserMaskByteArray != 0)
-    {
-        for(int i = 0; i < maxSkeletons; i++)
-        {
-            delete [] asUserMaskByteArray[i];
-        }
-        delete [] asUserMaskByteArray;
-    }
-    asUserMaskByteArray = new uint32_t*[maxSkeletons];
-    for(int i = 0; i < maxSkeletons; i++)
-    {
-        asUserMaskByteArray[i] = new uint32_t[asUserMaskPixelCount];
-    }
-    
+	userMasksGenerator->setTargetSize(width, height);
+	userMasksGenerator->setTargetMirrored(createBoolFromFREObject(argv[3]));
     unlockUserMaskMutex();
+
     return NULL;
 }
 FREObject KinectDevice::freSetUserMaskEnabled(FREObject argv[])
@@ -373,7 +348,7 @@ FREObject KinectDevice::freGetUserMaskFrame(FREObject argv[])
     
     if(trackingID > 0) trackingID--;
     
-    const unsigned int numUserMaskBytes = asUserMaskPixelCount * 4;
+    const unsigned int numUserMaskBytes = userMasksGenerator->getTargetPixelCount() * 4;
     
     FREObject objectByteArray = argv[2];
     FREByteArray byteArray;			
@@ -382,7 +357,7 @@ FREObject KinectDevice::freGetUserMaskFrame(FREObject argv[])
     FRESetObjectProperty(objectByteArray, (const uint8_t*) "length", length, NULL);
     FREAcquireByteArray(objectByteArray, &byteArray);
     lockUserMaskMutex();
-    memcpy(byteArray.bytes, asUserMaskByteArray[trackingID], numUserMaskBytes);
+	memcpy(byteArray.bytes, userMasksGenerator->getTargetBytes()[trackingID], numUserMaskBytes);
     unlockUserMaskMutex();
     FREReleaseByteArray(objectByteArray);
     
@@ -482,26 +457,12 @@ FREObject KinectDevice::freSetPointCloudMode(FREObject argv[])
     
     unsigned int width; FREGetObjectAsUint32(argv[1], &width);
     unsigned int height; FREGetObjectAsUint32(argv[2], &height);
-
     unsigned int density; FREGetObjectAsUint32(argv[4], &density);
-    
-    asPointCloudWidth = width;
-    asPointCloudHeight = height;
-    asPointCloudDensity = density;
-    asPointCloudIncludeRGB = createBoolFromFREObject(argv[5]);
-    asPointCloudPixelCount = (asPointCloudWidth * asPointCloudHeight) / asPointCloudDensity;
-    asPointCloudMirrored = createBoolFromFREObject(argv[3]);
-    pointCloudScale = pointCloudWidth / asPointCloudWidth;
-    
-    if(asPointCloudByteArray != 0) delete [] asPointCloudByteArray;
-    if(asPointCloudIncludeRGB)
-    {
-        asPointCloudByteArray = new short[asPointCloudPixelCount * 6];
-    }
-    else
-    {
-        asPointCloudByteArray = new short[asPointCloudPixelCount * 3];
-    }
+
+	pointCloudGenerator->setTargetSize(width, height);
+	pointCloudGenerator->setTargetDensity(density);
+	pointCloudGenerator->setIncludeRGB(createBoolFromFREObject(argv[5]));
+	pointCloudGenerator->setTargetMirrored(createBoolFromFREObject(argv[3]));
     
     unlockPointCloudMutex();
     
@@ -516,8 +477,8 @@ FREObject KinectDevice::freGetPointCloudFrame(FREObject argv[])
 {
 	FREObject objectPointsByteArray = argv[1];
     
-    const unsigned int numPointBytes = (asPointCloudWidth * asPointCloudHeight * sizeof(short) * (asPointCloudIncludeRGB ? 6 : 3)) / asPointCloudDensity;
-    if(numPointBytes == 0) return NULL;
+	const unsigned int numPointBytes = pointCloudGenerator->getByteArrayLength() * sizeof(short);
+	if(numPointBytes == 0) return NULL;
 
     lockPointCloudMutex();
     
@@ -526,7 +487,7 @@ FREObject KinectDevice::freGetPointCloudFrame(FREObject argv[])
     FRENewObjectFromUint32(numPointBytes, &pointsLength);
     FRESetObjectProperty(objectPointsByteArray, (const uint8_t*) "length", pointsLength, NULL);
     FREAcquireByteArray(objectPointsByteArray, &pointsByteArray);
-    memcpy(pointsByteArray.bytes, asPointCloudByteArray, numPointBytes);
+	memcpy(pointsByteArray.bytes, pointCloudGenerator->getTargetBytes(), numPointBytes);
     FREReleaseByteArray(objectPointsByteArray);
     
     //set the region information?

@@ -1,6 +1,9 @@
 #include "MSKinectDevice.h"
 #ifdef AIRKINECT_TARGET_MSSDK
 
+#include "AKMSSDKPointCloudGenerator.h"
+#include "AKMSSDKUserMasksGenerator.h"
+
 const float PI = acos(-1.0f);
 
 MSKinectDevice::MSKinectDevice(int nr)
@@ -140,6 +143,17 @@ void CALLBACK MSKinectDevice::statusProc( HRESULT hrStatus, const OLECHAR* insta
 //                                      Default Creation Functions        
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+
+void MSKinectDevice::createPointCloudGenerator()
+{
+	pointCloudGenerator = new AKMSSDKPointCloudGenerator();
+}
+
+void MSKinectDevice::createUserMasksGenerator()
+{
+	userMasksGenerator = new AKMSSDKUserMasksGenerator();
+}
+
 void MSKinectDevice::setDefaults()
 {
 	//set the defaults from the base class
@@ -147,6 +161,12 @@ void MSKinectDevice::setDefaults()
 
 	rgbImageBytesGenerator->setSourceMirrored(false);
 	depthImageBytesGenerator->setSourceMirrored(false);
+
+	pointCloudGenerator->setSourceRGBMirrored(false);
+	pointCloudGenerator->setSourceDepthMirrored(false);
+
+	userMasksGenerator->setSourceRGBMirrored(false);
+	userMasksGenerator->setSourceDepthMirrored(false);
 
 	//set specific defaults for MS SDK
     imageFrameTimeout = 0;
@@ -160,12 +180,6 @@ void MSKinectDevice::setDefaults()
 
 	depthParser = new AKMSSDKDepthParser();
 	rgbParser = new AKMSSDKRGBParser();
-    
-	//----------------
-	// User Masked Image
-	//----------------
-
-	asUserMaskResolution = getResolutionFrom(asUserMaskWidth, asUserMaskHeight);
     
 	//----------------
 	// Point Cloud Data
@@ -221,12 +235,6 @@ FREObject MSKinectDevice::freChooseSkeletons(FREObject argv[])
 		nuiSensor->NuiSkeletonSetTrackedSkeletons((DWORD *) chosenSkeletonIds);
 	}
 	return NULL;
-}
-
-FREObject MSKinectDevice::freSetUserMaskMode(FREObject argv[]) {
-	KinectDevice::freSetUserMaskMode(argv);
-	asUserMaskResolution = getResolutionFrom(asUserMaskWidth, asUserMaskHeight);
-    return NULL;
 }
 
 FREObject MSKinectDevice::freSetDepthMode(FREObject argv[]) {
@@ -500,9 +508,6 @@ void MSKinectDevice::run()
 			}
 		}
 
-		//Update all the scale information for all the features
-		updateConfigScale();
-
 		if(asSkeletonEnabled || asRGBEnabled || asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled){
 			dispatchInfoMessage((const uint8_t*) "Starting Kinect Thread");
 
@@ -607,163 +612,21 @@ void MSKinectDevice::dispatchPointCloudIfNeeded()
 	if(asPointCloudEnabled)
 	{
 		lockPointCloudMutex();
-		if(asPointCloudIncludeRGB)
-		{
-			pointCloudWithRGBHandler();
-		}
-		else
-		{
-			pointCloudHandler();
-		}
+
+		((AKMSSDKPointCloudGenerator*)pointCloudGenerator)->setNuiSensor(nuiSensor);
+
+		pointCloudGenerator->setNumRegions(numRegions);
+		pointCloudGenerator->setPointCloudRegions(pointCloudRegions);
+		pointCloudGenerator->setSourceDepthBytes(depthParser->getDepthByteArray());
+		pointCloudGenerator->setSourceDepthSize(depthParser->getWidth(), depthParser->getHeight());
+		pointCloudGenerator->setSourceRGBBytes(rgbParser->getImageByteArray());
+		pointCloudGenerator->setSourceRGBSize(rgbParser->getWidth(), rgbParser->getHeight());
+
+		pointCloudGenerator->generateTargetBytes();
+
 		unlockPointCloudMutex();
+
 		dispatchStatusMessage((const uint8_t*) "pointCloudFrame");
-	}
-}
-
-void MSKinectDevice::pointCloudWithRGBHandler()
-{
-	short *pointCloudRun = asPointCloudByteArray;
-	int direction = asPointCloudMirrored ? 1 : -1;
-	int directionFactor = (direction == -1) ? 1 : 0;
-    
-	if(pointCloudRegions != 0)
-	{
-		for(unsigned int i = 0; i < numRegions; i++)
-		{
-			pointCloudRegions[i].numPoints = 0;
-		}
-	}
-	else
-	{
-		numRegions = 0;
-	}
-    
-	uint32_t rgbValue;
-	int rgbIndex;
-	long depthX, depthY, rgbX, rgbY;
-	USHORT packedDepth, realDepth;
-	for(int y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
-	{
-		depthY = y * pointCloudScale;
-
-		const USHORT *pDepthBuffer = depthParser->getDepthByteArray() + ((y + directionFactor) * (depthImageBytesGenerator->getSourceWidth() * pointCloudScale)) - directionFactor;
-			
-		for(int x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
-		{
-			packedDepth = *pDepthBuffer;
-			realDepth = NuiDepthPixelToDepth(packedDepth);
-
-			//write to point cloud
-			*pointCloudRun = x;
-			pointCloudRun++;
-			*pointCloudRun = y;
-			pointCloudRun++;
-			*pointCloudRun = realDepth;
-			pointCloudRun++;
-
-			//calculate mirrored x
-			depthX = (direction * x * pointCloudScale) + (directionFactor * depthImageBytesGenerator->getSourceWidth());
-
-			nuiSensor->NuiImageGetColorPixelCoordinatesFromDepthPixelAtResolution(
-				rgbResolution,
-				depthResolution,
-				0,
-				depthX, 
-				depthY, 
-				packedDepth,
-				&rgbX,
-				&rgbY
-			);
-				
-			rgbIndex = (rgbX + (rgbY * rgbImageBytesGenerator->getSourceWidth()));
-
-			if(rgbIndex > rgbImageBytesGenerator->getSourcePixelCount())
-			{
-				* pointCloudRun = 0;
-				pointCloudRun++;
-				* pointCloudRun = 0;
-				pointCloudRun++;
-				* pointCloudRun = 0;
-				pointCloudRun++;
-			}
-			else
-			{
-				rgbValue = rgbParser->getImageByteArray()[rgbIndex];
-				* pointCloudRun = (USHORT) (0xff & (rgbValue >> 16));
-				pointCloudRun++;
-				* pointCloudRun = (USHORT) (0xff & (rgbValue >> 8));
-				pointCloudRun++;
-				* pointCloudRun = (USHORT) (0xff & rgbValue);
-				pointCloudRun++;
-			}
-            
-			//check regions
-			for(unsigned int i = 0; i < numRegions; i++)
-			{
-				if(
-					x >= pointCloudRegions[i].x && x <= pointCloudRegions[i].maxX &&
-					y >= pointCloudRegions[i].y && y <= pointCloudRegions[i].maxY &&
-					realDepth >= pointCloudRegions[i].z && realDepth <= pointCloudRegions[i].maxZ
-					)
-				{
-					pointCloudRegions[i].numPoints++;
-				}
-			}
-
-			pDepthBuffer += (pointCloudScale * direction * asPointCloudDensity);
-		}
-	}
-}
-
-void MSKinectDevice::pointCloudHandler()
-{
-	short *pointCloudRun = asPointCloudByteArray;
-	int direction = asPointCloudMirrored ? 1 : -1;
-	int directionFactor = (direction == -1) ? 1 : 0;
-    
-	if(pointCloudRegions != 0)
-	{
-		for(unsigned int i = 0; i < numRegions; i++)
-		{
-			pointCloudRegions[i].numPoints = 0;
-		}
-	}
-	else
-	{
-		numRegions = 0;
-	}
-
-	USHORT realDepth;
-	for(int y = 0; y < asPointCloudHeight; y+=asPointCloudDensity)
-	{
-		const USHORT *pDepthBuffer = depthParser->getDepthByteArray() + ((y + directionFactor) * (depthImageBytesGenerator->getSourceWidth() * pointCloudScale)) - directionFactor;
-        
-		for(int x = 0; x < asPointCloudWidth; x+=asPointCloudDensity)
-		{
-			realDepth = NuiDepthPixelToDepth(*pDepthBuffer);
-			//write to point cloud
-			*pointCloudRun = x;
-			pointCloudRun++;
-			*pointCloudRun = y;
-			pointCloudRun++;
-			*pointCloudRun = realDepth;
-			pointCloudRun++;
-            
-			//check regions
-			for(unsigned int i = 0; i < numRegions; i++)
-			{
-				if(
-					x >= pointCloudRegions[i].x && x <= pointCloudRegions[i].maxX &&
-					y >= pointCloudRegions[i].y && y <= pointCloudRegions[i].maxY &&
-					realDepth >= pointCloudRegions[i].z && realDepth <= pointCloudRegions[i].maxZ
-					)
-				{
-					pointCloudRegions[i].numPoints++;
-				}
-			}
-
-			pDepthBuffer += (pointCloudScale * direction * asPointCloudDensity);
-		}
 	}
 }
 
@@ -773,65 +636,11 @@ void MSKinectDevice::dispatchUserMaskIfNeeded()
 	{
 		lockUserMaskMutex();
 
-		int direction = asUserMaskMirrored ? 1 : -1;
-		int directionFactor = (direction == -1) ? 1 : 0;
-    
-		int pixelNr = 0;
-		uint32_t rgbValue;
-		int rgbIndex;
-		long depthX, depthY, rgbX, rgbY;
-		USHORT packedDepth;
-		for(int y = 0; y < asUserMaskHeight; y++)
-		{
-			depthY = y * userMaskScale;
-
-			const USHORT *pDepthBuffer = depthParser->getDepthByteArray() + ((y + directionFactor) * (depthImageBytesGenerator->getSourceWidth() * userMaskScale)) - directionFactor;
-			const uint32_t *pRGBBuffer = rgbParser->getImageByteArray() + ((y + directionFactor) * (rgbImageBytesGenerator->getSourceWidth() * userMaskScale)) - directionFactor;
-			const USHORT *pSceneBuffer = depthParser->getSceneByteArray() + ((y + directionFactor) * (depthImageBytesGenerator->getSourceWidth() * userMaskScale)) - directionFactor;
-			for(int x = 0; x < asUserMaskWidth; x++)
-			{
-				for(int i = 0; i < maxSkeletons; i++)
-				{
-					asUserMaskByteArray[i][pixelNr] = 0;
-				}
-				USHORT userIndex = *pSceneBuffer;
-				if(userIndex > 0)
-				{
-					//calculate mirrored x
-					depthX = (direction * x * userMaskScale) + (directionFactor * depthImageBytesGenerator->getSourceWidth());
-
-					packedDepth = *pDepthBuffer;
-					nuiSensor->NuiImageGetColorPixelCoordinatesFromDepthPixelAtResolution(
-						rgbResolution,
-						depthResolution,
-						0,
-						depthX, 
-						depthY, 
-						packedDepth,
-						&rgbX,
-						&rgbY
-					);
-				
-					rgbIndex = (rgbX + (rgbY * rgbImageBytesGenerator->getSourceWidth()));
-					rgbValue = 0;
-
-					if(rgbIndex > rgbImageBytesGenerator->getSourcePixelCount())
-					{
-						rgbValue = 0;
-					}
-					else
-					{
-						rgbValue = rgbParser->getImageByteArray()[rgbIndex];
-					}
-
-					asUserMaskByteArray[userIndex - 1][pixelNr] = 0xff << 24 | rgbValue;
-				}
-				pRGBBuffer += (userMaskScale * direction);
-				pDepthBuffer += (userMaskScale * direction);
-				pSceneBuffer += (userMaskScale * direction);
-				pixelNr++;
-			}
-		}
+		((AKMSSDKUserMasksGenerator*) userMasksGenerator)->setNuiSensor(nuiSensor);
+		((AKMSSDKUserMasksGenerator*) userMasksGenerator)->setSourceSceneBytes(depthParser->getSceneByteArray());
+		userMasksGenerator->setSourceDepthBytes(depthParser->getDepthByteArray());
+		userMasksGenerator->setSourceRGBBytes(rgbParser->getImageByteArray());
+		userMasksGenerator->generateTargetBytes();
 
 		unlockUserMaskMutex();
 		dispatchStatusMessage((const uint8_t*) "userMaskFrame");
@@ -1114,12 +923,6 @@ void MSKinectDevice::setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int
 	KinectDevice::setRGBMode(rgbWidth, rgbHeight, asRGBWidth, asRGBHeight, asRGBMirrored);
 	asRGBResolution = getResolutionFrom(asRGBWidth, asRGBHeight);
 	rgbResolution = getResolutionFrom(rgbWidth, rgbHeight);
-}
-
-void MSKinectDevice::updateConfigScale()
-{
-	userMaskScale = depthImageBytesGenerator->getSourceWidth() / asUserMaskWidth;
-	pointCloudScale = depthImageBytesGenerator->getSourceWidth() / asPointCloudWidth;
 }
 
 #endif
