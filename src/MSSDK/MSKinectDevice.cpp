@@ -584,6 +584,7 @@ void MSKinectDevice::dispatchUserFrameIfNeeded()
 		((AKMSSDKUserFrameGenerator*) userFrameGenerator)->setNuiSensor(nuiSensor);
 		((AKMSSDKUserFrameGenerator*) userFrameGenerator)->setTransformSmoothingParameters(transformSmoothingParameters);
 		userFrameGenerator->setSkeletonMirrored(asSkeletonMirrored);
+        userFrameGenerator->setSkeletonTrackingEnabled(asSkeletonEnabled);
 		userFrameGenerator->setDepthTargetMirrored(depthImageBytesGenerator->getTargetMirrored());
 		userFrameGenerator->setDepthTargetSize(depthImageBytesGenerator->getTargetWidth(), depthImageBytesGenerator->getTargetHeight());
 		userFrameGenerator->setDepthSourceSize(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());

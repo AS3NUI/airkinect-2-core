@@ -15,11 +15,22 @@
 		6C039C39153446C20060F00E /* KinectDeviceManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C2C153446C20060F00E /* KinectDeviceManager.h */; };
 		6C039C3A153446C20060F00E /* KinectExtension.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C039C2D153446C20060F00E /* KinectExtension.cpp */; };
 		6C039C3B153446C20060F00E /* KinectExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C2E153446C20060F00E /* KinectExtension.h */; };
-		6C039C3C153446C20060F00E /* KinectSkeleton.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C2F153446C20060F00E /* KinectSkeleton.h */; };
 		6C039C3F153446C20060F00E /* PointCloudRegion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C039C32153446C20060F00E /* PointCloudRegion.cpp */; };
 		6C039C40153446C20060F00E /* PointCloudRegion.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C33153446C20060F00E /* PointCloudRegion.h */; };
 		6C039C44153447250060F00E /* Adobe AIR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C039C43153447250060F00E /* Adobe AIR.framework */; };
 		6C68D786153583D900D2BF8E /* libboost_thread.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C68D785153583D900D2BF8E /* libboost_thread.a */; };
+		6C7023C315B5E847002000A7 /* AKBasicStructs.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023BB15B5E847002000A7 /* AKBasicStructs.h */; };
+		6C7023C415B5E847002000A7 /* AKSkeletonJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023BC15B5E847002000A7 /* AKSkeletonJoint.h */; };
+		6C7023C515B5E847002000A7 /* AKUser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023BD15B5E847002000A7 /* AKUser.h */; };
+		6C7023C615B5E847002000A7 /* AKUserFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023BE15B5E847002000A7 /* AKUserFrame.h */; };
+		6C7023C715B5E847002000A7 /* AKUserFrameGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7023BF15B5E847002000A7 /* AKUserFrameGenerator.cpp */; };
+		6C7023C815B5E847002000A7 /* AKUserFrameGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023C015B5E847002000A7 /* AKUserFrameGenerator.h */; };
+		6C7023C915B5E847002000A7 /* AKUtilityFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7023C115B5E847002000A7 /* AKUtilityFunctions.cpp */; };
+		6C7023CA15B5E847002000A7 /* AKUtilityFunctions.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023C215B5E847002000A7 /* AKUtilityFunctions.h */; };
+		6C7023CD15B5E851002000A7 /* AKMSSDKUserFrameGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7023CB15B5E851002000A7 /* AKMSSDKUserFrameGenerator.cpp */; };
+		6C7023CE15B5E851002000A7 /* AKMSSDKUserFrameGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023CC15B5E851002000A7 /* AKMSSDKUserFrameGenerator.h */; };
+		6C7023D115B5E85C002000A7 /* AKOpenNIUserFrameGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7023CF15B5E85C002000A7 /* AKOpenNIUserFrameGenerator.cpp */; };
+		6C7023D215B5E85C002000A7 /* AKOpenNIUserFrameGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023D015B5E85C002000A7 /* AKOpenNIUserFrameGenerator.h */; };
 		6CAA0B9A15B2E7330085D9CB /* AKMSSDKDepthParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CAA0B8D15B2E7330085D9CB /* AKMSSDKDepthParser.cpp */; };
 		6CAA0B9B15B2E7330085D9CB /* AKMSSDKDepthParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CAA0B8E15B2E7330085D9CB /* AKMSSDKDepthParser.h */; };
 		6CAA0B9C15B2E7330085D9CB /* AKMSSDKRGBParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CAA0B8F15B2E7330085D9CB /* AKMSSDKRGBParser.cpp */; };
@@ -36,8 +47,6 @@
 		6CAA0BAD15B2E7450085D9CB /* AKImageBytesGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CAA0BA715B2E7450085D9CB /* AKImageBytesGenerator.h */; };
 		6CAA0BAE15B2E7450085D9CB /* AKRGBParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CAA0BA815B2E7450085D9CB /* AKRGBParser.cpp */; };
 		6CAA0BAF15B2E7450085D9CB /* AKRGBParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CAA0BA915B2E7450085D9CB /* AKRGBParser.h */; };
-		6CAA0BB015B2E7450085D9CB /* FREHelperFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CAA0BAA15B2E7450085D9CB /* FREHelperFunctions.cpp */; };
-		6CAA0BB115B2E7450085D9CB /* FREHelperFunctions.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CAA0BAB15B2E7450085D9CB /* FREHelperFunctions.h */; };
 		6CD69E6215B4630000D1534A /* AKPointCloudGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CD69E5E15B4630000D1534A /* AKPointCloudGenerator.cpp */; };
 		6CD69E6315B4630000D1534A /* AKPointCloudGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CD69E5F15B4630000D1534A /* AKPointCloudGenerator.h */; };
 		6CD69E6415B4630000D1534A /* AKUserMasksGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CD69E6015B4630000D1534A /* AKUserMasksGenerator.cpp */; };
@@ -64,11 +73,22 @@
 		6C039C2C153446C20060F00E /* KinectDeviceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectDeviceManager.h; sourceTree = "<group>"; };
 		6C039C2D153446C20060F00E /* KinectExtension.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KinectExtension.cpp; sourceTree = "<group>"; };
 		6C039C2E153446C20060F00E /* KinectExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectExtension.h; sourceTree = "<group>"; };
-		6C039C2F153446C20060F00E /* KinectSkeleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KinectSkeleton.h; sourceTree = "<group>"; };
 		6C039C32153446C20060F00E /* PointCloudRegion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PointCloudRegion.cpp; sourceTree = "<group>"; };
 		6C039C33153446C20060F00E /* PointCloudRegion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointCloudRegion.h; sourceTree = "<group>"; };
 		6C039C43153447250060F00E /* Adobe AIR.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "Adobe AIR.framework"; path = "../../../../../../../Applications/Adobe Flash Builder 4.6/sdks/4.6.0/runtimes/air/mac/Adobe AIR.framework"; sourceTree = "<group>"; };
 		6C68D785153583D900D2BF8E /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = "../external-libraries/boost/lib/libboost_thread.a"; sourceTree = "<group>"; };
+		6C7023BB15B5E847002000A7 /* AKBasicStructs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKBasicStructs.h; sourceTree = "<group>"; };
+		6C7023BC15B5E847002000A7 /* AKSkeletonJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKSkeletonJoint.h; sourceTree = "<group>"; };
+		6C7023BD15B5E847002000A7 /* AKUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKUser.h; sourceTree = "<group>"; };
+		6C7023BE15B5E847002000A7 /* AKUserFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKUserFrame.h; sourceTree = "<group>"; };
+		6C7023BF15B5E847002000A7 /* AKUserFrameGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKUserFrameGenerator.cpp; sourceTree = "<group>"; };
+		6C7023C015B5E847002000A7 /* AKUserFrameGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKUserFrameGenerator.h; sourceTree = "<group>"; };
+		6C7023C115B5E847002000A7 /* AKUtilityFunctions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKUtilityFunctions.cpp; sourceTree = "<group>"; };
+		6C7023C215B5E847002000A7 /* AKUtilityFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKUtilityFunctions.h; sourceTree = "<group>"; };
+		6C7023CB15B5E851002000A7 /* AKMSSDKUserFrameGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKMSSDKUserFrameGenerator.cpp; sourceTree = "<group>"; };
+		6C7023CC15B5E851002000A7 /* AKMSSDKUserFrameGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKMSSDKUserFrameGenerator.h; sourceTree = "<group>"; };
+		6C7023CF15B5E85C002000A7 /* AKOpenNIUserFrameGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKOpenNIUserFrameGenerator.cpp; sourceTree = "<group>"; };
+		6C7023D015B5E85C002000A7 /* AKOpenNIUserFrameGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKOpenNIUserFrameGenerator.h; sourceTree = "<group>"; };
 		6CAA0B8D15B2E7330085D9CB /* AKMSSDKDepthParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKMSSDKDepthParser.cpp; sourceTree = "<group>"; };
 		6CAA0B8E15B2E7330085D9CB /* AKMSSDKDepthParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKMSSDKDepthParser.h; sourceTree = "<group>"; };
 		6CAA0B8F15B2E7330085D9CB /* AKMSSDKRGBParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKMSSDKRGBParser.cpp; sourceTree = "<group>"; };
@@ -85,8 +105,6 @@
 		6CAA0BA715B2E7450085D9CB /* AKImageBytesGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKImageBytesGenerator.h; sourceTree = "<group>"; };
 		6CAA0BA815B2E7450085D9CB /* AKRGBParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKRGBParser.cpp; sourceTree = "<group>"; };
 		6CAA0BA915B2E7450085D9CB /* AKRGBParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKRGBParser.h; sourceTree = "<group>"; };
-		6CAA0BAA15B2E7450085D9CB /* FREHelperFunctions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FREHelperFunctions.cpp; sourceTree = "<group>"; };
-		6CAA0BAB15B2E7450085D9CB /* FREHelperFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FREHelperFunctions.h; sourceTree = "<group>"; };
 		6CD69E5E15B4630000D1534A /* AKPointCloudGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKPointCloudGenerator.cpp; sourceTree = "<group>"; };
 		6CD69E5F15B4630000D1534A /* AKPointCloudGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKPointCloudGenerator.h; sourceTree = "<group>"; };
 		6CD69E6015B4630000D1534A /* AKUserMasksGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKUserMasksGenerator.cpp; sourceTree = "<group>"; };
@@ -128,6 +146,14 @@
 		6C039C26153446C20060F00E /* src */ = {
 			isa = PBXGroup;
 			children = (
+				6C7023BB15B5E847002000A7 /* AKBasicStructs.h */,
+				6C7023BC15B5E847002000A7 /* AKSkeletonJoint.h */,
+				6C7023BD15B5E847002000A7 /* AKUser.h */,
+				6C7023BE15B5E847002000A7 /* AKUserFrame.h */,
+				6C7023BF15B5E847002000A7 /* AKUserFrameGenerator.cpp */,
+				6C7023C015B5E847002000A7 /* AKUserFrameGenerator.h */,
+				6C7023C115B5E847002000A7 /* AKUtilityFunctions.cpp */,
+				6C7023C215B5E847002000A7 /* AKUtilityFunctions.h */,
 				6CD69E5E15B4630000D1534A /* AKPointCloudGenerator.cpp */,
 				6CD69E5F15B4630000D1534A /* AKPointCloudGenerator.h */,
 				6CD69E6015B4630000D1534A /* AKUserMasksGenerator.cpp */,
@@ -136,8 +162,6 @@
 				6CAA0BA715B2E7450085D9CB /* AKImageBytesGenerator.h */,
 				6CAA0BA815B2E7450085D9CB /* AKRGBParser.cpp */,
 				6CAA0BA915B2E7450085D9CB /* AKRGBParser.h */,
-				6CAA0BAA15B2E7450085D9CB /* FREHelperFunctions.cpp */,
-				6CAA0BAB15B2E7450085D9CB /* FREHelperFunctions.h */,
 				6CAA0B8C15B2E7330085D9CB /* MSSDK */,
 				6CAA0B9315B2E7330085D9CB /* OpenNI */,
 				6C039C27153446C20060F00E /* ExtensionConfig.h */,
@@ -148,7 +172,6 @@
 				6C039C2C153446C20060F00E /* KinectDeviceManager.h */,
 				6C039C2D153446C20060F00E /* KinectExtension.cpp */,
 				6C039C2E153446C20060F00E /* KinectExtension.h */,
-				6C039C2F153446C20060F00E /* KinectSkeleton.h */,
 				6C039C32153446C20060F00E /* PointCloudRegion.cpp */,
 				6C039C33153446C20060F00E /* PointCloudRegion.h */,
 			);
@@ -159,6 +182,8 @@
 		6CAA0B8C15B2E7330085D9CB /* MSSDK */ = {
 			isa = PBXGroup;
 			children = (
+				6C7023CB15B5E851002000A7 /* AKMSSDKUserFrameGenerator.cpp */,
+				6C7023CC15B5E851002000A7 /* AKMSSDKUserFrameGenerator.h */,
 				6CD69E6715B4630B00D1534A /* AKMSSDKPointCloudGenerator.cpp */,
 				6CD69E6815B4630B00D1534A /* AKMSSDKPointCloudGenerator.h */,
 				6CD69E6915B4630B00D1534A /* AKMSSDKUserMasksGenerator.cpp */,
@@ -176,6 +201,8 @@
 		6CAA0B9315B2E7330085D9CB /* OpenNI */ = {
 			isa = PBXGroup;
 			children = (
+				6C7023CF15B5E85C002000A7 /* AKOpenNIUserFrameGenerator.cpp */,
+				6C7023D015B5E85C002000A7 /* AKOpenNIUserFrameGenerator.h */,
 				6CD69E6F15B4631600D1534A /* AKOpenNIPointCloudGenerator.cpp */,
 				6CD69E7015B4631600D1534A /* AKOpenNIPointCloudGenerator.h */,
 				6CD69E7115B4631600D1534A /* AKOpenNIUserMasksGenerator.cpp */,
@@ -268,7 +295,6 @@
 				6C039C37153446C20060F00E /* KinectDevice.h in Headers */,
 				6C039C39153446C20060F00E /* KinectDeviceManager.h in Headers */,
 				6C039C3B153446C20060F00E /* KinectExtension.h in Headers */,
-				6C039C3C153446C20060F00E /* KinectSkeleton.h in Headers */,
 				6C039C40153446C20060F00E /* PointCloudRegion.h in Headers */,
 				6CAA0B9B15B2E7330085D9CB /* AKMSSDKDepthParser.h in Headers */,
 				6CAA0B9D15B2E7330085D9CB /* AKMSSDKRGBParser.h in Headers */,
@@ -278,13 +304,20 @@
 				6CAA0BA515B2E7330085D9CB /* OpenNIDevice.h in Headers */,
 				6CAA0BAD15B2E7450085D9CB /* AKImageBytesGenerator.h in Headers */,
 				6CAA0BAF15B2E7450085D9CB /* AKRGBParser.h in Headers */,
-				6CAA0BB115B2E7450085D9CB /* FREHelperFunctions.h in Headers */,
 				6CD69E6315B4630000D1534A /* AKPointCloudGenerator.h in Headers */,
 				6CD69E6515B4630000D1534A /* AKUserMasksGenerator.h in Headers */,
 				6CD69E6C15B4630B00D1534A /* AKMSSDKPointCloudGenerator.h in Headers */,
 				6CD69E6E15B4630B00D1534A /* AKMSSDKUserMasksGenerator.h in Headers */,
 				6CD69E7415B4631600D1534A /* AKOpenNIPointCloudGenerator.h in Headers */,
 				6CD69E7615B4631600D1534A /* AKOpenNIUserMasksGenerator.h in Headers */,
+				6C7023C315B5E847002000A7 /* AKBasicStructs.h in Headers */,
+				6C7023C415B5E847002000A7 /* AKSkeletonJoint.h in Headers */,
+				6C7023C515B5E847002000A7 /* AKUser.h in Headers */,
+				6C7023C615B5E847002000A7 /* AKUserFrame.h in Headers */,
+				6C7023C815B5E847002000A7 /* AKUserFrameGenerator.h in Headers */,
+				6C7023CA15B5E847002000A7 /* AKUtilityFunctions.h in Headers */,
+				6C7023CE15B5E851002000A7 /* AKMSSDKUserFrameGenerator.h in Headers */,
+				6C7023D215B5E85C002000A7 /* AKOpenNIUserFrameGenerator.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,13 +395,16 @@
 				6CAA0BA415B2E7330085D9CB /* OpenNIDevice.cpp in Sources */,
 				6CAA0BAC15B2E7450085D9CB /* AKImageBytesGenerator.cpp in Sources */,
 				6CAA0BAE15B2E7450085D9CB /* AKRGBParser.cpp in Sources */,
-				6CAA0BB015B2E7450085D9CB /* FREHelperFunctions.cpp in Sources */,
 				6CD69E6215B4630000D1534A /* AKPointCloudGenerator.cpp in Sources */,
 				6CD69E6415B4630000D1534A /* AKUserMasksGenerator.cpp in Sources */,
 				6CD69E6B15B4630B00D1534A /* AKMSSDKPointCloudGenerator.cpp in Sources */,
 				6CD69E6D15B4630B00D1534A /* AKMSSDKUserMasksGenerator.cpp in Sources */,
 				6CD69E7315B4631600D1534A /* AKOpenNIPointCloudGenerator.cpp in Sources */,
 				6CD69E7515B4631600D1534A /* AKOpenNIUserMasksGenerator.cpp in Sources */,
+				6C7023C715B5E847002000A7 /* AKUserFrameGenerator.cpp in Sources */,
+				6C7023C915B5E847002000A7 /* AKUtilityFunctions.cpp in Sources */,
+				6C7023CD15B5E851002000A7 /* AKMSSDKUserFrameGenerator.cpp in Sources */,
+				6C7023D115B5E85C002000A7 /* AKOpenNIUserFrameGenerator.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

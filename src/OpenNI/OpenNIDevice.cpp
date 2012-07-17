@@ -683,6 +683,7 @@ void OpenNIDevice::dispatchUserFrameIfNeeded()
 		((AKOpenNIUserFrameGenerator*) userFrameGenerator)->setDepthGenerator(&depthGenerator);
 		((AKOpenNIUserFrameGenerator*) userFrameGenerator)->setUserGenerator(&userGenerator);
 		userFrameGenerator->setSkeletonMirrored(asSkeletonMirrored);
+        userFrameGenerator->setSkeletonTrackingEnabled(asSkeletonEnabled);
 		userFrameGenerator->setDepthTargetMirrored(depthImageBytesGenerator->getTargetMirrored());
 		userFrameGenerator->setDepthTargetSize(depthImageBytesGenerator->getTargetWidth(), depthImageBytesGenerator->getTargetHeight());
 		userFrameGenerator->setDepthSourceSize(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
