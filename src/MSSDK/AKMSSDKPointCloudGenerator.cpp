@@ -1,16 +1,17 @@
 #include "AKMSSDKPointCloudGenerator.h"
+#include "../AKUtilityFunctions.h"
 #ifdef AIRKINECT_TARGET_MSSDK
 
 void AKMSSDKPointCloudGenerator::setSourceDepthSize(int width, int height)
 {
 	AKPointCloudGenerator::setSourceDepthSize(width, height);
-	_sourceDepthResolution = getResolutionFrom(width, height);
+	_sourceDepthResolution = getNuiImageResolutionForGivenWidthAndHeight(width, height);
 }
 
 void AKMSSDKPointCloudGenerator::setSourceRGBSize(int width, int height)
 {
 	AKPointCloudGenerator::setSourceRGBSize(width, height);
-	_sourceRGBResolution = getResolutionFrom(width, height);
+	_sourceRGBResolution = getNuiImageResolutionForGivenWidthAndHeight(width, height);
 }
 
 void AKMSSDKPointCloudGenerator::setNuiSensor(INuiSensor* nuiSensor)
@@ -112,15 +113,6 @@ void AKMSSDKPointCloudGenerator::generateTargetBytes()
 			pDepthBuffer += (_scale * _direction * _targetDensity);
 		}
 	}
-}
-
-NUI_IMAGE_RESOLUTION AKMSSDKPointCloudGenerator::getResolutionFrom(int width, int height)
-{
-	NUI_IMAGE_RESOLUTION rtnRes = NUI_IMAGE_RESOLUTION_320x240;
-	if(width == 80 && height == 60) rtnRes = NUI_IMAGE_RESOLUTION_80x60;
-	if(width == 640 && height == 480) rtnRes = NUI_IMAGE_RESOLUTION_640x480;
-	if(width == 1280 && height == 960) rtnRes = NUI_IMAGE_RESOLUTION_1280x960;
-	return rtnRes;
 }
 
 #endif

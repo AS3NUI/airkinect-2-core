@@ -1,6 +1,5 @@
 #include "KinectDevice.h"
-#include "KinectSkeleton.h"
-#include "FREHelperFunctions.h"
+#include "AKUtilityFunctions.h"
 
 void KinectDevice::createPointCloudGenerator()
 {
@@ -10,10 +9,16 @@ void KinectDevice::createUserMasksGenerator()
 {
 }
 
+void KinectDevice::createUserFrameGenerator()
+{
+}
+
 void KinectDevice::setDefaults()
 {
 	started = false;
     running = false;
+
+	createUserFrameGenerator();
 
 	asUserMirrored = false;
     asUserEnabled = false;
@@ -39,7 +44,7 @@ void KinectDevice::setDefaults()
 	asUserMaskEnabled = false;
 	createUserMasksGenerator();
 	userMasksGenerator->setTargetSize(320, 240);
-	userMasksGenerator->setMaxUsers(maxSkeletons);
+	userMasksGenerator->setMaxUsers(userFrameGenerator->getMaxUsers());
 	userMasksGenerator->setTargetMirrored(false);
 	userMasksGenerator->setSourceDepthSize(640, 480);
 	userMasksGenerator->setSourceSceneSize(640, 480);
@@ -59,9 +64,6 @@ void KinectDevice::setDefaults()
 
 	chosenSkeletonIds = 0;
 	numChosenSkeletons = 0;
-
-	setNumJointsAndJointNames();
-	allocateUserFrame();
 }
 
 void KinectDevice::dispatchErrorMessage(const uint8_t* errorMessage)
@@ -103,6 +105,10 @@ void KinectDevice::cleanupByteArrays()
 		delete userMasksGenerator;
 	userMasksGenerator = 0;
 
+	if(userFrameGenerator != 0)
+		delete userFrameGenerator;
+	userFrameGenerator = 0;
+
     if(pointCloudRegions != 0)
 		delete [] pointCloudRegions;
 	pointCloudRegions = 0;
@@ -110,28 +116,6 @@ void KinectDevice::cleanupByteArrays()
 	if(chosenSkeletonIds != 0)
 		delete [] chosenSkeletonIds;
 	chosenSkeletonIds = 0;
-}
-
-void KinectDevice::setNumJointsAndJointNames()
-{
-}
-
-void KinectDevice::allocateUserFrame()
-{
-	userFrame.users = new kinectUser[maxSkeletons];
-	for(int i = 0; i < maxSkeletons; i++)
-	{
-		userFrame.users[i].joints = new kinectSkeletonJoint[numJoints];
-	}
-}
-
-void KinectDevice::deallocateUserFrame()
-{
-	for(int i = 0; i < maxSkeletons; i++)
-	{
-		delete [] userFrame.users[i].joints;
-	}
-	delete [] userFrame.users;
 }
 
 //Getter/Setters for FREContext
@@ -169,8 +153,8 @@ FREObject KinectDevice::freSetUserMode(FREObject argv[])
 }
 FREObject KinectDevice::freSetUserColor(FREObject argv[])
 {
-	unsigned int userID; FREGetObjectAsUint32(argv[1], &userID);
-    unsigned int color; FREGetObjectAsUint32(argv[2], &color);
+	unsigned int userID = createUnsignedIntFromFREObject(argv[1]);
+    unsigned int color = createUnsignedIntFromFREObject(argv[2]);
     bool useIntensity = createBoolFromFREObject(argv[3]);
     setUserColor(userID, color, useIntensity);
     return NULL;
@@ -218,113 +202,11 @@ FREObject KinectDevice::freChooseSkeletons(FREObject argv[])
 FREObject KinectDevice::freGetUserFrame(FREObject argv[])
 {
 	lockUserMutex();
-    
-    short int trackedSkeletons = 0;
-    
-    FREObject freUserFrame, frameNumber, timestamp, users, user, userType, userID, trackingID, hasSkeleton, joints, joint, jointName;
-    FREObject positionConfidence;
-	FREObject orientationConfidence;
-
-	FRENewObject( (const uint8_t*) asUserFrameClass, 0, NULL, &freUserFrame, NULL);
-
-	FRENewObjectFromUint32(userFrame.frameNumber, &frameNumber);
-    FRENewObjectFromUint32(userFrame.timeStamp, &timestamp);
-
-	FRESetObjectProperty(freUserFrame, (const uint8_t*) "frameNumber", frameNumber, NULL);
-	FRESetObjectProperty(freUserFrame, (const uint8_t*) "timeStamp", timestamp, NULL);
-    
-    FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.User>", 0, NULL, &users, NULL);
-    
-    for(int i = 0; i < maxSkeletons; i++)
-    {
-        if(userFrame.users[i].isTracking)
-        {
-			//create the user object
-			FRENewObject( (const uint8_t*) asUserClass, 0, NULL, &user, NULL);
-
-			FRENewObjectFromUTF8(strlen(capabilities.framework), (const uint8_t*) capabilities.framework, &userType);
-			FRENewObjectFromUint32(userFrame.users[i].userID, &userID);
-			FRENewObjectFromUint32(userFrame.users[i].trackingID, &trackingID);
-			FRENewObjectFromBool((userFrame.users[i].hasSkeleton) ? 1 : 0, &hasSkeleton);
-
-			FRESetObjectProperty(user, (const uint8_t*) "framework", userType, NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "userID", userID, NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "trackingID", trackingID, NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "position", createFREVector3D(userFrame.users[i].worldX, userFrame.users[i].worldY, userFrame.users[i].worldZ, 0.0), NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "positionRelative", createFREVector3D(userFrame.users[i].worldRelativeX, userFrame.users[i].worldRelativeY, userFrame.users[i].worldRelativeZ, 0.0), NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "rgbPosition", createFREPoint(userFrame.users[i].rgbX, userFrame.users[i].rgbY), NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "rgbRelativePosition", createFREPoint(userFrame.users[i].rgbRelativeX, userFrame.users[i].rgbRelativeY), NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "depthPosition", createFREPoint(userFrame.users[i].depthX, userFrame.users[i].depthY), NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "depthRelativePosition", createFREPoint(userFrame.users[i].depthRelativeX, userFrame.users[i].depthRelativeY), NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "hasSkeleton", hasSkeleton, NULL);
-
-			//create the joints vector
-            FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.SkeletonJoint>", 0, NULL, &joints, NULL);
-            
-            for(int j = 0; j < numJoints; j++)
-            {
-
-				FRENewObject( (const uint8_t*) asJointClass, 0, NULL, &joint, NULL);
-
-                FRENewObjectFromUTF8(strlen(jointNames[j]), (const uint8_t*) jointNames[j], &jointName);
-				FRENewObjectFromDouble(userFrame.users[i].joints[j].positionConfidence, &positionConfidence);
-				FRENewObjectFromDouble(userFrame.users[i].joints[j].orientationConfidence, &orientationConfidence);
-
-				FRESetObjectProperty(joint, (const uint8_t*) "name", jointName, NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "position", createFREVector3D(userFrame.users[i].joints[j].worldX, userFrame.users[i].joints[j].worldY, userFrame.users[i].joints[j].worldZ, 0.0), NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "positionRelative", createFREVector3D(userFrame.users[i].joints[j].worldRelativeX, userFrame.users[i].joints[j].worldRelativeY, userFrame.users[i].joints[j].worldRelativeZ, 0.0), NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "rgbPosition", createFREPoint(userFrame.users[i].joints[j].rgbX, userFrame.users[i].joints[j].rgbY), NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "rgbRelativePosition", createFREPoint(userFrame.users[i].joints[j].rgbRelativeX, userFrame.users[i].joints[j].rgbRelativeY), NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "depthPosition", createFREPoint(userFrame.users[i].joints[j].depthX, userFrame.users[i].joints[j].depthY), NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "depthRelativePosition", createFREPoint(userFrame.users[i].joints[j].depthRelativeX, userFrame.users[i].joints[j].depthRelativeY), NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "positionConfidence", positionConfidence, NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "absoluteOrientationMatrix", createFREMatrix3DFromKinectRotationMatrix(userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix), NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "absoluteOrientationQuaternion", createFREVector3DFromKinectRotationQuaternion(userFrame.users[i].joints[j].absoluteOrientation.rotationQuaternion), NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "hierarchicalOrientationMatrix", createFREMatrix3DFromKinectRotationMatrix(userFrame.users[i].joints[j].hierarchicalOrientation.rotationMatrix), NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "hierarchicalOrientationQuaternion", createFREVector3DFromKinectRotationQuaternion(userFrame.users[i].joints[j].hierarchicalOrientation.rotationQuaternion), NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "orientationConfidence", orientationConfidence, NULL);
-                
-				FRESetArrayElementAt(joints, j, joint);
-            }
-            
-			FRESetObjectProperty(user, (const uint8_t*) "skeletonJoints", joints, NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "skeletonJointNameIndices", freGetSkeletonJointNameIndices(NULL), NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "skeletonJointNames", freGetSkeletonJointNames(NULL), NULL);
-            
-            FRESetArrayElementAt(users, trackedSkeletons, user);
-            trackedSkeletons++;
-        }
-    }
-
-	FRESetObjectProperty(freUserFrame, (const uint8_t*) "users", users, NULL);
-    
+	FREObject freUserFrame = userFrameGenerator->getFREObject();
     unlockUserMutex();
-    
     return freUserFrame;
 }
 
-FREObject KinectDevice::freGetSkeletonJointNameIndices(FREObject argv[])
-{
-	FREObject skeletonJointNameIndices, jointIndex;
-    FRENewObject( (const uint8_t*) "flash.utils.Dictionary", 0, NULL, &skeletonJointNameIndices, NULL);
-	for(int i = 0; i < numJoints; i++)
-    {
-        FRENewObjectFromUint32(i, &jointIndex);
-        FRESetObjectProperty(skeletonJointNameIndices, (const uint8_t*) jointNames[i], jointIndex, NULL);
-    }
-    return skeletonJointNameIndices;
-}
-FREObject KinectDevice::freGetSkeletonJointNames(FREObject argv[])
-{ 
-	FREObject skeletonJointNames, skeletonJointName;
-	FRENewObject( (const uint8_t*) "Vector.<String>", 0, NULL, &skeletonJointNames, NULL);
-	for(int i = 0; i < numJoints; i++)
-	{
-	FRENewObjectFromUTF8(strlen(jointNames[i]), (const uint8_t*) jointNames[i], &skeletonJointName);
-	FRESetArrayElementAt(skeletonJointNames, i, skeletonJointName);
-	}
-	return skeletonJointNames;
-}
 FREObject KinectDevice::freSetUserMaskMode(FREObject argv[])
 {
 	unsigned int width; FREGetObjectAsUint32(argv[1], &width);

@@ -13,7 +13,6 @@
 
 #include <XnCppWrapper.h>
 #include "KinectDevice.h"
-#include "KinectSkeleton.h"
 #include "KinectCapabilities.h"
 #include "PointCloudRegion.h"
 #include "AKOpenNIRGBParser.h"
@@ -46,6 +45,7 @@ protected:
 
 	void					createPointCloudGenerator();
 	void					createUserMasksGenerator();
+	void					createUserFrameGenerator();
     
 private:
     xn::Context             context;
@@ -66,7 +66,7 @@ private:
     
     bool                    userCallbacksRegistered;
     
-    void                    addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex, int targetOrientationIndex);
+	void                    addJointElement(AKUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex);
     
     float                   **userIndexColors;//[MAX_SKELETONS][4];
     

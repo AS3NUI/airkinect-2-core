@@ -21,8 +21,6 @@ private:
 
 	NUI_IMAGE_RESOLUTION _sourceDepthResolution;
 	NUI_IMAGE_RESOLUTION _sourceRGBResolution;
-
-	NUI_IMAGE_RESOLUTION getResolutionFrom(int width, int height);
 };
 
 #endif

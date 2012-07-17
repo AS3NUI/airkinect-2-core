@@ -14,12 +14,12 @@
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include "KinectCapabilities.h"
-#include "KinectSkeleton.h"
 #include "PointCloudRegion.h"
 
 #include "AKImageBytesGenerator.h"
 #include "AKPointCloudGenerator.h"
 #include "AKUserMasksGenerator.h"
+#include "AKUserFrameGenerator.h"
 
 class KinectDevice
 {
@@ -66,14 +66,6 @@ public:
 
 protected:
 
-	const char					*asJointClass;
-	const char					*asUserClass;
-	const char					*asUserFrameClass;
-
-	int							numJoints;
-	int							maxSkeletons;
-	char						**jointNames;
-
 	virtual void                lockUserMutex();
     virtual void                unlockUserMutex();
     
@@ -93,16 +85,10 @@ protected:
     virtual void                unlockPointCloudMutex();
 
 	virtual void				setDefaults();
-	virtual void				setNumJointsAndJointNames();
-	virtual void				allocateUserFrame();
-	virtual void				deallocateUserFrame();
 	virtual void				cleanupByteArrays();
 	virtual void				setUserColor(int userID, int color, bool useIntensity);
 
 	virtual void				setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored);
-
-	virtual FREObject           freGetSkeletonJointNameIndices(FREObject argv[]);
-    virtual FREObject			freGetSkeletonJointNames(FREObject argv[]);
 
 	FREContext					freContext;
 	KinectCapabilities			capabilities;
@@ -150,7 +136,8 @@ protected:
 
 	bool						asPointCloudEnabled;
 
-	kinectUserFrame				userFrame;
+	AKUserFrameGenerator*		userFrameGenerator;
+	virtual void				createUserFrameGenerator();
 
 	AKUserMasksGenerator*		userMasksGenerator;
 	virtual void				createUserMasksGenerator();

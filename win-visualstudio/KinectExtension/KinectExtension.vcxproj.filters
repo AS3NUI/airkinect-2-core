@@ -45,9 +45,6 @@
     <ClInclude Include="..\..\src\ExtensionConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\FREHelperFunctions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\KinectCapabilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -58,9 +55,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\KinectExtension.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\KinectSkeleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\PointCloudRegion.h">
@@ -102,15 +96,36 @@
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.h">
       <Filter>Header Files\MSSDK</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\AKBasicStructs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\AKSkeletonJoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\AKUser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\AKUserFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\AKUserFrameGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserFrameGenerator.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserFrameGenerator.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\AKUtilityFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\AKImageBytesGenerator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\FREHelperFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\KinectDevice.cpp">
@@ -160,6 +175,18 @@
     </ClCompile>
     <ClCompile Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.cpp">
       <Filter>Source Files\MSSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\AKUserFrameGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIUserFrameGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKUserFrameGenerator.cpp">
+      <Filter>Source Files\MSSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\AKUtilityFunctions.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

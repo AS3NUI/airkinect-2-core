@@ -3,6 +3,7 @@
 
 #include "AKMSSDKPointCloudGenerator.h"
 #include "AKMSSDKUserMasksGenerator.h"
+#include "AKMSSDKUserFrameGenerator.h"
 
 const float PI = acos(-1.0f);
 
@@ -33,77 +34,9 @@ MSKinectDevice::MSKinectDevice(int nr)
 
 	capabilities.maxSensors								= 4;
 	capabilities.framework								= "mssdk";
-    
-    //set class names of actionscript equivalents
-	asJointClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSSkeletonJoint";
-	asUserClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSUser";
-	asUserFrameClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSUserFrame";
-	
-	maxSkeletons = NUI_SKELETON_COUNT;
 	
     setDefaults();
 	addKinectDeviceStatusListener();
-}
-
-void MSKinectDevice::setNumJointsAndJointNames()
-{
-	if(asSeatedSkeletonEnabled)
-	{
-		setNumJointsAndJointNamesForSeatedSkeletonTracking();
-	}
-	else
-	{
-		setNumJointsAndJointNamesForRegularSkeletonTracking();
-	}
-	
-}
-
-void MSKinectDevice::setNumJointsAndJointNamesForSeatedSkeletonTracking()
-{
-	numJoints = 10;
-	jointNames = new char*[numJoints];
-	jointNames[0] = "neck";
-	jointNames[1] = "head";
-    
-	jointNames[2] = "left_shoulder";
-	jointNames[3] = "left_elbow";
-	jointNames[4] = "left_wrist";
-	jointNames[5] = "left_hand";
-    
-	jointNames[6] = "right_shoulder";
-	jointNames[7] = "right_elbow";
-	jointNames[8] = "right_wrist";
-	jointNames[9] = "right_hand";
-}
-
-void MSKinectDevice::setNumJointsAndJointNamesForRegularSkeletonTracking()
-{
-	numJoints = 20;
-	jointNames = new char*[numJoints];
-	jointNames[0] = "waist";
-	jointNames[1] = "torso";
-	jointNames[2] = "neck";
-	jointNames[3] = "head";
-    
-	jointNames[4] = "left_shoulder";
-	jointNames[5] = "left_elbow";
-	jointNames[6] = "left_wrist";
-	jointNames[7] = "left_hand";
-    
-	jointNames[8] = "right_shoulder";
-	jointNames[9] = "right_elbow";
-	jointNames[10] = "right_wrist";
-	jointNames[11] = "right_hand";
-    
-	jointNames[12] = "left_hip";
-	jointNames[13] = "left_knee";
-	jointNames[14] = "left_ankle";
-	jointNames[15] = "left_foot";
-    
-	jointNames[16] = "right_hip";
-	jointNames[17] = "right_knee";
-	jointNames[18] = "right_ankle";
-	jointNames[19] = "right_foot";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,6 +87,11 @@ void MSKinectDevice::createUserMasksGenerator()
 	userMasksGenerator = new AKMSSDKUserMasksGenerator();
 }
 
+void MSKinectDevice::createUserFrameGenerator()
+{
+	userFrameGenerator = new AKMSSDKUserFrameGenerator();
+}
+
 void MSKinectDevice::setDefaults()
 {
 	//set the defaults from the base class
@@ -174,8 +112,7 @@ void MSKinectDevice::setDefaults()
 	//----------------
 	// Depth Image
 	//----------------
-	asDepthResolution = getResolutionFrom(depthImageBytesGenerator->getTargetWidth(), depthImageBytesGenerator->getTargetHeight());
-	depthResolution = getResolutionFrom(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
+	depthResolution = getNuiImageResolutionForGivenWidthAndHeight(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
 	depthPlayerIndexEnabled = false;
 
 	depthParser = new AKMSSDKDepthParser();
@@ -208,23 +145,20 @@ void MSKinectDevice::setDefaults()
 // Start FRE Function
 //-------------------
 
-FREObject MSKinectDevice::freSetSkeletonMode(FREObject argv[]) {
-
+FREObject MSKinectDevice::freSetSkeletonMode(FREObject argv[]) 
+{
 	bool previousSeatedSkeletonEnabled = asSeatedSkeletonEnabled;
 	bool previousChooseSkeletonsEnabled = asChooseSkeletonsEnabled;
 	KinectDevice::freSetSkeletonMode(argv);
-	if(running && (previousSeatedSkeletonEnabled != asSeatedSkeletonEnabled || previousChooseSkeletonsEnabled != asChooseSkeletonsEnabled)) {
+	if(running && (previousSeatedSkeletonEnabled != asSeatedSkeletonEnabled || previousChooseSkeletonsEnabled != asChooseSkeletonsEnabled)) 
+	{
 		lockUserMutex();
-		deallocateUserFrame();
-		setNumJointsAndJointNames();
-		allocateUserFrame();
+		((AKMSSDKUserFrameGenerator*) userFrameGenerator)->setSeatedSkeletonEnabled(asSeatedSkeletonEnabled);
 		HRESULT hr = setSkeletonTrackingFlags();
-		if ( FAILED(hr) ){
+		if (FAILED(hr))
 			dispatchErrorMessage((const uint8_t*) "Failed to Initalize Skeleton Tracking");
-		}
 		unlockUserMutex();
 	}
-
 	return NULL;
 }
 
@@ -235,12 +169,6 @@ FREObject MSKinectDevice::freChooseSkeletons(FREObject argv[])
 		nuiSensor->NuiSkeletonSetTrackedSkeletons((DWORD *) chosenSkeletonIds);
 	}
 	return NULL;
-}
-
-FREObject MSKinectDevice::freSetDepthMode(FREObject argv[]) {
-	KinectDevice::freSetDepthMode(argv);
-	asDepthResolution = getResolutionFrom(depthImageBytesGenerator->getTargetWidth(), depthImageBytesGenerator->getTargetHeight());
-    return NULL;
 }
 
 FREObject MSKinectDevice::freSetNearModeEnabled(FREObject argv[])
@@ -331,7 +259,7 @@ void MSKinectDevice::dispatchError(HRESULT hr){
 	}else if(hr == E_NUI_NOTREADY){
 		dispatchErrorMessage((const uint8_t*) "NUI Not Ready");
 	}else if(hr == E_NUI_SKELETAL_ENGINE_BUSY){
-		dispatchErrorMessage((const uint8_t*) "NUI Skeltal Engine Busy");
+		dispatchErrorMessage((const uint8_t*) "NUI Skeletal Engine Busy");
 	}else if(hr == E_NUI_NOTPOWERED){
 		dispatchErrorMessage((const uint8_t*) "NUI Not Powered");
 	}else if(hr == E_NUI_BADIINDEX){
@@ -649,248 +577,24 @@ void MSKinectDevice::dispatchUserMaskIfNeeded()
 
 void MSKinectDevice::dispatchUserFrameIfNeeded()
 {
-	lockUserMutex();
-
-    memset(&userFrame.users[0], 0, sizeof(userFrame.users));
-	NUI_SKELETON_FRAME skeletonFrame = {0};
-	HRESULT hr = nuiSensor->NuiSkeletonGetNextFrame( 0, &skeletonFrame );
-	if(FAILED(hr))
+	if(asUserEnabled || asSkeletonEnabled || asUserMaskEnabled)
 	{
+		lockUserMutex();
+
+		((AKMSSDKUserFrameGenerator*) userFrameGenerator)->setNuiSensor(nuiSensor);
+		((AKMSSDKUserFrameGenerator*) userFrameGenerator)->setTransformSmoothingParameters(transformSmoothingParameters);
+		userFrameGenerator->setSkeletonMirrored(asSkeletonMirrored);
+		userFrameGenerator->setDepthTargetMirrored(depthImageBytesGenerator->getTargetMirrored());
+		userFrameGenerator->setDepthTargetSize(depthImageBytesGenerator->getTargetWidth(), depthImageBytesGenerator->getTargetHeight());
+		userFrameGenerator->setDepthSourceSize(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
+		userFrameGenerator->setRGBTargetMirrored(rgbImageBytesGenerator->getTargetMirrored());
+		userFrameGenerator->setRGBTargetSize(rgbImageBytesGenerator->getTargetWidth(), rgbImageBytesGenerator->getTargetHeight());
+		userFrameGenerator->setRGBSourceSize(rgbImageBytesGenerator->getSourceWidth(), rgbImageBytesGenerator->getSourceHeight());
+		userFrameGenerator->generateUserFrame();
+
 		unlockUserMutex();
-		return;
+		dispatchStatusMessage((const uint8_t*) "userFrame");
 	}
-
-	nuiSensor->NuiTransformSmooth(&skeletonFrame, &transformSmoothingParameters);
-
-	NUI_SKELETON_DATA skeletonData;
-	userFrame.frameNumber = skeletonFrame.dwFrameNumber;
-	userFrame.timeStamp = (int)(skeletonFrame.liTimeStamp.QuadPart /1000);
-
-	for (int i = 0; i < NUI_SKELETON_COUNT; ++i){
-		skeletonData = skeletonFrame.SkeletonData[i];
-
-		if(skeletonData.eTrackingState == NUI_SKELETON_TRACKED || skeletonData.eTrackingState == NUI_SKELETON_POSITION_ONLY) {
-			userFrame.users[i].isTracking = true;
-			//dwTrackingID is some wierd ass number by microsoft, to match properly to depth player index use i+1
-			userFrame.users[i].trackingID = skeletonData.dwTrackingID;
-			userFrame.users[i].userID = i+1;
-			userFrame.users[i].hasSkeleton = skeletonData.eTrackingState == NUI_SKELETON_TRACKED;
-			
-			//Transform for User
-			calculateKinectTransform(userFrame.users[i], skeletonData.Position);
-
-			//joint orientation (kinect sdk 1.5)
-			NUI_SKELETON_BONE_ORIENTATION *boneOrientations = new NUI_SKELETON_BONE_ORIENTATION[NUI_SKELETON_POSITION_COUNT];
-			hr = NuiSkeletonCalculateBoneOrientations(&skeletonData, boneOrientations);
-
-			//Joint Position Calculations
-			if (userFrame.users[i].hasSkeleton){
-				addJointElements(userFrame.users[i], skeletonData, boneOrientations);
-			}
-
-			//cleanup
-			delete [] boneOrientations;
-		}else{
-			userFrame.users[i].isTracking = false;
-		}
-	}
-
-	previousSkeletonFrame = &skeletonFrame;
-
-	unlockUserMutex();
-	dispatchStatusMessage((const uint8_t*) "userFrame");
-}
-
-void MSKinectDevice::calculateKinectTransform(kinectTransform &kTransform, Vector4 skeletonTransform){
-	long colorX, colorY, depthX, depthY;
-	USHORT depthValue;
-
-	Vector4 mSkeletonPosition = skeletonTransform;
-	skeletonTransform.x *= -1;
-
-	kTransform.worldX = asSkeletonMirrored ? mSkeletonPosition.x * 1000 : skeletonTransform.x * 1000;
-	kTransform.worldY = mSkeletonPosition.y * 1000;
-	kTransform.worldZ = mSkeletonPosition.z * 1000;
-
-	kTransform.worldRelativeX = asSkeletonMirrored ? mSkeletonPosition.x : skeletonTransform.x;
-    kTransform.worldRelativeY = mSkeletonPosition.y;
-    kTransform.worldRelativeZ = mSkeletonPosition.z;
-
-	//User to Pixel Positions on Images
-	if(depthImageBytesGenerator->getTargetMirrored()){
-		NuiTransformSkeletonToDepthImage(mSkeletonPosition, &depthX, &depthY, &depthValue,asDepthResolution);
-	}else{
-		NuiTransformSkeletonToDepthImage(skeletonTransform, &depthX, &depthY, &depthValue,asDepthResolution);
-	}
-	kTransform.depthX = depthX;
-	kTransform.depthY = depthY;
-
-	kTransform.depthRelativeX = ((float)depthX)/((float)depthImageBytesGenerator->getTargetWidth());
-	kTransform.depthRelativeY = ((float)depthY)/((float)depthImageBytesGenerator->getTargetHeight());
-
-	if(rgbImageBytesGenerator->getTargetMirrored()){
-		NuiTransformSkeletonToDepthImage(mSkeletonPosition, &depthX, &depthY, &depthValue,asDepthResolution);
-	}else{
-		NuiTransformSkeletonToDepthImage(skeletonTransform, &depthX, &depthY, &depthValue,asDepthResolution);
-	}
-	
-	nuiSensor->NuiImageGetColorPixelCoordinatesFromDepthPixelAtResolution(asRGBResolution, asDepthResolution, 0, depthX,depthY, depthValue,&colorX,&colorY);
-	kTransform.rgbX = (int)colorX;
-	kTransform.rgbY = (int)colorY;
-
-	kTransform.rgbRelativeX = ((float)colorX)/((float)rgbImageBytesGenerator->getTargetWidth());
-	kTransform.rgbRelativeY = ((float)colorY)/((float)rgbImageBytesGenerator->getTargetHeight());
-}
-
-void MSKinectDevice::addJointElements(kinectUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
-{
-	if(asSeatedSkeletonEnabled)
-		addJointElementsForSeatedSkeletonTracking(kUser, skeletonData, boneOrientations);
-	else
-		addJointElementsForRegularSkeletonTracking(kUser, skeletonData, boneOrientations);
-}
-
-void MSKinectDevice::addJointElementsForSeatedSkeletonTracking(kinectUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
-{
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER, 0);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HEAD, 1);
-                
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_LEFT, 2);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT, 3);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT, 4);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT, 5);
-                
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_RIGHT, 6);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT, 7);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT, 8);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT, 9);
-}
-
-void MSKinectDevice::addJointElementsForRegularSkeletonTracking(kinectUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
-{
-	addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER, 0);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SPINE, 1);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER, 2);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HEAD, 3);
-                
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_LEFT, 4);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT, 5);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT, 6);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT, 7);
-                
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_RIGHT, 8);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT, 9);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT, 10);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT, 11);
-                
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_LEFT, 12);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_LEFT, 13);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_LEFT, 14);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_LEFT, 15);
-                
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_RIGHT, 16);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_RIGHT, 17);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_RIGHT, 18);
-    addJointElement(kUser, skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_RIGHT, 19);
-}
-
-void MSKinectDevice::addJointElement(kinectUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint, uint32_t targetIndex)
-{
-	Vector4 jointPosition = skeletonData.SkeletonPositions[eJoint];
-
-	//Transform for User
-	calculateKinectTransform(kUser.joints[targetIndex], jointPosition);
-
-	//skeleton.eSkeletonPositionTrackingState[jointTo]
-
-	kUser.joints[targetIndex].orientationConfidence = 0;
-	kUser.joints[targetIndex].positionConfidence = 0;
-
-	if(skeletonData.eSkeletonPositionTrackingState[eJoint] == NUI_SKELETON_POSITION_INFERRED)
-	{
-		kUser.joints[targetIndex].orientationConfidence = 0.5;
-		kUser.joints[targetIndex].positionConfidence = 0.5;
-	}
-	else if(skeletonData.eSkeletonPositionTrackingState[eJoint] == NUI_SKELETON_POSITION_TRACKED)
-	{
-		kUser.joints[targetIndex].orientationConfidence = 1;
-		kUser.joints[targetIndex].positionConfidence = 1;
-	}
-
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M11 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M11;
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M12 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M12;
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M13 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M13;
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M14 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M14;
-
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M21 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M21;
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M22 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M22;
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M23 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M23;
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M24 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M24;
-
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M31 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M31;
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M32 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M32;
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M33 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M33;
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M34 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M34;
-
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M41 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M41;
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M42 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M42;
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M43 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M43;
-	kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M44 = boneOrientations[eJoint].absoluteRotation.rotationMatrix.M44;
-
-	kUser.joints[targetIndex].absoluteOrientation.rotationQuaternion.x = boneOrientations[eJoint].absoluteRotation.rotationQuaternion.x;
-	kUser.joints[targetIndex].absoluteOrientation.rotationQuaternion.y = boneOrientations[eJoint].absoluteRotation.rotationQuaternion.y;
-	kUser.joints[targetIndex].absoluteOrientation.rotationQuaternion.z = boneOrientations[eJoint].absoluteRotation.rotationQuaternion.z;
-	kUser.joints[targetIndex].absoluteOrientation.rotationQuaternion.w = boneOrientations[eJoint].absoluteRotation.rotationQuaternion.w;
-
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M11 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M11;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M12 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M12;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M13 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M13;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M14 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M14;
-
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M21 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M21;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M22 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M22;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M23 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M23;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M24 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M24;
-
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M31 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M31;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M32 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M32;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M33 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M33;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M34 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M34;
-
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M41 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M41;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M42 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M42;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M43 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M43;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationMatrix.M44 = boneOrientations[eJoint].hierarchicalRotation.rotationMatrix.M44;
-
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationQuaternion.x = boneOrientations[eJoint].hierarchicalRotation.rotationQuaternion.x;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationQuaternion.y = boneOrientations[eJoint].hierarchicalRotation.rotationQuaternion.y;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationQuaternion.z = boneOrientations[eJoint].hierarchicalRotation.rotationQuaternion.z;
-	kUser.joints[targetIndex].hierarchicalOrientation.rotationQuaternion.w = boneOrientations[eJoint].hierarchicalRotation.rotationQuaternion.w;
-
-    kUser.joints[targetIndex].positionConfidence = 1;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//                                      TRANSLATION FUNCTIONS
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-NUI_IMAGE_RESOLUTION MSKinectDevice::getResolutionFrom(int width, int height){
-	NUI_IMAGE_RESOLUTION rtnRes = NUI_IMAGE_RESOLUTION_320x240;
-	if(width == 80 && height == 60) rtnRes = NUI_IMAGE_RESOLUTION_80x60;
-	if(width == 640 && height == 480) rtnRes = NUI_IMAGE_RESOLUTION_640x480;
-	if(width == 1280 && height == 960) rtnRes = NUI_IMAGE_RESOLUTION_1280x960;
-	return rtnRes;
-}
-
-POINT MSKinectDevice::getDepthPixelPointFromJointCoordinate(Vector4 jointCoordinates){
-	POINT depthPoint;
-	float depthX, depthY;
-	NuiTransformSkeletonToDepthImage(jointCoordinates, &depthX, &depthY);
-	depthPoint.x = (int) depthX;
-	depthPoint.y = (int) depthY;
-	return depthPoint;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -900,8 +604,8 @@ POINT MSKinectDevice::getDepthPixelPointFromJointCoordinate(Vector4 jointCoordin
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void MSKinectDevice::setUserColor(int userID, int color, bool useIntensity){
-	//bitches!
+void MSKinectDevice::setUserColor(int userID, int color, bool useIntensity)
+{
 	if(userID > NUI_SKELETON_COUNT) return;
 	if(userIndexColors == 0) userIndexColors = new BYTE[NUI_SKELETON_COUNT * 4];
 	
@@ -921,8 +625,7 @@ void MSKinectDevice::setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int
 		rgbHeight = 960;
 	}
 	KinectDevice::setRGBMode(rgbWidth, rgbHeight, asRGBWidth, asRGBHeight, asRGBMirrored);
-	asRGBResolution = getResolutionFrom(asRGBWidth, asRGBHeight);
-	rgbResolution = getResolutionFrom(rgbWidth, rgbHeight);
+	rgbResolution = getNuiImageResolutionForGivenWidthAndHeight(rgbWidth, rgbHeight);
 }
 
 #endif

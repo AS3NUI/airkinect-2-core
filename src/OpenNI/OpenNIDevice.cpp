@@ -8,6 +8,7 @@
 
 #include "AKOpenNIPointCloudGenerator.h"
 #include "AKOpenNIUserMasksGenerator.h"
+#include "AKOpenNIUserFrameGenerator.h"
 
 XnBool needPose = FALSE;
 XnChar strPose[20] = "";
@@ -49,13 +50,6 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
     capabilities.maxSensors								= 1;
     capabilities.framework								= "openni";
     
-    //set class names of actionscript equivalents
-	asJointClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNISkeletonJoint";
-	asUserClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUser";
-	asUserFrameClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUserFrame";
-
-	maxSkeletons = 15;
-    
     //some sensors don't have an RGB camera (asus xtion pro)
     XnStatus rc;
     xn::NodeInfoList imageNodes;
@@ -70,31 +64,6 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
     setDefaults();
 }
 
-void OpenNIDevice::setNumJointsAndJointNames()
-{
-	numJoints = 15;
-	jointNames = new char*[numJoints];
-	jointNames[0] = "head";
-	jointNames[1] = "neck";
-	jointNames[2] = "torso";
-    
-	jointNames[3] = "left_shoulder";
-	jointNames[4] = "left_elbow";
-	jointNames[5] = "left_hand";
-    
-	jointNames[6] = "right_shoulder";
-	jointNames[7] = "right_elbow";
-	jointNames[8] = "right_hand";
-    
-	jointNames[9] = "left_hip";
-	jointNames[10] = "left_knee";
-	jointNames[11] = "left_foot";
-    
-	jointNames[12] = "right_hip";
-	jointNames[13] = "right_knee";
-	jointNames[14] = "right_foot";
-}
-
 void OpenNIDevice::createPointCloudGenerator()
 {
 	pointCloudGenerator = new AKOpenNIPointCloudGenerator();
@@ -103,6 +72,11 @@ void OpenNIDevice::createPointCloudGenerator()
 void OpenNIDevice::createUserMasksGenerator()
 {
 	userMasksGenerator = new AKOpenNIUserMasksGenerator();
+}
+
+void OpenNIDevice::createUserFrameGenerator()
+{
+	userFrameGenerator = new AKOpenNIUserFrameGenerator();
 }
 
 void OpenNIDevice::setDefaults()
@@ -149,8 +123,8 @@ void OpenNIDevice::setDefaults()
     asInfraredByteArray = 0;
     
     //player index coloring
-	userIndexColors = new float*[maxSkeletons];
-	for(int i = 0; i < maxSkeletons; i++)
+	userIndexColors = new float*[userFrameGenerator->getMaxUsers()];
+	for(int i = 0; i < userFrameGenerator->getMaxUsers(); i++)
 	{
 		userIndexColors[i] = new float[4];
 	}
@@ -176,7 +150,7 @@ void OpenNIDevice::setDefaults()
 
 void OpenNIDevice::setUserColor(int userID, int color, bool useIntensity)
 {
-	if(userID > maxSkeletons) return;
+	if(userID > userFrameGenerator->getMaxUsers()) return;
 	
     userIndexColors[userID - 1][0] = (0xFF & (color >> 16)) / 255.0f;
     userIndexColors[userID - 1][1] = (0xFF & (color >> 8)) / 255.0f;
@@ -705,114 +679,17 @@ void OpenNIDevice::dispatchUserFrameIfNeeded()
 	if((asUserEnabled || asSkeletonEnabled || asUserMaskEnabled) && userGeneratorCreated)
 	{
 		lockUserMutex();
-		
-		memset(&userFrame.users[0], 0, sizeof(userFrame.users));
-    
-		XnUserID *aUsers = new XnUserID[maxSkeletons];
-		XnUInt16 nUsers = maxSkeletons;
-		XnUInt16 trackedUsers = userGenerator.GetNumberOfUsers();
-		XnPoint3D position;
-		XnStatus rc;
-    
-		userGenerator.GetUsers(aUsers, nUsers);
-    
-		userFrame.frameNumber = userGenerator.GetFrameID();
-		userFrame.timeStamp = (int) (userGenerator.GetTimestamp() / 1000);
-    
-		for (int i = 0; i < maxSkeletons; ++i)
-		{
-			if(i < trackedUsers)
-			{
-				rc = userGenerator.GetCoM(aUsers[i], position);
-				userFrame.users[i].isTracking = true;
-				userFrame.users[i].userID = aUsers[i];
-				userFrame.users[i].trackingID = aUsers[i];
 
-				userFrame.users[i].hasSkeleton = (asSkeletonEnabled && userGenerator.GetSkeletonCap().IsTracking(aUsers[i]));
-
-				userFrame.users[i].worldX = position.X;
-				userFrame.users[i].worldY = position.Y;
-				userFrame.users[i].worldZ = position.Z;
-            
-				userFrame.users[i].worldRelativeX = (depthImageBytesGenerator->getSourceWidth() - position.X) / (depthImageBytesGenerator->getSourceWidth() * 2) - .5;
-				userFrame.users[i].worldRelativeY = -1 * (((depthImageBytesGenerator->getSourceHeight() - position.Y) / (depthImageBytesGenerator->getSourceHeight() * 2)) - .5);
-				userFrame.users[i].worldRelativeZ = (position.Z * 7.8125) / MAX_DEPTH;
-            
-				//depth & rgb space are the same, as we aligned the depth & image streams
-				XnPoint3D pt[1];
-				pt[0] = position;
-				depthGenerator.ConvertRealWorldToProjective(1, pt, pt);
-            
-				userFrame.users[i].rgbRelativeX = userFrame.users[i].depthRelativeX = pt[0].X / depthImageBytesGenerator->getSourceWidth();
-				userFrame.users[i].rgbRelativeY = userFrame.users[i].depthRelativeY = pt[0].Y / depthImageBytesGenerator->getSourceHeight();
-            
-				if(rgbImageBytesGenerator->getTargetMirrored()) userFrame.users[i].rgbRelativeX = 1 - userFrame.users[i].rgbRelativeX;
-				if(depthImageBytesGenerator->getTargetMirrored()) userFrame.users[i].depthRelativeX = 1 - userFrame.users[i].depthRelativeX;
-            
-				userFrame.users[i].rgbX = (int) (userFrame.users[i].rgbRelativeX * rgbImageBytesGenerator->getTargetWidth());
-				userFrame.users[i].rgbY = (int) (userFrame.users[i].rgbRelativeY * rgbImageBytesGenerator->getTargetHeight());
-				userFrame.users[i].depthX = (int) (userFrame.users[i].depthRelativeX * depthImageBytesGenerator->getTargetWidth());
-				userFrame.users[i].depthY = (int) (userFrame.users[i].depthRelativeY * depthImageBytesGenerator->getTargetHeight());
-            
-				if (userFrame.users[i].hasSkeleton)
-				{
-					//in openni, left/right are in device space, rather than user space
-					//that's why we switch LEFT/RIGHT here, to match MS SDK (user space)
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_HEAD, 0, 0);
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_NECK, 1, 1);
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_TORSO, 2, 2);
-                
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_SHOULDER, 3, 3);
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_ELBOW, 4, 4);
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_HAND, 5, 5);
-                
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_SHOULDER, 6, 6);
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_ELBOW, 7, 7);
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_HAND, 8, 8);
-                
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_HIP, 9, 9);
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_KNEE, 10, 10);
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_RIGHT_FOOT, 11, 11);
-                
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_HIP, 12, 12);
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_KNEE, 13, 13);
-					addJointElement(userFrame.users[i], aUsers[i], XN_SKEL_LEFT_FOOT, 14, 14);
-                
-					//set joint orientation matrices for joints with no orientation confidence
-					for(int j = 0; j < numJoints; j++)
-					{
-						if(userFrame.users[i].joints[j].orientationConfidence == 0.0)
-						{
-							//set it to the identity matrix
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M11 = 1.0;
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M12 = 0.0;
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M13 = 0.0;
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M14 = 0.0;
-                        
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M21 = 0.0;
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M22 = 1.0;
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M23 = 0.0;
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M24 = 0.0;
-                        
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M31 = 0.0;
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M32 = 0.0;
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M33 = 1.0;
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M34 = 0.0;
-                        
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M41 = 0.0;
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M42 = 0.0;
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M43 = 0.0;
-							userFrame.users[i].joints[j].absoluteOrientation.rotationMatrix.M44 = 1.0;
-						}
-					}
-				}
-			}
-			else
-			{
-				userFrame.users[i].isTracking = false;
-			}
-		}
-
+		((AKOpenNIUserFrameGenerator*) userFrameGenerator)->setDepthGenerator(&depthGenerator);
+		((AKOpenNIUserFrameGenerator*) userFrameGenerator)->setUserGenerator(&userGenerator);
+		userFrameGenerator->setSkeletonMirrored(asSkeletonMirrored);
+		userFrameGenerator->setDepthTargetMirrored(depthImageBytesGenerator->getTargetMirrored());
+		userFrameGenerator->setDepthTargetSize(depthImageBytesGenerator->getTargetWidth(), depthImageBytesGenerator->getTargetHeight());
+		userFrameGenerator->setDepthSourceSize(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
+		userFrameGenerator->setRGBTargetMirrored(rgbImageBytesGenerator->getTargetMirrored());
+		userFrameGenerator->setRGBTargetSize(rgbImageBytesGenerator->getTargetWidth(), rgbImageBytesGenerator->getTargetHeight());
+		userFrameGenerator->setRGBSourceSize(rgbImageBytesGenerator->getSourceWidth(), rgbImageBytesGenerator->getSourceHeight());
+		userFrameGenerator->generateUserFrame();
 
 		unlockUserMutex();
 		dispatchStatusMessage((const uint8_t*) "userFrame");
@@ -833,80 +710,6 @@ void OpenNIDevice::dispatchUserMaskIfNeeded()
 		unlockUserMaskMutex();
 		dispatchStatusMessage((const uint8_t*) "userMaskFrame");
 	}
-}
-
-void OpenNIDevice::addJointElement(kinectUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex, int targetOrientationIndex)
-{
-    float jointPositionX, jointPositionY, jointPositionZ, jointW, jointPositionConfidence;
-    
-    XnSkeletonJointPosition jointPosition;
-    userGenerator.GetSkeletonCap().GetSkeletonJointPosition(user, eJoint, jointPosition);
-    
-    jointPositionX = jointPosition.position.X;
-    jointPositionY = jointPosition.position.Y;
-    jointPositionZ = jointPosition.position.Z;
-    jointW = 0;
-    jointPositionConfidence = jointPosition.fConfidence;
-    
-    //diable joint orientation on OpenNI for now
-    if(false && targetOrientationIndex > -1)
-    {
-        XnSkeletonJointOrientation orientation;
-        userGenerator.GetSkeletonCap().GetSkeletonJointOrientation(user, eJoint, orientation);
-        
-        kUser.joints[targetOrientationIndex].orientationConfidence = orientation.fConfidence;
-        
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M11 = orientation.orientation.elements[0];
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M12 = orientation.orientation.elements[3];
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M13 = orientation.orientation.elements[6];
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M14 = 0.0;
-        
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M21 = orientation.orientation.elements[1];
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M22 = orientation.orientation.elements[4];
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M23 = orientation.orientation.elements[7];
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M24 = 0.0;
-        
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M31 = orientation.orientation.elements[2];
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M32 = orientation.orientation.elements[5];
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M33 = orientation.orientation.elements[8];
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M34 = 0.0;
-        
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M41 = 0.0;
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M42 = 0.0;
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M43 = 0.0;
-        kUser.joints[targetOrientationIndex].absoluteOrientation.rotationMatrix.M44 = 1.0;
-    }
-    else
-    {
-        kUser.joints[targetOrientationIndex].orientationConfidence = 0.0;
-    }
-    
-    kUser.joints[targetIndex].positionConfidence = jointPositionConfidence;
-
-    kUser.joints[targetIndex].worldX = jointPositionX;
-    kUser.joints[targetIndex].worldY = jointPositionY;
-    kUser.joints[targetIndex].worldZ = jointPositionZ;
-    
-	kUser.joints[targetIndex].worldRelativeX = (depthImageBytesGenerator->getSourceWidth() - jointPositionX) / (depthImageBytesGenerator->getSourceWidth() * 2) - .5;
-	kUser.joints[targetIndex].worldRelativeY = -1 * (((depthImageBytesGenerator->getSourceHeight() - jointPositionY) / (depthImageBytesGenerator->getSourceHeight() * 2)) - .5);
-    kUser.joints[targetIndex].worldRelativeZ = (jointPositionZ * 7.8125) / MAX_DEPTH;
-    
-    //relative position / depth & rgb are aligned
-    XnPoint3D pt[1];
-    pt[0] = jointPosition.position;
-    depthGenerator.ConvertRealWorldToProjective(1, pt, pt);
-    
-	kUser.joints[targetIndex].rgbRelativeX = kUser.joints[targetIndex].depthRelativeX = pt[0].X / depthImageBytesGenerator->getSourceWidth();
-	kUser.joints[targetIndex].rgbRelativeY = kUser.joints[targetIndex].depthRelativeY = pt[0].Y / depthImageBytesGenerator->getSourceHeight();
-    
-    //take mirrored rgb / depth images into account
-    if(rgbImageBytesGenerator->getTargetMirrored()) kUser.joints[targetIndex].rgbRelativeX = 1 - kUser.joints[targetIndex].rgbRelativeX;
-	if(depthImageBytesGenerator->getTargetMirrored()) kUser.joints[targetIndex].depthRelativeX = 1 - kUser.joints[targetIndex].depthRelativeX;
-    
-    kUser.joints[targetIndex].rgbX = (int) (kUser.joints[targetIndex].rgbRelativeX * rgbImageBytesGenerator->getTargetWidth());
-    kUser.joints[targetIndex].rgbY = (int) (kUser.joints[targetIndex].rgbRelativeY * rgbImageBytesGenerator->getTargetHeight());
-	kUser.joints[targetIndex].depthX = (int) (kUser.joints[targetIndex].depthRelativeX * depthImageBytesGenerator->getTargetWidth());
-	kUser.joints[targetIndex].depthY = (int) (kUser.joints[targetIndex].depthRelativeY * depthImageBytesGenerator->getTargetHeight());
 }
 
 void OpenNIDevice::dispose()
