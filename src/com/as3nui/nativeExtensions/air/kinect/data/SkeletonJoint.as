@@ -15,9 +15,7 @@
 */
 package com.as3nui.nativeExtensions.air.kinect.data
 {
-	import flash.geom.Matrix3D;
-	import flash.geom.Point;
-	import flash.geom.Vector3D;
+	
 
 	/**
 	 * This class represents one joint in a user skeleton.
@@ -55,49 +53,14 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		public var name:String;
 		
 		/**
-		 * Position of the joint in world coordinates
+		 * Position of the joint
 		 */ 
-		public var position:Vector3D;
-		
-		/**
-		 * Relative position of the joint
-		 */ 
-		public var positionRelative:Vector3D;
-		
-		/**
-		 * Absolute 2D position of the joint, mapped in RGB space
-		 */ 
-		public var rgbPosition:Point;
-		
-		/**
-		 * Relative 2D position of the joint, mapped in RGB space
-		 */ 
-		public var rgbRelativePosition:Point;
-		
-		/**
-		 * Absolute 2D position of the joint, mapped in depth space
-		 */ 
-		public var depthPosition:Point;
-		
-		/**
-		 * Relative 2D position of the joint, mapped in depth space
-		 */ 
-		public var depthRelativePosition:Point;
+		public var position:Position;
 
 		/**
 		 * Accuracy of the joint position
 		 */
 		public var positionConfidence:Number;
-		
-		public var absoluteOrientationMatrix:Matrix3D;
-		public var absoluteOrientationQuaternion:Vector3D;
-		public var hierarchicalOrientationMatrix:Matrix3D;
-		public var hierarchicalOrientationQuaternion:Vector3D;
-
-		/**
-		 * Accuracy of the joint orientation
-		 */
-		public var orientationConfidence:Number;
 
 
 		public function SkeletonJoint()
@@ -110,28 +73,9 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		public function copyFrom(otherJoint:SkeletonJoint):void
 		{
 			name = otherJoint.name;
-			position ||= new Vector3D();
+			position ||= new Position();
 			position.copyFrom(otherJoint.position);
-			positionRelative ||= new Vector3D();
-			positionRelative.copyFrom(otherJoint.positionRelative);
-			rgbPosition ||= new Point();
-			rgbPosition.copyFrom(otherJoint.rgbPosition);
-			rgbRelativePosition ||= new Point();
-			rgbRelativePosition.copyFrom(otherJoint.rgbRelativePosition);
-			depthPosition ||= new Point();
-			depthPosition.copyFrom(otherJoint.depthPosition);
-			depthRelativePosition ||= new Point();
-			depthRelativePosition.copyFrom(otherJoint.depthRelativePosition);
 			positionConfidence = otherJoint.positionConfidence;
-			absoluteOrientationMatrix ||= new Matrix3D();
-			absoluteOrientationMatrix.copyFrom(otherJoint.absoluteOrientationMatrix);
-			absoluteOrientationQuaternion ||= new Vector3D();
-			absoluteOrientationQuaternion.copyFrom(otherJoint.absoluteOrientationQuaternion);
-			hierarchicalOrientationMatrix ||= new Matrix3D();
-			hierarchicalOrientationMatrix.copyFrom(otherJoint.hierarchicalOrientationMatrix);
-			hierarchicalOrientationQuaternion ||= new Vector3D();
-			hierarchicalOrientationQuaternion.copyFrom(otherJoint.hierarchicalOrientationQuaternion);
-			orientationConfidence = otherJoint.orientationConfidence;
 		}
 	}
 }

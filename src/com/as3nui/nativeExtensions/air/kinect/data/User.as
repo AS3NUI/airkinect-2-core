@@ -58,34 +58,9 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		public var trackingID:uint;
 		
 		/**
-		 * Position of the user in world coordinates
+		 * Position of the user
 		 */ 
-		public var position:Vector3D;
-		
-		/**
-		 * Relative position of the user
-		 */ 
-		public var positionRelative:Vector3D;
-		
-		/**
-		 * Absolute 2D position of the user, mapped in RGB space
-		 */ 
-		public var rgbPosition:Point;
-		
-		/**
-		 * Relative 2D position of the user, mapped in RGB space
-		 */ 
-		public var rgbRelativePosition:Point;
-
-		/**
-		 * Absolute 2D position of the user, mapped in depth space
-		 */ 
-		public var depthPosition:Point;
-		
-		/**
-		 * Relative 2D position of the user, mapped in depth space
-		 */ 
-		public var depthRelativePosition:Point;
+		public var position:Position;
 		
 		/**
 		 * Does this user have a calibrated skeleton or not?
@@ -160,12 +135,8 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		{
 			framework = otherUser.framework;
 			userID = otherUser.userID;
+			position ||= new Position();
 			position.copyFrom(otherUser.position);
-			positionRelative.copyFrom(otherUser.positionRelative);
-			rgbPosition.copyFrom(otherUser.rgbPosition);
-			rgbRelativePosition.copyFrom(otherUser.rgbRelativePosition);
-			depthPosition.copyFrom(otherUser.depthPosition);
-			depthRelativePosition.copyFrom(otherUser.depthRelativePosition);
 			hasSkeleton = otherUser.hasSkeleton;
 			updateJointCount(otherUser.skeletonJoints.length);
 			for(var i:uint = 0; i < otherUser.skeletonJoints.length; i++)
@@ -183,7 +154,7 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			skeletonJoints.length = count;
 			for(var i:uint = 0; i < count; i++)
 			{
-				if(skeletonJoints[i] == null) skeletonJoints[i] = new SkeletonJoint();
+				skeletonJoints[i] ||= new SkeletonJoint();
 			}
 		}
 	}

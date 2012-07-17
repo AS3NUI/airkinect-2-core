@@ -58,10 +58,6 @@ package com.as3nui.nativeExtensions.air.kinect.bridge
 		/** @private */
 		protected static const EXTENSION_REQUEST_GET_USER_FRAME:String = "getUserFrame";
 		/** @private */
-		protected static const EXTENSION_REQUEST_GET_SKELETON_JOINT_NAME_INDICIES:String = "getSkeletonJointNameIndices";
-		/** @private */
-		protected static const EXTENSION_REQUEST_GET_SKELETON_JOINT_NAMES:String = "getSkeletonJointNames";
-		/** @private */
 		protected static const EXTENSION_REQUEST_SET_USER_MASK_MODE:String = "setUserMaskMode";
 		/** @private */
 		protected static const EXTENSION_REQUEST_SET_USER_MASK_ENABLED:String = "setUserMaskEnabled";
