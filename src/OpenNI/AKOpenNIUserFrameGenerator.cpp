@@ -111,9 +111,12 @@ void AKOpenNIUserFrameGenerator::generateUserFrame()
 
 			_userFrame.users[i].hasSkeleton = (_skeletonTrackingEnabled && _userGenerator->GetSkeletonCap().IsTracking(aUsers[i]));
 
-			_userFrame.users[i].position.world.create(position.X, position.Y, position.Z);
+			double worldX = position.X;
+			if(!_skeletonMirrored) worldX *= -1;
 
-			_userFrame.users[i].position.worldRelative.x = (_depthSourceWidth - position.X) / (_depthSourceWidth * 2) - .5;
+			_userFrame.users[i].position.world.create(worldX, position.Y, position.Z);
+
+			_userFrame.users[i].position.worldRelative.x = (_depthSourceWidth - worldX) / (_depthSourceWidth * 2) - .5;
 			_userFrame.users[i].position.worldRelative.y = -1 * (((_depthSourceHeight - position.Y) / (_depthSourceHeight * 2)) - .5);
 			_userFrame.users[i].position.worldRelative.z = (position.Z * 7.8125) / MAX_DEPTH;
             
@@ -173,6 +176,8 @@ void AKOpenNIUserFrameGenerator::addJointElement(AKUser &kUser, XnUserID user, X
     _userGenerator->GetSkeletonCap().GetSkeletonJointPosition(user, eJoint, jointPosition);
     
     jointPositionX = jointPosition.position.X;
+	if(!_skeletonMirrored) jointPositionX *= -1;
+
     jointPositionY = jointPosition.position.Y;
     jointPositionZ = jointPosition.position.Z;
     jointW = 0;
