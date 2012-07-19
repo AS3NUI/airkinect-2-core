@@ -58,11 +58,39 @@ void AKOpenNIUserFrameGenerator::deallocateJointNames()
 void AKOpenNIUserFrameGenerator::allocateUserFrame()
 {
 	AKUserFrameGenerator::allocateUserFrame();
+
+	_openNIUserFrame = new AKOpenNIUserFrame();
+	_openNIUserFrame->userFrame = _userFrame;
+	_openNIUserFrame->openNIUsers = new AKOpenNIUser[_maxSkeletons];
+	for(int i = 0; i < _maxSkeletons; i++)
+	{
+		_openNIUserFrame->openNIUsers[i].user = &_userFrame->users[i];
+		_openNIUserFrame->openNIUsers[i].openNISkeletonJoints = new AKOpenNISkeletonJoint[_numJoints];
+		for(int j = 0; j < _numJoints; j++)
+		{
+			_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[j].skeletonJoint = &_userFrame->users[i].skeletonJoints[j];
+		}
+	}
 }
 
 void AKOpenNIUserFrameGenerator::deallocateUserFrame()
 {
 	AKUserFrameGenerator::deallocateUserFrame();
+	if(_openNIUserFrame != 0)
+	{
+		if(_openNIUserFrame->openNIUsers != 0)
+		{
+			for(int i = 0; i < _maxSkeletons; i++)
+			{
+				delete [] _openNIUserFrame->openNIUsers[i].openNISkeletonJoints;
+				_openNIUserFrame->openNIUsers[i].openNISkeletonJoints = 0;
+			}
+			delete [] _openNIUserFrame->openNIUsers;
+			_openNIUserFrame->openNIUsers = 0;
+		}
+		delete _openNIUserFrame;
+		_openNIUserFrame = 0;
+	}
 }
 
 void AKOpenNIUserFrameGenerator::setDepthGenerator(xn::DepthGenerator* depthGenerator)
@@ -105,25 +133,26 @@ void AKOpenNIUserFrameGenerator::generateUserFrame()
 			{
 				//in openni, left/right are in device space, rather than user space
 				//that's why we switch LEFT/RIGHT here, to match MS SDK (user space)
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_HEAD, 0);
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_NECK, 1);
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_TORSO, 2);
+
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[0], aUsers[i], XN_SKEL_HEAD);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[1], aUsers[i], XN_SKEL_NECK);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[2], aUsers[i], XN_SKEL_TORSO);
                 
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_RIGHT_SHOULDER, 3);
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_RIGHT_ELBOW, 4);
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_RIGHT_HAND, 5);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[3], aUsers[i], XN_SKEL_RIGHT_SHOULDER);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[4], aUsers[i], XN_SKEL_RIGHT_ELBOW);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[5], aUsers[i], XN_SKEL_RIGHT_HAND);
                 
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_LEFT_SHOULDER, 6);
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_LEFT_ELBOW, 7);
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_LEFT_HAND, 8);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[6], aUsers[i], XN_SKEL_LEFT_SHOULDER);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[7], aUsers[i], XN_SKEL_LEFT_ELBOW);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[8], aUsers[i], XN_SKEL_LEFT_HAND);
                 
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_RIGHT_HIP, 9);
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_RIGHT_KNEE, 10);
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_RIGHT_FOOT, 11);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[9], aUsers[i], XN_SKEL_RIGHT_HIP);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[10], aUsers[i], XN_SKEL_RIGHT_KNEE);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[11], aUsers[i], XN_SKEL_RIGHT_FOOT);
                 
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_LEFT_HIP, 12);
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_LEFT_KNEE, 13);
-				addJointElement(_userFrame->users[i], aUsers[i], XN_SKEL_LEFT_FOOT, 14);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[12], aUsers[i], XN_SKEL_LEFT_HIP);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[13], aUsers[i], XN_SKEL_LEFT_KNEE);
+				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[14], aUsers[i], XN_SKEL_LEFT_FOOT);
 			}
 		}
 		else
@@ -133,40 +162,55 @@ void AKOpenNIUserFrameGenerator::generateUserFrame()
 	}
 }
 
-void AKOpenNIUserFrameGenerator::addJointElement(AKUser &kUser, XnUserID user, XnSkeletonJoint eJoint, unsigned int targetIndex)
+void AKOpenNIUserFrameGenerator::setJointProperties(AKOpenNISkeletonJoint& openNISkeletonJoint, XnUserID user, XnSkeletonJoint eJoint)
 {   
     XnSkeletonJointPosition jointPosition;
     _userGenerator->GetSkeletonCap().GetSkeletonJointPosition(user, eJoint, jointPosition);
 
-	calculatePosition(kUser.skeletonJoints[targetIndex].position, jointPosition.position);
-	kUser.skeletonJoints[targetIndex].positionConfidence = jointPosition.fConfidence;
+	calculatePosition(openNISkeletonJoint.skeletonJoint->position, jointPosition.position);
+	openNISkeletonJoint.skeletonJoint->positionConfidence = jointPosition.fConfidence;
     
-	/*
     XnSkeletonJointOrientation orientation;
     _userGenerator->GetSkeletonCap().GetSkeletonJointOrientation(user, eJoint, orientation);
-    
-    kUser.joints[targetOrientationIndex].orientationConfidence = orientation.fConfidence;
-    
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M11 = orientation.orientation.elements[0];
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M12 = orientation.orientation.elements[3];
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M13 = orientation.orientation.elements[6];
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M14 = 0.0;
+
+	openNISkeletonJoint.orientationConfidence = orientation.fConfidence;
+	if(openNISkeletonJoint.orientationConfidence == 0.0)
+	{
+		openNISkeletonJoint.orientation.M11 = 1.0;
+		openNISkeletonJoint.orientation.M12 = 0.0;
+		openNISkeletonJoint.orientation.M13 = 0.0;
         
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M21 = orientation.orientation.elements[1];
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M22 = orientation.orientation.elements[4];
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M23 = orientation.orientation.elements[7];
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M24 = 0.0;
+		openNISkeletonJoint.orientation.M21 = 0.0;
+		openNISkeletonJoint.orientation.M22 = 1.0;
+		openNISkeletonJoint.orientation.M23 = 0.0;
         
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M31 = orientation.orientation.elements[2];
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M32 = orientation.orientation.elements[5];
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M33 = orientation.orientation.elements[8];
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M34 = 0.0;
-        
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M41 = 0.0;
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M42 = 0.0;
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M43 = 0.0;
-    kUser.joints[targetIndex].absoluteOrientation.rotationMatrix.M44 = 1.0;
-	*/
+		openNISkeletonJoint.orientation.M31 = 0.0;
+		openNISkeletonJoint.orientation.M32 = 0.0;
+		openNISkeletonJoint.orientation.M33 = 1.0;
+	}
+	else
+	{
+		openNISkeletonJoint.orientation.M11 = orientation.orientation.elements[0];
+		openNISkeletonJoint.orientation.M12 = orientation.orientation.elements[3];
+		openNISkeletonJoint.orientation.M13 = orientation.orientation.elements[6];
+
+		openNISkeletonJoint.orientation.M21 = orientation.orientation.elements[1];
+		openNISkeletonJoint.orientation.M22 = orientation.orientation.elements[4];
+		openNISkeletonJoint.orientation.M23 = orientation.orientation.elements[7];
+		
+		openNISkeletonJoint.orientation.M31 = orientation.orientation.elements[2];
+		openNISkeletonJoint.orientation.M32 = orientation.orientation.elements[5];
+		openNISkeletonJoint.orientation.M33 = orientation.orientation.elements[8];
+	}
+
+	openNISkeletonJoint.orientation.M14 = 0.0;
+	openNISkeletonJoint.orientation.M24 = 0.0;
+	openNISkeletonJoint.orientation.M34 = 0.0;
+
+	openNISkeletonJoint.orientation.M41 = 0.0;
+	openNISkeletonJoint.orientation.M42 = 0.0;
+	openNISkeletonJoint.orientation.M43 = 0.0;
+	openNISkeletonJoint.orientation.M44 = 1.0;
 }
 
 void AKOpenNIUserFrameGenerator::calculatePosition(AKPosition &akPosition, XnPoint3D xnPosition)
@@ -199,7 +243,7 @@ void AKOpenNIUserFrameGenerator::calculatePosition(AKPosition &akPosition, XnPoi
 
 FREObject AKOpenNIUserFrameGenerator::getFREObject()
 {
-	return _userFrame->asFREObject();
+	return _openNIUserFrame->asFREObject();
 }
 
 #endif

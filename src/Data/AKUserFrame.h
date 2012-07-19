@@ -27,7 +27,28 @@ typedef struct _AKUserFrame
 
 	FREObject asFREObject()
 	{
-		FREObject freUserFrame, freFrameNumber, freTimestamp, freUsers, freUser;
+		FREObject freUserFrame = asFREObjectWithoutUsers();
+		short int trackedSkeletons = 0;
+		FREObject freUsers;
+		FREGetObjectProperty(freUserFrame, (const uint8_t*) "users", &freUsers, NULL);
+		for(int i = 0; i < maxSkeletons; i++)
+		{
+			if(this->users[i].isTracking)
+			{
+				//create the user object
+				FREObject freUser = this->users[i].asFREObject();
+            
+				FRESetArrayElementAt(freUsers, trackedSkeletons, freUser);
+				trackedSkeletons++;
+			}
+		}
+		FRESetObjectProperty(freUserFrame, (const uint8_t*) "users", freUsers, NULL);
+		return freUserFrame;
+	};
+
+	FREObject asFREObjectWithoutUsers()
+	{
+		FREObject freUserFrame, freFrameNumber, freTimestamp, freUsers;
 
 		FRENewObject( (const uint8_t*) asUserFrameClass, 0, NULL, &freUserFrame, NULL);
 
@@ -38,21 +59,8 @@ typedef struct _AKUserFrame
 		FRESetObjectProperty(freUserFrame, (const uint8_t*) "timeStamp", freTimestamp, NULL);
     
 		FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.User>", 0, NULL, &freUsers, NULL);
-    
-		short int trackedSkeletons = 0;
-		for(int i = 0; i < maxSkeletons; i++)
-		{
-			if(this->users[i].isTracking)
-			{
-				//create the user object
-				freUser = this->users[i].asFREObject();
-            
-				FRESetArrayElementAt(freUsers, trackedSkeletons, freUser);
-				trackedSkeletons++;
-			}
-		}
-
 		FRESetObjectProperty(freUserFrame, (const uint8_t*) "users", freUsers, NULL);
+
 		return freUserFrame;
 	};
 

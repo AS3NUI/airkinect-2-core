@@ -33,6 +33,22 @@ typedef struct _AKUser
 
 	FREObject asFREObject()
 	{
+		FREObject freUser = asFREObjectWithoutJoints();
+        
+		FREObject freJoints;
+		FREGetObjectProperty(freUser, (const uint8_t*) "skeletonJoints", &freJoints, NULL);
+		for(int i = 0; i < numJoints; i++)
+		{
+			FREObject freJoint = this->skeletonJoints[i].asFREObject();
+			FRESetArrayElementAt(freJoints, i, freJoint);
+		}
+		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonJoints", freJoints, NULL);
+
+		return freUser;
+	};
+	
+	FREObject asFREObjectWithoutJoints()
+	{
 		FREObject freUser, freUserType, freUserID, freTrackingID, freHasSkeleton, freJoints;
 
 		FRENewObject( (const uint8_t*) asUserClass, 0, NULL, &freUser, NULL);
@@ -48,22 +64,15 @@ typedef struct _AKUser
 		FRESetObjectProperty(freUser, (const uint8_t*) "position", this->position.asFREObject(), NULL);
 		FRESetObjectProperty(freUser, (const uint8_t*) "hasSkeleton", freHasSkeleton, NULL);
 
-		//create the joints vector
-		FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.SkeletonJoint>", 0, NULL, &freJoints, NULL);
-            
-		for(int i = 0; i < numJoints; i++)
-		{
-			FREObject freJoint = this->skeletonJoints[i].asFREObject();
-			FRESetArrayElementAt(freJoints, i, freJoint);
-		}
-            
+		FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.SkeletonJoint>", 0, NULL, &freJoints, NULL);            
 		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonJoints", freJoints, NULL);
+
 		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonJointNameIndices", freGetSkeletonJointNameIndices(), NULL);
 		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonJointNames", freGetSkeletonJointNames(), NULL);
 
 		return freUser;
-	};
-	
+	}
+
 	FREObject freGetSkeletonJointNameIndices()
 	{
 		FREObject skeletonJointNameIndices, jointIndex;

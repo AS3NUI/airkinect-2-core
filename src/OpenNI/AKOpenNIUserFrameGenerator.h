@@ -5,6 +5,8 @@
 #ifdef AIRKINECT_TARGET_OPENNI
 
 #include "../AKUserFrameGenerator.h"
+#include "Data/AKOpenNIUserFrame.h"
+
 #include <XnCppWrapper.h>
 
 class AKOpenNIUserFrameGenerator : public AKUserFrameGenerator
@@ -31,10 +33,12 @@ protected:
 
 private:
 
+	AKOpenNIUserFrame* _openNIUserFrame;
+
 	xn::DepthGenerator* _depthGenerator;
 	xn::UserGenerator* _userGenerator;
 
-	void addJointElement(AKUser &kUser, XnUserID user, XnSkeletonJoint eJoint, unsigned int targetIndex);
+	void setJointProperties(AKOpenNISkeletonJoint &openNISkeletonJoint, XnUserID user, XnSkeletonJoint eJoint);
 	void calculatePosition(AKPosition &akPosition, XnPoint3D xnPosition);
 
 };

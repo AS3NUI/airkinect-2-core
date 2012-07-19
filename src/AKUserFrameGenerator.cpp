@@ -45,15 +45,20 @@ void AKUserFrameGenerator::allocateUserFrame()
 
 void AKUserFrameGenerator::deallocateUserFrame()
 {
-	if(_userFrame->users != 0)
+	if(_userFrame != 0)
 	{
-		for(int i = 0; i < _maxSkeletons; i++)
+		if(_userFrame->users != 0)
 		{
-			delete [] _userFrame->users[i].skeletonJoints;
-			_userFrame->users[i].skeletonJoints = 0;
+			for(int i = 0; i < _maxSkeletons; i++)
+			{
+				delete [] _userFrame->users[i].skeletonJoints;
+				_userFrame->users[i].skeletonJoints = 0;
+			}
+			delete [] _userFrame->users;
+			_userFrame->users = 0;
 		}
-		delete [] _userFrame->users;
-		_userFrame->users = 0;
+		delete _userFrame;
+		_userFrame = 0;
 	}
 }
 

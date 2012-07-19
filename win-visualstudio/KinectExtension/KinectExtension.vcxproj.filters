@@ -34,6 +34,9 @@
     <Filter Include="Header Files\Data">
       <UniqueIdentifier>{9b4aae67-bbd1-4a37-a458-92cfe324ad08}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\OpenNI\Data">
+      <UniqueIdentifier>{bd07c405-9c30-4de9-babb-0e49794cd440}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FlashRuntimeExtensions.h">
@@ -122,6 +125,15 @@
     </ClInclude>
     <ClInclude Include="..\..\src\Data\AKUserFrame.h">
       <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNISkeletonJoint.h">
+      <Filter>Header Files\OpenNI\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNIUser.h">
+      <Filter>Header Files\OpenNI\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNIUserFrame.h">
+      <Filter>Header Files\OpenNI\Data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

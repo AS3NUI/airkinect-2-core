@@ -240,6 +240,9 @@
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIRGBParser.h" />
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserFrameGenerator.h" />
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserMasksGenerator.h" />
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNISkeletonJoint.h" />
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNIUser.h" />
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNIUserFrame.h" />
     <ClInclude Include="..\..\src\OpenNI\OpenNIDevice.h" />
     <ClInclude Include="..\..\src\PointCloudRegion.h" />
     <ClInclude Include="FlashRuntimeExtensions.h" />
