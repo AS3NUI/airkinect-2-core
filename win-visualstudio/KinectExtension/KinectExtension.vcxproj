@@ -234,6 +234,9 @@
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKRGBParser.h" />
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserFrameGenerator.h" />
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.h" />
+    <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKSkeletonJoint.h" />
+    <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKUser.h" />
+    <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKUserFrame.h" />
     <ClInclude Include="..\..\src\MSSDK\MSKinectDevice.h" />
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIDepthParser.h" />
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIPointCloudGenerator.h" />

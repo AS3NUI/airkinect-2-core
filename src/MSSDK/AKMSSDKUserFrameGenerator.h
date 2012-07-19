@@ -6,6 +6,7 @@
 
 #include "../AKUserFrameGenerator.h"
 #include "../AKUtilityFunctions.h"
+#include "Data/AKMSSDKUserFrame.h"
 
 class AKMSSDKUserFrameGenerator : public AKUserFrameGenerator
 {
@@ -34,6 +35,8 @@ protected:
 
 private:
 
+	AKMSSDKUserFrame* _mssdkUserFrame;
+
 	bool _seatedSkeletonEnabled;
 	INuiSensor* _nuiSensor;
 
@@ -45,10 +48,11 @@ private:
 	void allocateJointNamesForSeatedSkeletonTracking();
 	void allocateJointNamesForRegularSkeletonTracking();
 
-	void addJointElements(AKUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
-	void addJointElementsForSeatedSkeletonTracking(AKUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
-	void addJointElementsForRegularSkeletonTracking(AKUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
-	void addJointElement(AKUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint, uint32_t targetIndex);
+	void addJointElements(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
+	void addJointElementsForSeatedSkeletonTracking(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
+	void addJointElementsForRegularSkeletonTracking(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
+	
+	void setJointProperties(AKMSSDKSkeletonJoint &mssdkSkeletonJoint, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint);
 	void calculatePosition(AKPosition &kTransform, Vector4 skeletonTransform);
 
 };

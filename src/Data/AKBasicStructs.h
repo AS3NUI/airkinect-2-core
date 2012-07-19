@@ -121,15 +121,18 @@ typedef struct _AKQuaternion : AKPoint3D
 
 	FREObject asFREObject()
 	{
-		FREObject vector;
+		FREObject quaternion;
 		FREObject freX, freY, freZ, freW;
 		FRENewObjectFromDouble(x, &freX);
 		FRENewObjectFromDouble(y, &freY);
 		FRENewObjectFromDouble(z, &freZ);
 		FRENewObjectFromDouble(w, &freW);
-		FREObject vectorParams[] = {freX, freY, freZ, freW};
-		FRENewObject( (const uint8_t*) "flash.geom.Vector3D", 4, vectorParams, &vector, NULL);
-		return vector;
+		FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.data.Quaternion", 0, NULL, &quaternion, NULL);
+		FRESetObjectProperty(quaternion, (const uint8_t*) "x", freX, NULL);
+		FRESetObjectProperty(quaternion, (const uint8_t*) "y", freY, NULL);
+		FRESetObjectProperty(quaternion, (const uint8_t*) "z", freZ, NULL);
+		FRESetObjectProperty(quaternion, (const uint8_t*) "w", freW, NULL);
+		return quaternion;
 	};
 
 } AKQuaternion;
