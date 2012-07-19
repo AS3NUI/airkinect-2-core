@@ -21,14 +21,7 @@ public:
 	void generateUserFrame();
 	FREObject getFREObject();
 
-private:
-	
-	const char* _asJointClass;
-	const char* _asUserClass;
-	const char* _asUserFrameClass;
-
-	xn::DepthGenerator* _depthGenerator;
-	xn::UserGenerator* _userGenerator;
+protected:
 
 	void allocateUserFrame();
 	void deallocateUserFrame();
@@ -36,10 +29,13 @@ private:
 	void allocateJointNames();
 	void deallocateJointNames();
 
-	FREObject freGetSkeletonJointNameIndices();
-	FREObject freGetSkeletonJointNames();
+private:
+
+	xn::DepthGenerator* _depthGenerator;
+	xn::UserGenerator* _userGenerator;
 
 	void addJointElement(AKUser &kUser, XnUserID user, XnSkeletonJoint eJoint, unsigned int targetIndex);
+	void calculatePosition(AKPosition &akPosition, XnPoint3D xnPosition);
 
 };
 

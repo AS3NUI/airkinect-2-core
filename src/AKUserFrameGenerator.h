@@ -10,7 +10,7 @@
 #endif
 
 #include <stdlib.h>
-#include "AKUserFrame.h"
+#include "Data/AKUserFrame.h"
 
 class AKUserFrameGenerator
 {
@@ -35,6 +35,11 @@ public:
 	virtual FREObject getFREObject();
 
 protected:
+	
+	const char* _asUserFrameClass;
+	const char* _asUserClass;
+	const char* _asJointClass;
+	const char* _framework;
 
 	bool _rgbTargetMirrored;
 	bool _depthTargetMirrored;
@@ -58,7 +63,9 @@ protected:
 	int _maxSkeletons;
 	char** _jointNames;
 
-	AKUserFrame _userFrame;
+	AKUserFrame* _userFrame;
+	virtual void allocateUserFrame();
+	virtual void deallocateUserFrame();
 };
 
 #endif

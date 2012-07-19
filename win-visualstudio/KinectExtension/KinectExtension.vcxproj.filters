@@ -31,6 +31,9 @@
     <Filter Include="Source Files\OpenNI">
       <UniqueIdentifier>{fe07468c-fbbb-4b22-af3e-25cc29636a4f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Data">
+      <UniqueIdentifier>{9b4aae67-bbd1-4a37-a458-92cfe324ad08}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FlashRuntimeExtensions.h">
@@ -96,18 +99,6 @@
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.h">
       <Filter>Header Files\MSSDK</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\AKBasicStructs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\AKSkeletonJoint.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\AKUser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\AKUserFrame.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\AKUserFrameGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -119,6 +110,18 @@
     </ClInclude>
     <ClInclude Include="..\..\src\AKUtilityFunctions.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Data\AKBasicStructs.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Data\AKSkeletonJoint.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Data\AKUser.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Data\AKUserFrame.h">
+      <Filter>Header Files\Data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

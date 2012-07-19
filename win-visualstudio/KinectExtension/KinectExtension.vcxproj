@@ -217,12 +217,12 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\AKImageBytesGenerator.h" />
     <ClInclude Include="..\..\src\AKPointCloudGenerator.h" />
-    <ClInclude Include="..\..\src\AKBasicStructs.h" />
-    <ClInclude Include="..\..\src\AKSkeletonJoint.h" />
-    <ClInclude Include="..\..\src\AKUser.h" />
-    <ClInclude Include="..\..\src\AKUserFrame.h" />
     <ClInclude Include="..\..\src\AKUserFrameGenerator.h" />
     <ClInclude Include="..\..\src\AKUserMasksGenerator.h" />
+    <ClInclude Include="..\..\src\Data\AKBasicStructs.h" />
+    <ClInclude Include="..\..\src\Data\AKSkeletonJoint.h" />
+    <ClInclude Include="..\..\src\Data\AKUser.h" />
+    <ClInclude Include="..\..\src\Data\AKUserFrame.h" />
     <ClInclude Include="..\..\src\ExtensionConfig.h" />
     <ClInclude Include="..\..\src\AKUtilityFunctions.h" />
     <ClInclude Include="..\..\src\KinectCapabilities.h" />

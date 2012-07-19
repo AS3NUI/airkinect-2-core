@@ -2,11 +2,12 @@
 #ifdef AIRKINECT_TARGET_MSSDK
 
 AKMSSDKUserFrameGenerator::AKMSSDKUserFrameGenerator()
-{
+{	
 	_asJointClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSSkeletonJoint";
 	_asUserClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSUser";
 	_asUserFrameClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSUserFrame";
-	
+	_framework = "mssdk";
+
 	_maxSkeletons = NUI_SKELETON_COUNT;
 
 	_seatedSkeletonEnabled = false;
@@ -88,25 +89,12 @@ void AKMSSDKUserFrameGenerator::allocateJointNamesForRegularSkeletonTracking()
 
 void AKMSSDKUserFrameGenerator::allocateUserFrame()
 {
-	_userFrame.users = new AKUser[_maxSkeletons];
-	for(int i = 0; i < _maxSkeletons; i++)
-	{
-		_userFrame.users[i].skeletonJoints = new AKSkeletonJoint[_numJoints];
-	}
+	AKUserFrameGenerator::allocateUserFrame();
 }
 
 void AKMSSDKUserFrameGenerator::deallocateUserFrame()
 {
-	if(_userFrame.users != 0)
-	{
-		for(int i = 0; i < _maxSkeletons; i++)
-		{
-			delete [] _userFrame.users[i].skeletonJoints;
-			_userFrame.users[i].skeletonJoints = 0;
-		}
-		delete [] _userFrame.users;
-		_userFrame.users = 0;
-	}
+	AKUserFrameGenerator::deallocateUserFrame();
 }
 
 void AKMSSDKUserFrameGenerator::setRGBTargetSize(int width, int height)
@@ -142,8 +130,6 @@ void AKMSSDKUserFrameGenerator::setTransformSmoothingParameters(NUI_TRANSFORM_SM
 
 void AKMSSDKUserFrameGenerator::generateUserFrame()
 {
-
-    memset(&_userFrame.users[0], 0, sizeof(_userFrame.users));
 	NUI_SKELETON_FRAME skeletonFrame = {0};
 	HRESULT hr = _nuiSensor->NuiSkeletonGetNextFrame( 0, &skeletonFrame );
 	if(FAILED(hr))
@@ -154,40 +140,40 @@ void AKMSSDKUserFrameGenerator::generateUserFrame()
 	_nuiSensor->NuiTransformSmooth(&skeletonFrame, &_transformSmoothingParameters);
 
 	NUI_SKELETON_DATA skeletonData;
-	_userFrame.frameNumber = skeletonFrame.dwFrameNumber;
-	_userFrame.timeStamp = (int)(skeletonFrame.liTimeStamp.QuadPart /1000);
+	_userFrame->frameNumber = skeletonFrame.dwFrameNumber;
+	_userFrame->timeStamp = (int)(skeletonFrame.liTimeStamp.QuadPart /1000);
 
 	for (int i = 0; i < NUI_SKELETON_COUNT; ++i){
 		skeletonData = skeletonFrame.SkeletonData[i];
 
 		if(skeletonData.eTrackingState == NUI_SKELETON_TRACKED || skeletonData.eTrackingState == NUI_SKELETON_POSITION_ONLY) {
-			_userFrame.users[i].isTracking = true;
+			_userFrame->users[i].isTracking = true;
 			//dwTrackingID is some wierd ass number by microsoft, to match properly to depth player index use i+1
-			_userFrame.users[i].trackingID = skeletonData.dwTrackingID;
-			_userFrame.users[i].userID = i+1;
-			_userFrame.users[i].hasSkeleton = skeletonData.eTrackingState == NUI_SKELETON_TRACKED;
+			_userFrame->users[i].trackingID = skeletonData.dwTrackingID;
+			_userFrame->users[i].userID = i+1;
+			_userFrame->users[i].hasSkeleton = skeletonData.eTrackingState == NUI_SKELETON_TRACKED;
 			
 			//Transform for User
-			calculateKinectTransform(_userFrame.users[i].position, skeletonData.Position);
+			calculatePosition(_userFrame->users[i].position, skeletonData.Position);
 
 			//joint orientation (kinect sdk 1.5)
 			NUI_SKELETON_BONE_ORIENTATION *boneOrientations = new NUI_SKELETON_BONE_ORIENTATION[NUI_SKELETON_POSITION_COUNT];
 			hr = NuiSkeletonCalculateBoneOrientations(&skeletonData, boneOrientations);
 
 			//Joint Position Calculations
-			if (_userFrame.users[i].hasSkeleton){
-				addJointElements(_userFrame.users[i], skeletonData, boneOrientations);
+			if (_userFrame->users[i].hasSkeleton){
+				addJointElements(_userFrame->users[i], skeletonData, boneOrientations);
 			}
 
 			//cleanup
 			delete [] boneOrientations;
 		}else{
-			_userFrame.users[i].isTracking = false;
+			_userFrame->users[i].isTracking = false;
 		}
 	}
 }
 
-void AKMSSDKUserFrameGenerator::calculateKinectTransform(AKPosition &kTransform, Vector4 skeletonTransform){
+void AKMSSDKUserFrameGenerator::calculatePosition(AKPosition &kTransform, Vector4 skeletonTransform){
 	long colorX, colorY, depthX, depthY;
 	USHORT depthValue;
 
@@ -276,7 +262,7 @@ void AKMSSDKUserFrameGenerator::addJointElement(AKUser &kUser, NUI_SKELETON_DATA
 	Vector4 jointPosition = skeletonData.SkeletonPositions[eJoint];
 
 	//Transform for User
-	calculateKinectTransform(kUser.skeletonJoints[targetIndex].position, jointPosition);
+	calculatePosition(kUser.skeletonJoints[targetIndex].position, jointPosition);
 
 	kUser.skeletonJoints[targetIndex].positionConfidence = 0;
 
@@ -345,93 +331,7 @@ void AKMSSDKUserFrameGenerator::addJointElement(AKUser &kUser, NUI_SKELETON_DATA
 
 FREObject AKMSSDKUserFrameGenerator::getFREObject()
 {
-	short int trackedSkeletons = 0;
-    
-    FREObject freUserFrame, frameNumber, timestamp, users, user, userType, userID, trackingID, hasSkeleton, joints, joint, jointName;
-    FREObject positionConfidence;
-
-	FRENewObject( (const uint8_t*) _asUserFrameClass, 0, NULL, &freUserFrame, NULL);
-
-	FRENewObjectFromUint32(_userFrame.frameNumber, &frameNumber);
-    FRENewObjectFromUint32(_userFrame.timeStamp, &timestamp);
-
-	FRESetObjectProperty(freUserFrame, (const uint8_t*) "frameNumber", frameNumber, NULL);
-	FRESetObjectProperty(freUserFrame, (const uint8_t*) "timeStamp", timestamp, NULL);
-    
-    FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.User>", 0, NULL, &users, NULL);
-    
-    for(int i = 0; i < _maxSkeletons; i++)
-    {
-        if(_userFrame.users[i].isTracking)
-        {
-			//create the user object
-			FRENewObject( (const uint8_t*) _asUserClass, 0, NULL, &user, NULL);
-
-			char* framework = "mssdk";
-
-			FRENewObjectFromUTF8(strlen(framework), (const uint8_t*) framework, &userType);
-			FRENewObjectFromUint32(_userFrame.users[i].userID, &userID);
-			FRENewObjectFromUint32(_userFrame.users[i].trackingID, &trackingID);
-			FRENewObjectFromBool((_userFrame.users[i].hasSkeleton) ? 1 : 0, &hasSkeleton);
-
-			FRESetObjectProperty(user, (const uint8_t*) "framework", userType, NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "userID", userID, NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "trackingID", trackingID, NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "position", _userFrame.users[i].position.asFREObject(), NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "hasSkeleton", hasSkeleton, NULL);
-
-			//create the joints vector
-            FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.SkeletonJoint>", 0, NULL, &joints, NULL);
-            
-            for(int j = 0; j < _numJoints; j++)
-            {
-
-				FRENewObject( (const uint8_t*) _asJointClass, 0, NULL, &joint, NULL);
-
-                FRENewObjectFromUTF8(strlen(_jointNames[j]), (const uint8_t*) _jointNames[j], &jointName);
-				FRENewObjectFromDouble(_userFrame.users[i].skeletonJoints[j].positionConfidence, &positionConfidence);
-
-				FRESetObjectProperty(joint, (const uint8_t*) "name", jointName, NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "position", _userFrame.users[i].skeletonJoints[j].position.asFREObject(), NULL);
-				FRESetObjectProperty(joint, (const uint8_t*) "positionConfidence", positionConfidence, NULL);
-                
-				FRESetArrayElementAt(joints, j, joint);
-            }
-            
-			FRESetObjectProperty(user, (const uint8_t*) "skeletonJoints", joints, NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "skeletonJointNameIndices", freGetSkeletonJointNameIndices(), NULL);
-			FRESetObjectProperty(user, (const uint8_t*) "skeletonJointNames", freGetSkeletonJointNames(), NULL);
-            
-            FRESetArrayElementAt(users, trackedSkeletons, user);
-            trackedSkeletons++;
-        }
-    }
-
-	FRESetObjectProperty(freUserFrame, (const uint8_t*) "users", users, NULL);
-	return freUserFrame;
-}
-
-FREObject AKMSSDKUserFrameGenerator::freGetSkeletonJointNameIndices()
-{
-	FREObject skeletonJointNameIndices, jointIndex;
-    FRENewObject( (const uint8_t*) "flash.utils.Dictionary", 0, NULL, &skeletonJointNameIndices, NULL);
-	for(int i = 0; i < _numJoints; i++)
-    {
-        FRENewObjectFromUint32(i, &jointIndex);
-        FRESetObjectProperty(skeletonJointNameIndices, (const uint8_t*) _jointNames[i], jointIndex, NULL);
-    }
-    return skeletonJointNameIndices;
-}
-FREObject AKMSSDKUserFrameGenerator::freGetSkeletonJointNames()
-{ 
-	FREObject skeletonJointNames, skeletonJointName;
-	FRENewObject( (const uint8_t*) "Vector.<String>", 0, NULL, &skeletonJointNames, NULL);
-	for(int i = 0; i < _numJoints; i++)
-	{
-	FRENewObjectFromUTF8(strlen(_jointNames[i]), (const uint8_t*) _jointNames[i], &skeletonJointName);
-	FRESetArrayElementAt(skeletonJointNames, i, skeletonJointName);
-	}
-	return skeletonJointNames;
+	return _userFrame->asFREObject();
 }
 
 #endif

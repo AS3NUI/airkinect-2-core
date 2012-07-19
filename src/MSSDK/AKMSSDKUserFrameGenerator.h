@@ -24,11 +24,15 @@ public:
 	void generateUserFrame();
 	FREObject getFREObject();
 
+protected:
+
+	void allocateUserFrame();
+	void deallocateUserFrame();
+
+	void allocateJointNames();
+	void deallocateJointNames();
+
 private:
-	
-	const char* _asJointClass;
-	const char* _asUserClass;
-	const char* _asUserFrameClass;
 
 	bool _seatedSkeletonEnabled;
 	INuiSensor* _nuiSensor;
@@ -38,23 +42,14 @@ private:
 
 	NUI_TRANSFORM_SMOOTH_PARAMETERS _transformSmoothingParameters;
 
-	void allocateUserFrame();
-	void deallocateUserFrame();
-
-	void allocateJointNames();
-	void deallocateJointNames();
-
 	void allocateJointNamesForSeatedSkeletonTracking();
 	void allocateJointNamesForRegularSkeletonTracking();
-
-	FREObject freGetSkeletonJointNameIndices();
-	FREObject freGetSkeletonJointNames();
 
 	void addJointElements(AKUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
 	void addJointElementsForSeatedSkeletonTracking(AKUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
 	void addJointElementsForRegularSkeletonTracking(AKUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
 	void addJointElement(AKUser &kUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint, uint32_t targetIndex);
-	void calculateKinectTransform(AKPosition &kTransform, Vector4 skeletonTransform);
+	void calculatePosition(AKPosition &kTransform, Vector4 skeletonTransform);
 
 };
 

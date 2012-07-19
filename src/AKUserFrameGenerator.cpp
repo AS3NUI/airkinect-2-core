@@ -18,6 +18,43 @@ AKUserFrameGenerator::AKUserFrameGenerator()
 
 AKUserFrameGenerator::~AKUserFrameGenerator()
 {
+	deallocateUserFrame();
+}
+
+void AKUserFrameGenerator::allocateUserFrame()
+{
+	_userFrame = new AKUserFrame();
+	_userFrame->asUserFrameClass = _asUserFrameClass;
+	_userFrame->users = new AKUser[_maxSkeletons];
+	_userFrame->jointNames = _jointNames;
+	_userFrame->maxSkeletons = _maxSkeletons;
+	for(int i = 0; i < _maxSkeletons; i++)
+	{
+		_userFrame->users[i].asUserClass = _asUserClass;
+		_userFrame->users[i].framework = _framework;
+		_userFrame->users[i].skeletonJoints = new AKSkeletonJoint[_numJoints];
+		_userFrame->users[i].jointNames = _jointNames;
+		_userFrame->users[i].numJoints = _numJoints;
+		for(int j = 0; j < _numJoints; j++)
+		{
+			_userFrame->users[i].skeletonJoints[j].asJointClass = _asJointClass;
+			_userFrame->users[i].skeletonJoints[j].jointName = _jointNames[j];
+		}
+	}
+}
+
+void AKUserFrameGenerator::deallocateUserFrame()
+{
+	if(_userFrame->users != 0)
+	{
+		for(int i = 0; i < _maxSkeletons; i++)
+		{
+			delete [] _userFrame->users[i].skeletonJoints;
+			_userFrame->users[i].skeletonJoints = 0;
+		}
+		delete [] _userFrame->users;
+		_userFrame->users = 0;
+	}
 }
 
 void AKUserFrameGenerator::setRGBTargetMirrored(bool rgbTargetMirrored)
