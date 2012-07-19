@@ -19,10 +19,16 @@
 		6C039C40153446C20060F00E /* PointCloudRegion.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C039C33153446C20060F00E /* PointCloudRegion.h */; };
 		6C039C44153447250060F00E /* Adobe AIR.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C039C43153447250060F00E /* Adobe AIR.framework */; };
 		6C68D786153583D900D2BF8E /* libboost_thread.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C68D785153583D900D2BF8E /* libboost_thread.a */; };
-		6C7023C315B5E847002000A7 /* AKBasicStructs.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023BB15B5E847002000A7 /* AKBasicStructs.h */; };
-		6C7023C415B5E847002000A7 /* AKSkeletonJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023BC15B5E847002000A7 /* AKSkeletonJoint.h */; };
-		6C7023C515B5E847002000A7 /* AKUser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023BD15B5E847002000A7 /* AKUser.h */; };
-		6C7023C615B5E847002000A7 /* AKUserFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023BE15B5E847002000A7 /* AKUserFrame.h */; };
+		6C70230115B8495300B8128A /* AKMSSDKSkeletonJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7022FE15B8495300B8128A /* AKMSSDKSkeletonJoint.h */; };
+		6C70230215B8495300B8128A /* AKMSSDKUser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7022FF15B8495300B8128A /* AKMSSDKUser.h */; };
+		6C70230315B8495300B8128A /* AKMSSDKUserFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C70230015B8495300B8128A /* AKMSSDKUserFrame.h */; };
+		6C70230815B8496700B8128A /* AKOpenNISkeletonJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C70230515B8496700B8128A /* AKOpenNISkeletonJoint.h */; };
+		6C70230915B8496700B8128A /* AKOpenNIUser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C70230615B8496700B8128A /* AKOpenNIUser.h */; };
+		6C70230A15B8496700B8128A /* AKOpenNIUserFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C70230715B8496700B8128A /* AKOpenNIUserFrame.h */; };
+		6C70231015B8497300B8128A /* AKBasicStructs.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C70230C15B8497300B8128A /* AKBasicStructs.h */; };
+		6C70231115B8497300B8128A /* AKSkeletonJoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C70230D15B8497300B8128A /* AKSkeletonJoint.h */; };
+		6C70231215B8497300B8128A /* AKUser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C70230E15B8497300B8128A /* AKUser.h */; };
+		6C70231315B8497300B8128A /* AKUserFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C70230F15B8497300B8128A /* AKUserFrame.h */; };
 		6C7023C715B5E847002000A7 /* AKUserFrameGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7023BF15B5E847002000A7 /* AKUserFrameGenerator.cpp */; };
 		6C7023C815B5E847002000A7 /* AKUserFrameGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023C015B5E847002000A7 /* AKUserFrameGenerator.h */; };
 		6C7023C915B5E847002000A7 /* AKUtilityFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7023C115B5E847002000A7 /* AKUtilityFunctions.cpp */; };
@@ -77,10 +83,16 @@
 		6C039C33153446C20060F00E /* PointCloudRegion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointCloudRegion.h; sourceTree = "<group>"; };
 		6C039C43153447250060F00E /* Adobe AIR.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "Adobe AIR.framework"; path = "../../../../../../../Applications/Adobe Flash Builder 4.6/sdks/4.6.0/runtimes/air/mac/Adobe AIR.framework"; sourceTree = "<group>"; };
 		6C68D785153583D900D2BF8E /* libboost_thread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_thread.a; path = "../external-libraries/boost/lib/libboost_thread.a"; sourceTree = "<group>"; };
-		6C7023BB15B5E847002000A7 /* AKBasicStructs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKBasicStructs.h; sourceTree = "<group>"; };
-		6C7023BC15B5E847002000A7 /* AKSkeletonJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKSkeletonJoint.h; sourceTree = "<group>"; };
-		6C7023BD15B5E847002000A7 /* AKUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKUser.h; sourceTree = "<group>"; };
-		6C7023BE15B5E847002000A7 /* AKUserFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKUserFrame.h; sourceTree = "<group>"; };
+		6C7022FE15B8495300B8128A /* AKMSSDKSkeletonJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKMSSDKSkeletonJoint.h; sourceTree = "<group>"; };
+		6C7022FF15B8495300B8128A /* AKMSSDKUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKMSSDKUser.h; sourceTree = "<group>"; };
+		6C70230015B8495300B8128A /* AKMSSDKUserFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKMSSDKUserFrame.h; sourceTree = "<group>"; };
+		6C70230515B8496700B8128A /* AKOpenNISkeletonJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKOpenNISkeletonJoint.h; sourceTree = "<group>"; };
+		6C70230615B8496700B8128A /* AKOpenNIUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKOpenNIUser.h; sourceTree = "<group>"; };
+		6C70230715B8496700B8128A /* AKOpenNIUserFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKOpenNIUserFrame.h; sourceTree = "<group>"; };
+		6C70230C15B8497300B8128A /* AKBasicStructs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKBasicStructs.h; sourceTree = "<group>"; };
+		6C70230D15B8497300B8128A /* AKSkeletonJoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKSkeletonJoint.h; sourceTree = "<group>"; };
+		6C70230E15B8497300B8128A /* AKUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKUser.h; sourceTree = "<group>"; };
+		6C70230F15B8497300B8128A /* AKUserFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKUserFrame.h; sourceTree = "<group>"; };
 		6C7023BF15B5E847002000A7 /* AKUserFrameGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKUserFrameGenerator.cpp; sourceTree = "<group>"; };
 		6C7023C015B5E847002000A7 /* AKUserFrameGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKUserFrameGenerator.h; sourceTree = "<group>"; };
 		6C7023C115B5E847002000A7 /* AKUtilityFunctions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKUtilityFunctions.cpp; sourceTree = "<group>"; };
@@ -146,10 +158,7 @@
 		6C039C26153446C20060F00E /* src */ = {
 			isa = PBXGroup;
 			children = (
-				6C7023BB15B5E847002000A7 /* AKBasicStructs.h */,
-				6C7023BC15B5E847002000A7 /* AKSkeletonJoint.h */,
-				6C7023BD15B5E847002000A7 /* AKUser.h */,
-				6C7023BE15B5E847002000A7 /* AKUserFrame.h */,
+				6C70230B15B8497300B8128A /* Data */,
 				6C7023BF15B5E847002000A7 /* AKUserFrameGenerator.cpp */,
 				6C7023C015B5E847002000A7 /* AKUserFrameGenerator.h */,
 				6C7023C115B5E847002000A7 /* AKUtilityFunctions.cpp */,
@@ -179,9 +188,41 @@
 			path = ../src;
 			sourceTree = "<group>";
 		};
+		6C7022FD15B8495300B8128A /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				6C7022FE15B8495300B8128A /* AKMSSDKSkeletonJoint.h */,
+				6C7022FF15B8495300B8128A /* AKMSSDKUser.h */,
+				6C70230015B8495300B8128A /* AKMSSDKUserFrame.h */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		6C70230415B8496700B8128A /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				6C70230515B8496700B8128A /* AKOpenNISkeletonJoint.h */,
+				6C70230615B8496700B8128A /* AKOpenNIUser.h */,
+				6C70230715B8496700B8128A /* AKOpenNIUserFrame.h */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		6C70230B15B8497300B8128A /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				6C70230C15B8497300B8128A /* AKBasicStructs.h */,
+				6C70230D15B8497300B8128A /* AKSkeletonJoint.h */,
+				6C70230E15B8497300B8128A /* AKUser.h */,
+				6C70230F15B8497300B8128A /* AKUserFrame.h */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
 		6CAA0B8C15B2E7330085D9CB /* MSSDK */ = {
 			isa = PBXGroup;
 			children = (
+				6C7022FD15B8495300B8128A /* Data */,
 				6C7023CB15B5E851002000A7 /* AKMSSDKUserFrameGenerator.cpp */,
 				6C7023CC15B5E851002000A7 /* AKMSSDKUserFrameGenerator.h */,
 				6CD69E6715B4630B00D1534A /* AKMSSDKPointCloudGenerator.cpp */,
@@ -201,6 +242,7 @@
 		6CAA0B9315B2E7330085D9CB /* OpenNI */ = {
 			isa = PBXGroup;
 			children = (
+				6C70230415B8496700B8128A /* Data */,
 				6C7023CF15B5E85C002000A7 /* AKOpenNIUserFrameGenerator.cpp */,
 				6C7023D015B5E85C002000A7 /* AKOpenNIUserFrameGenerator.h */,
 				6CD69E6F15B4631600D1534A /* AKOpenNIPointCloudGenerator.cpp */,
@@ -310,14 +352,20 @@
 				6CD69E6E15B4630B00D1534A /* AKMSSDKUserMasksGenerator.h in Headers */,
 				6CD69E7415B4631600D1534A /* AKOpenNIPointCloudGenerator.h in Headers */,
 				6CD69E7615B4631600D1534A /* AKOpenNIUserMasksGenerator.h in Headers */,
-				6C7023C315B5E847002000A7 /* AKBasicStructs.h in Headers */,
-				6C7023C415B5E847002000A7 /* AKSkeletonJoint.h in Headers */,
-				6C7023C515B5E847002000A7 /* AKUser.h in Headers */,
-				6C7023C615B5E847002000A7 /* AKUserFrame.h in Headers */,
 				6C7023C815B5E847002000A7 /* AKUserFrameGenerator.h in Headers */,
 				6C7023CA15B5E847002000A7 /* AKUtilityFunctions.h in Headers */,
 				6C7023CE15B5E851002000A7 /* AKMSSDKUserFrameGenerator.h in Headers */,
 				6C7023D215B5E85C002000A7 /* AKOpenNIUserFrameGenerator.h in Headers */,
+				6C70230115B8495300B8128A /* AKMSSDKSkeletonJoint.h in Headers */,
+				6C70230215B8495300B8128A /* AKMSSDKUser.h in Headers */,
+				6C70230315B8495300B8128A /* AKMSSDKUserFrame.h in Headers */,
+				6C70230815B8496700B8128A /* AKOpenNISkeletonJoint.h in Headers */,
+				6C70230915B8496700B8128A /* AKOpenNIUser.h in Headers */,
+				6C70230A15B8496700B8128A /* AKOpenNIUserFrame.h in Headers */,
+				6C70231015B8497300B8128A /* AKBasicStructs.h in Headers */,
+				6C70231115B8497300B8128A /* AKSkeletonJoint.h in Headers */,
+				6C70231215B8497300B8128A /* AKUser.h in Headers */,
+				6C70231315B8497300B8128A /* AKUserFrame.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

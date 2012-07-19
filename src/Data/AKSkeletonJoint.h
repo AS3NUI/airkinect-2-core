@@ -9,6 +9,7 @@
     #include <Adobe AIR/Adobe AIR.h>
 #endif
 
+#include <string.h>
 #include "AKBasicStructs.h"
 
 #ifndef _AKSkeletonJoint_
