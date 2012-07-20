@@ -67,6 +67,11 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		public var skeletonJoints:Vector.<SkeletonJoint>;
 		
 		/**
+		 * Collection of Skeleton bones
+		 */ 
+		public var skeletonBones:Vector.<SkeletonBone>;
+		
+		/**
 		 * Framework used to generate this skeleton
 		 * @see com.as3nui.nativeExtensions.air.kinect.constants.Framework for possible options
 		 */ 
@@ -88,6 +93,18 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 * List of all skeleton joint names for this user
 		 */ 
 		public var skeletonJointNames:Vector.<String>;
+		
+		/**
+		 * Dictionary of skeleton bone names, mapping to index in the skeleton bones vector
+		 * 
+		 * @private
+		 */ 
+		public var skeletonBoneNameIndices:Dictionary;
+		
+		/**
+		 * List of all skeleton bone names for this user
+		 */ 
+		public var skeletonBoneNames:Vector.<String>;
 		
 		public function User()
 		{
@@ -115,11 +132,20 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		
 		/**
 		 * Get a joint by it's name
-		 * @see com.as3nui.nativeExtensions.air.kinect.constants.JointNames for the basic options
 		 */ 
 		public function getJointByName(jointName:String):SkeletonJoint
 		{
+			if(skeletonJointNameIndices[jointName] == undefined) return null;
 			return skeletonJoints[skeletonJointNameIndices[jointName]];
+		}
+		
+		/**
+		 * Get a bone by it's name
+		 */ 
+		public function getBoneByName(boneName:String):SkeletonBone
+		{
+			if(skeletonBoneNameIndices[boneName] == undefined) return null;
+			return skeletonBones[skeletonBoneNameIndices[boneName]];
 		}
 		
 		/**
@@ -133,9 +159,15 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			position.copyFrom(otherUser.position);
 			hasSkeleton = otherUser.hasSkeleton;
 			updateJointCount(otherUser.skeletonJoints.length);
-			for(var i:uint = 0; i < otherUser.skeletonJoints.length; i++)
+			var i:uint = 0
+			for(i = 0; i < otherUser.skeletonJoints.length; i++)
 			{
 				skeletonJoints[i].copyFrom(otherUser.skeletonJoints[i]);
+			}
+			updateBoneCount(otherUser.skeletonBones.length);
+			for(i = 0; i < otherUser.skeletonBones.length; i++)
+			{
+				skeletonBones[i].copyFrom(otherUser.skeletonBones[i]);
 			}
 		}
 		
@@ -149,6 +181,19 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			for(var i:uint = 0; i < count; i++)
 			{
 				skeletonJoints[i] ||= new SkeletonJoint();
+			}
+		}
+		
+		/**
+		 * Resizes the skeletonBones vector
+		 * This may be needed when we switch between seated - normal tracking
+		 */ 
+		private function updateBoneCount(count:uint):void
+		{
+			skeletonBones.length = count;
+			for(var i:uint = 0; i < count; i++)
+			{
+				skeletonBones[i] ||= new SkeletonBone();
 			}
 		}
 	}
