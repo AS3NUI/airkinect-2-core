@@ -9,9 +9,12 @@ const float PI = acos(-1.0f);
 
 MSKinectDevice::MSKinectDevice(int nr)
 {
-    printf("MSKinectDevice::MSKinectDevice(%i)\n", nr);
     this->nr = nr;
     this->freContext = freContext;
+
+	char msg[100];
+	sprintf_s(msg, "MSKinectDevice::MSKinectDevice(%i)", nr);
+	trace((const uint8_t*) msg);
 
 	//initialize the capabilities of this device
 	capabilities.hasCameraElevationSupport				= true;
@@ -109,18 +112,11 @@ void MSKinectDevice::setDefaults()
 	//set specific defaults for MS SDK
     imageFrameTimeout = 0;
     
-	//----------------
-	// Depth Image
-	//----------------
 	depthResolution = getNuiImageResolutionForGivenWidthAndHeight(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
 	depthPlayerIndexEnabled = false;
 
 	depthParser = new AKMSSDKDepthParser();
 	rgbParser = new AKMSSDKRGBParser();
-    
-	//----------------
-	// Point Cloud Data
-	//----------------
 
 	//Player Index Coloring
 	userIndexColors = 0;
@@ -144,6 +140,15 @@ void MSKinectDevice::setDefaults()
 //-------------------
 // Start FRE Function
 //-------------------
+
+FREObject MSKinectDevice::freSetDepthMode(FREObject argv[])
+{
+	KinectDevice::freSetDepthMode(argv);
+	lockDepthMutex();
+	depthResolution = getNuiImageResolutionForGivenWidthAndHeight(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
+	unlockDepthMutex();
+	return NULL;
+}
 
 FREObject MSKinectDevice::freSetSkeletonMode(FREObject argv[]) 
 {
@@ -396,7 +401,7 @@ void MSKinectDevice::run()
 			hr = setSkeletonTrackingFlags();
 			if ( FAILED(hr) ){
 				dispatchErrorMessage((const uint8_t*) "Failed to Initalize Skeleton Tracking");
-				stop();
+				this->dispose();
 				return;
 			}
 		}
@@ -408,7 +413,7 @@ void MSKinectDevice::run()
 			hr = nuiSensor->NuiImageStreamOpen( NUI_IMAGE_TYPE_COLOR, rgbResolution, 0, 2, rgbFrameEvent, &rgbFrameHandle );
 			if ( FAILED(hr) ){
 				dispatchErrorMessage((const uint8_t*) "Failed to Initalize RGB Camera");
-				stop();
+				this->dispose();
 				return;
 			}
 		}
@@ -431,7 +436,7 @@ void MSKinectDevice::run()
 			//Failed dispatch some message
 			if ( FAILED(hr) ){
 				dispatchErrorMessage((const uint8_t*) "Failed to Initalize Depth Camera");
-				stop();
+				this->dispose();
 				return;
 			}
 		}

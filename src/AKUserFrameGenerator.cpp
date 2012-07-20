@@ -40,6 +40,14 @@ void AKUserFrameGenerator::allocateUserFrame()
 			_userFrame->users[i].skeletonJoints[j].asJointClass = _asJointClass;
 			_userFrame->users[i].skeletonJoints[j].jointName = _jointNames[j];
 		}
+		_userFrame->users[i].skeletonBones = new AKSkeletonBone[_numBones];
+		_userFrame->users[i].boneNames = _boneNames;
+		_userFrame->users[i].numBones = _numBones;
+		for(int j = 0; j < _numBones; j++)
+		{
+			_userFrame->users[i].skeletonBones[j].asBoneClass = _asBoneClass;
+			_userFrame->users[i].skeletonBones[j].boneName = _boneNames[j];
+		}
 	}
 }
 
@@ -53,6 +61,9 @@ void AKUserFrameGenerator::deallocateUserFrame()
 			{
 				delete [] _userFrame->users[i].skeletonJoints;
 				_userFrame->users[i].skeletonJoints = 0;
+
+				delete [] _userFrame->users[i].skeletonBones;
+				_userFrame->users[i].skeletonBones = 0;
 			}
 			delete [] _userFrame->users;
 			_userFrame->users = 0;

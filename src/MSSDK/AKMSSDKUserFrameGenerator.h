@@ -33,6 +33,9 @@ protected:
 	void allocateJointNames();
 	void deallocateJointNames();
 
+	void allocateBoneNames();
+	void deallocateBoneNames();
+
 private:
 
 	AKMSSDKUserFrame* _mssdkUserFrame;
@@ -48,12 +51,21 @@ private:
 	void allocateJointNamesForSeatedSkeletonTracking();
 	void allocateJointNamesForRegularSkeletonTracking();
 
+	void allocateBoneNamesForSeatedSkeletonTracking();
+	void allocateBoneNamesForRegularSkeletonTracking();
+
 	void addJointElements(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
 	void addJointElementsForSeatedSkeletonTracking(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
 	void addJointElementsForRegularSkeletonTracking(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
 	
+	void addBoneElements(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
+	void addBoneElementsForSeatedSkeletonTracking(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
+	void addBoneElementsForRegularSkeletonTracking(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations);
+	
 	void setJointProperties(AKMSSDKSkeletonJoint &mssdkSkeletonJoint, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint);
 	void calculatePosition(AKPosition &kTransform, Vector4 skeletonTransform);
+
+	void setBoneProperties(AKMSSDKSkeletonBone &mssdkSkeletonBone, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX indexOfJointWithRotation);
 
 };
 

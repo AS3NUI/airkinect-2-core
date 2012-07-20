@@ -12,6 +12,7 @@
 #include <string.h>
 #include "AKBasicStructs.h"
 #include "AKSkeletonJoint.h"
+#include "AKSkeletonBone.h"
 
 #ifndef _AKUser_
 #define _AKUser_
@@ -25,9 +26,13 @@ typedef struct _AKUser
     
     bool hasSkeleton;
     AKSkeletonJoint* skeletonJoints;
+	AKSkeletonBone* skeletonBones;
 
 	char** jointNames;
 	int numJoints;
+
+	char** boneNames;
+	int numBones;
 
 	const char* asUserClass;
 	const char* framework;
@@ -45,12 +50,21 @@ typedef struct _AKUser
 		}
 		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonJoints", freJoints, NULL);
 
+		FREObject freBones;
+		FREGetObjectProperty(freUser, (const uint8_t*) "skeletonBones", &freBones, NULL);
+		for(int i = 0; i < numBones; i++)
+		{
+			FREObject freBone = this->skeletonBones[i].asFREObject();
+			FRESetArrayElementAt(freBones, i, freBone);
+		}
+		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonBones", freBones, NULL);
+
 		return freUser;
 	};
 	
 	FREObject asFREObjectWithoutJoints()
 	{
-		FREObject freUser, freUserType, freUserID, freTrackingID, freHasSkeleton, freJoints;
+		FREObject freUser, freUserType, freUserID, freTrackingID, freHasSkeleton, freJoints, freBones;
 
 		FRENewObject( (const uint8_t*) asUserClass, 0, NULL, &freUser, NULL);
 
@@ -68,8 +82,14 @@ typedef struct _AKUser
 		FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.SkeletonJoint>", 0, NULL, &freJoints, NULL);            
 		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonJoints", freJoints, NULL);
 
+		FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.SkeletonBone>", 0, NULL, &freBones, NULL);            
+		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonBones", freBones, NULL);
+
 		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonJointNameIndices", freGetSkeletonJointNameIndices(), NULL);
 		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonJointNames", freGetSkeletonJointNames(), NULL);
+
+		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonBoneNameIndices", freGetSkeletonBoneNameIndices(), NULL);
+		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonBoneNames", freGetSkeletonBoneNames(), NULL);
 
 		return freUser;
 	}
@@ -96,6 +116,30 @@ typedef struct _AKUser
 		FRESetArrayElementAt(skeletonJointNames, i, skeletonJointName);
 		}
 		return skeletonJointNames;
+	};
+
+	FREObject freGetSkeletonBoneNameIndices()
+	{
+		FREObject skeletonBoneNameIndices, boneIndex;
+		FRENewObject( (const uint8_t*) "flash.utils.Dictionary", 0, NULL, &skeletonBoneNameIndices, NULL);
+		for(int i = 0; i < numBones; i++)
+		{
+			FRENewObjectFromUint32(i, &boneIndex);
+			FRESetObjectProperty(skeletonBoneNameIndices, (const uint8_t*) boneNames[i], boneIndex, NULL);
+		}
+		return skeletonBoneNameIndices;
+	};
+
+	FREObject freGetSkeletonBoneNames()
+	{ 
+		FREObject skeletonBoneNames, skeletonBoneName;
+		FRENewObject( (const uint8_t*) "Vector.<String>", 0, NULL, &skeletonBoneNames, NULL);
+		for(int i = 0; i < numBones; i++)
+		{
+		FRENewObjectFromUTF8(strlen(boneNames[i]), (const uint8_t*) boneNames[i], &skeletonBoneName);
+		FRESetArrayElementAt(skeletonBoneNames, i, skeletonBoneName);
+		}
+		return skeletonBoneNames;
 	};
 
 } AKUser;

@@ -39,6 +39,7 @@ protected:
 	const char* _asUserFrameClass;
 	const char* _asUserClass;
 	const char* _asJointClass;
+	const char* _asBoneClass;
 	const char* _framework;
 
 	bool _rgbTargetMirrored;
@@ -60,8 +61,11 @@ protected:
 	bool _skeletonMirrored;
 
 	int _numJoints;
+	int _numBones;
 	int _maxSkeletons;
+	
 	char** _jointNames;
+	char** _boneNames;
 
 	AKUserFrame* _userFrame;
 	virtual void allocateUserFrame();

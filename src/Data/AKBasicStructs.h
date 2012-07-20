@@ -246,4 +246,25 @@ typedef struct _AKMatrix3D
 } AKMatrix3D;
 #endif _AKMatrix3D_
 
+//
+// This structure describes an orientation
+//
+#ifndef _AKOrientation_
+#define _AKOrientation_
+typedef struct _AKOrientation 
+{
+	AKMatrix3D absoluteOrientationMatrix;
+
+	FREObject asFREObject()
+	{
+		FREObject orientation;
+		FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.data.Orientation", 0, NULL, &orientation, NULL);
+
+		FRESetObjectProperty(orientation, (const uint8_t*) "absoluteOrientationMatrix", absoluteOrientationMatrix.asFREObject(), NULL);
+
+		return orientation;
+	}
+} AKOrientation;
+#endif _AKOrientation_
+
 #endif

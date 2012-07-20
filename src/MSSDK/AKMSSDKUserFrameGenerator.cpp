@@ -2,8 +2,9 @@
 #ifdef AIRKINECT_TARGET_MSSDK
 
 AKMSSDKUserFrameGenerator::AKMSSDKUserFrameGenerator()
-{	
+{
 	_asJointClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSSkeletonJoint";
+	_asBoneClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSSkeletonBone";
 	_asUserClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSUser";
 	_asUserFrameClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSUserFrame";
 	_framework = "mssdk";
@@ -13,12 +14,14 @@ AKMSSDKUserFrameGenerator::AKMSSDKUserFrameGenerator()
 	_seatedSkeletonEnabled = false;
 
 	allocateJointNames();
+	allocateBoneNames();
 	allocateUserFrame();
 }
 
 AKMSSDKUserFrameGenerator::~AKMSSDKUserFrameGenerator()
 {
 	deallocateJointNames();
+	deallocateBoneNames();
 	deallocateUserFrame();
 }
 
@@ -36,6 +39,23 @@ void AKMSSDKUserFrameGenerator::deallocateJointNames()
 	{
 		delete [] _jointNames;
 		_jointNames = 0;
+	}
+}
+
+void AKMSSDKUserFrameGenerator::allocateBoneNames()
+{
+	if(_seatedSkeletonEnabled)
+		allocateBoneNamesForSeatedSkeletonTracking();
+	else
+		allocateBoneNamesForRegularSkeletonTracking();
+}
+
+void AKMSSDKUserFrameGenerator::deallocateBoneNames()
+{
+	if(_boneNames != 0)
+	{
+		delete [] _boneNames;
+		_boneNames = 0;
 	}
 }
 
@@ -87,6 +107,34 @@ void AKMSSDKUserFrameGenerator::allocateJointNamesForRegularSkeletonTracking()
 	_jointNames[19] = "right_foot";
 }
 
+void AKMSSDKUserFrameGenerator::allocateBoneNamesForSeatedSkeletonTracking()
+{
+	_numBones = 5;
+	_boneNames = new char*[_numBones];
+	_boneNames[0] = "neck";
+	_boneNames[1] = "left_upper_arm";
+	_boneNames[2] = "left_lower_arm";
+	_boneNames[3] = "right_upper_arm";
+	_boneNames[4] = "right_lower_arm";
+}
+
+void AKMSSDKUserFrameGenerator::allocateBoneNamesForRegularSkeletonTracking()
+{
+	_numBones = 10;
+	_boneNames = new char*[_numBones];
+	_boneNames[0] = "neck";
+	_boneNames[1] = "left_upper_arm";
+	_boneNames[2] = "left_lower_arm";
+	_boneNames[3] = "right_upper_arm";
+	_boneNames[4] = "right_lower_arm";
+
+	_boneNames[5] = "spine";
+	_boneNames[6] = "left_upper_leg";
+	_boneNames[7] = "left_lower_leg";
+	_boneNames[8] = "right_upper_leg";
+	_boneNames[9] = "right_lower_leg";
+}
+
 void AKMSSDKUserFrameGenerator::allocateUserFrame()
 {
 	AKUserFrameGenerator::allocateUserFrame();
@@ -102,6 +150,11 @@ void AKMSSDKUserFrameGenerator::allocateUserFrame()
 		{
 			_mssdkUserFrame->mssdkUsers[i].mssdkSkeletonJoints[j].skeletonJoint = &_userFrame->users[i].skeletonJoints[j];
 		}
+		_mssdkUserFrame->mssdkUsers[i].mssdkSkeletonBones = new AKMSSDKSkeletonBone[_numBones];
+		for(int j = 0; j < _numBones; j++)
+		{
+			_mssdkUserFrame->mssdkUsers[i].mssdkSkeletonBones[j].skeletonBone = &_userFrame->users[i].skeletonBones[j];
+		}
 	}
 }
 
@@ -116,6 +169,9 @@ void AKMSSDKUserFrameGenerator::deallocateUserFrame()
 			{
 				delete [] _mssdkUserFrame->mssdkUsers[i].mssdkSkeletonJoints;
 				_mssdkUserFrame->mssdkUsers[i].mssdkSkeletonJoints = 0;
+
+				delete [] _mssdkUserFrame->mssdkUsers[i].mssdkSkeletonBones;
+				_mssdkUserFrame->mssdkUsers[i].mssdkSkeletonBones = 0;
 			}
 			delete [] _mssdkUserFrame->mssdkUsers;
 			_mssdkUserFrame->mssdkUsers = 0;
@@ -140,9 +196,11 @@ void AKMSSDKUserFrameGenerator::setDepthTargetSize(int width, int height)
 void AKMSSDKUserFrameGenerator::setSeatedSkeletonEnabled(bool seatedSkeletonEnabled)
 {
 	deallocateJointNames();
+	deallocateBoneNames();
 	deallocateUserFrame();
 	_seatedSkeletonEnabled = seatedSkeletonEnabled;
 	allocateJointNames();
+	allocateBoneNames();
 	allocateUserFrame();
 }
 
@@ -191,6 +249,7 @@ void AKMSSDKUserFrameGenerator::generateUserFrame()
 			//Joint Position Calculations
 			if (_userFrame->users[i].hasSkeleton){
 				addJointElements(_mssdkUserFrame->mssdkUsers[i], skeletonData, boneOrientations);
+				addBoneElements(_mssdkUserFrame->mssdkUsers[i], skeletonData, boneOrientations);
 			}
 
 			//cleanup
@@ -351,6 +410,62 @@ void AKMSSDKUserFrameGenerator::setJointProperties(AKMSSDKSkeletonJoint &mssdkSk
 	mssdkSkeletonJoint.hierarchicalRotationQuaternion.y = boneOrientations[eJoint].hierarchicalRotation.rotationQuaternion.y;
 	mssdkSkeletonJoint.hierarchicalRotationQuaternion.z = boneOrientations[eJoint].hierarchicalRotation.rotationQuaternion.z;
 	mssdkSkeletonJoint.hierarchicalRotationQuaternion.w = boneOrientations[eJoint].hierarchicalRotation.rotationQuaternion.w;
+}
+
+void AKMSSDKUserFrameGenerator::addBoneElements(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
+{
+	if(_seatedSkeletonEnabled)
+		addBoneElementsForSeatedSkeletonTracking(mssdkUser, skeletonData, boneOrientations);
+	else
+		addBoneElementsForRegularSkeletonTracking(mssdkUser, skeletonData, boneOrientations);
+}
+
+void AKMSSDKUserFrameGenerator::addBoneElementsForSeatedSkeletonTracking(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
+{
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[0], boneOrientations, NUI_SKELETON_POSITION_HEAD); //neck bone
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[1], boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT); //left upper arm
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[2], boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT); //left lower arm
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[3], boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT); //right upper arm
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[4], boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT); //right lower arm
+}
+
+void AKMSSDKUserFrameGenerator::addBoneElementsForRegularSkeletonTracking(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
+{
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[0], boneOrientations, NUI_SKELETON_POSITION_HEAD); //neck bone
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[1], boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT); //left upper arm
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[2], boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT); //left lower arm
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[3], boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT); //right upper arm
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[4], boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT); //right lower arm
+
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[5], boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER); //spine
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[6], boneOrientations, NUI_SKELETON_POSITION_KNEE_LEFT); //left_upper_leg
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[7], boneOrientations, NUI_SKELETON_POSITION_ANKLE_LEFT); //left_lower_leg
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[8], boneOrientations, NUI_SKELETON_POSITION_KNEE_RIGHT); //right_upper_leg
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[9], boneOrientations, NUI_SKELETON_POSITION_ANKLE_RIGHT); //right_lower_leg
+}
+
+
+void AKMSSDKUserFrameGenerator::setBoneProperties(AKMSSDKSkeletonBone &mssdkSkeletonBone, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX indexOfJointWithRotation)
+{
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M11 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M11;
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M12 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M12;
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M13 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M13;
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M14 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M14;
+
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M21 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M21;
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M22 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M22;
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M23 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M23;
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M24 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M24;
+
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M31 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M31;
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M32 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M32;
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M33 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M33;
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M34 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M34;
+
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M41 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M41;
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M42 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M42;
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M43 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M43;
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M44 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M44;
 }
 
 FREObject AKMSSDKUserFrameGenerator::getFREObject()

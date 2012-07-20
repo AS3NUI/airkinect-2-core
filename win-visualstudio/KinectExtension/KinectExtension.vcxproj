@@ -220,6 +220,7 @@
     <ClInclude Include="..\..\src\AKUserFrameGenerator.h" />
     <ClInclude Include="..\..\src\AKUserMasksGenerator.h" />
     <ClInclude Include="..\..\src\Data\AKBasicStructs.h" />
+    <ClInclude Include="..\..\src\Data\AKSkeletonBone.h" />
     <ClInclude Include="..\..\src\Data\AKSkeletonJoint.h" />
     <ClInclude Include="..\..\src\Data\AKUser.h" />
     <ClInclude Include="..\..\src\Data\AKUserFrame.h" />
@@ -234,6 +235,7 @@
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKRGBParser.h" />
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserFrameGenerator.h" />
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.h" />
+    <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKSkeletonBone.h" />
     <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKSkeletonJoint.h" />
     <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKUser.h" />
     <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKUserFrame.h" />
@@ -243,6 +245,7 @@
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIRGBParser.h" />
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserFrameGenerator.h" />
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserMasksGenerator.h" />
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNISkeletonBone.h" />
     <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNISkeletonJoint.h" />
     <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNIUser.h" />
     <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNIUserFrame.h" />

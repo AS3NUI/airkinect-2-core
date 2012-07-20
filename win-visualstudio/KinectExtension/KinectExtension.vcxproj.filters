@@ -147,6 +147,15 @@
     <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKUserFrame.h">
       <Filter>Header Files\MSSDK\Data</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Data\AKSkeletonBone.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKSkeletonBone.h">
+      <Filter>Header Files\MSSDK\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNISkeletonBone.h">
+      <Filter>Header Files\OpenNI\Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

@@ -23,6 +23,8 @@ public:
     void			dispose();
 
 	//Overridden FRE functions
+	FREObject			freSetDepthMode(FREObject argv[]);
+
 	FREObject           freSetSkeletonMode(FREObject argv[]);
 	FREObject			freChooseSkeletons(FREObject argv[]);
 	FREObject			freSetNearModeEnabled(FREObject argv[]);

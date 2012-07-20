@@ -13,6 +13,7 @@
 
 #include "../../Data/AKUser.h"
 #include "AKOpenNISkeletonJoint.h"
+#include "AKOpenNISkeletonBone.h"
 
 #ifndef _AKOpenNIUser_
 #define _AKOpenNIUser_
@@ -20,6 +21,7 @@ typedef struct _AKOpenNIUser
 {
 	AKUser* user;
 	AKOpenNISkeletonJoint* openNISkeletonJoints;
+	AKOpenNISkeletonBone* openNISkeletonBones;
 
 	FREObject asFREObject()
 	{
@@ -33,6 +35,15 @@ typedef struct _AKOpenNIUser
 			FRESetArrayElementAt(freJoints, i, freJoint);
 		}
 		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonJoints", freJoints, NULL);
+
+		FREObject freBones;
+		FREGetObjectProperty(freUser, (const uint8_t*) "skeletonBones", &freBones, NULL);
+		for(int i = 0; i < this->user->numBones; i++)
+		{
+			FREObject freBone = this->openNISkeletonBones[i].asFREObject();
+			FRESetArrayElementAt(freBones, i, freBone);
+		}
+		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonBones", freBones, NULL);
 
 		return freUser;
 	};
