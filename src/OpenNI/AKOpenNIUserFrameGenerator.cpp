@@ -2,23 +2,29 @@
 
 #ifdef AIRKINECT_TARGET_OPENNI
 
+#include <math.h>
+
 AKOpenNIUserFrameGenerator::AKOpenNIUserFrameGenerator()
 {
 	_asJointClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNISkeletonJoint";
+	_asBoneClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNISkeletonBone";
 	_asUserClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUser";
 	_asUserFrameClass = "com.as3nui.nativeExtensions.air.kinect.frameworks.openni.data.OpenNIUserFrame";
 	_framework = "openni";
 
 	_maxSkeletons = 15;
 	_numJoints = 15;
+	_numBones = 10;
 
 	allocateJointNames();
+	allocateBoneNames();
 	allocateUserFrame();
 }
 
 AKOpenNIUserFrameGenerator::~AKOpenNIUserFrameGenerator()
 {
 	deallocateJointNames();
+	deallocateBoneNames();
 	deallocateUserFrame();
 }
 
@@ -55,6 +61,31 @@ void AKOpenNIUserFrameGenerator::deallocateJointNames()
 	}
 }
 
+void AKOpenNIUserFrameGenerator::allocateBoneNames()
+{
+	_boneNames = new char*[_numBones];
+	_boneNames[0] = "neck";
+	_boneNames[1] = "left_upper_arm";
+	_boneNames[2] = "left_lower_arm";
+	_boneNames[3] = "right_upper_arm";
+	_boneNames[4] = "right_lower_arm";
+
+	_boneNames[5] = "spine";
+	_boneNames[6] = "left_upper_leg";
+	_boneNames[7] = "left_lower_leg";
+	_boneNames[8] = "right_upper_leg";
+	_boneNames[9] = "right_lower_leg";
+}
+
+void AKOpenNIUserFrameGenerator::deallocateBoneNames()
+{
+	if(_boneNames != 0)
+	{
+		delete [] _boneNames;
+		_boneNames = 0;
+	}
+}
+
 void AKOpenNIUserFrameGenerator::allocateUserFrame()
 {
 	AKUserFrameGenerator::allocateUserFrame();
@@ -65,10 +96,17 @@ void AKOpenNIUserFrameGenerator::allocateUserFrame()
 	for(int i = 0; i < _maxSkeletons; i++)
 	{
 		_openNIUserFrame->openNIUsers[i].user = &_userFrame->users[i];
+		
 		_openNIUserFrame->openNIUsers[i].openNISkeletonJoints = new AKOpenNISkeletonJoint[_numJoints];
 		for(int j = 0; j < _numJoints; j++)
 		{
 			_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[j].skeletonJoint = &_userFrame->users[i].skeletonJoints[j];
+		}
+
+		_openNIUserFrame->openNIUsers[i].openNISkeletonBones = new AKOpenNISkeletonBone[_numBones];
+		for(int j = 0; j < _numBones; j++)
+		{
+			_openNIUserFrame->openNIUsers[i].openNISkeletonBones[j].skeletonBone = &_userFrame->users[i].skeletonBones[j];
 		}
 	}
 }
@@ -84,6 +122,9 @@ void AKOpenNIUserFrameGenerator::deallocateUserFrame()
 			{
 				delete [] _openNIUserFrame->openNIUsers[i].openNISkeletonJoints;
 				_openNIUserFrame->openNIUsers[i].openNISkeletonJoints = 0;
+
+				delete [] _openNIUserFrame->openNIUsers[i].openNISkeletonBones;
+				_openNIUserFrame->openNIUsers[i].openNISkeletonBones = 0;
 			}
 			delete [] _openNIUserFrame->openNIUsers;
 			_openNIUserFrame->openNIUsers = 0;
@@ -131,28 +172,8 @@ void AKOpenNIUserFrameGenerator::generateUserFrame()
             
 			if (_userFrame->users[i].hasSkeleton)
 			{
-				//in openni, left/right are in device space, rather than user space
-				//that's why we switch LEFT/RIGHT here, to match MS SDK (user space)
-
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[0], aUsers[i], XN_SKEL_HEAD);
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[1], aUsers[i], XN_SKEL_NECK);
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[2], aUsers[i], XN_SKEL_TORSO);
-                
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[3], aUsers[i], XN_SKEL_RIGHT_SHOULDER);
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[4], aUsers[i], XN_SKEL_RIGHT_ELBOW);
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[5], aUsers[i], XN_SKEL_RIGHT_HAND);
-                
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[6], aUsers[i], XN_SKEL_LEFT_SHOULDER);
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[7], aUsers[i], XN_SKEL_LEFT_ELBOW);
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[8], aUsers[i], XN_SKEL_LEFT_HAND);
-                
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[9], aUsers[i], XN_SKEL_RIGHT_HIP);
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[10], aUsers[i], XN_SKEL_RIGHT_KNEE);
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[11], aUsers[i], XN_SKEL_RIGHT_FOOT);
-                
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[12], aUsers[i], XN_SKEL_LEFT_HIP);
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[13], aUsers[i], XN_SKEL_LEFT_KNEE);
-				setJointProperties(_openNIUserFrame->openNIUsers[i].openNISkeletonJoints[14], aUsers[i], XN_SKEL_LEFT_FOOT);
+				addJointElements(_openNIUserFrame->openNIUsers[i], aUsers[i]);
+				addBoneElements(_openNIUserFrame->openNIUsers[i], aUsers[i]);
 			}
 		}
 		else
@@ -160,6 +181,32 @@ void AKOpenNIUserFrameGenerator::generateUserFrame()
 			_userFrame->users[i].isTracking = false;
 		}
 	}
+}
+
+void AKOpenNIUserFrameGenerator::addJointElements(AKOpenNIUser &openNIUser, XnUserID userID)
+{
+	//in openni, left/right are in device space, rather than user space
+	//that's why we switch LEFT/RIGHT here, to match MS SDK (user space)
+
+	setJointProperties(openNIUser.openNISkeletonJoints[0], userID, XN_SKEL_HEAD);
+	setJointProperties(openNIUser.openNISkeletonJoints[1], userID, XN_SKEL_NECK);
+	setJointProperties(openNIUser.openNISkeletonJoints[2], userID, XN_SKEL_TORSO);
+                
+	setJointProperties(openNIUser.openNISkeletonJoints[3], userID, XN_SKEL_RIGHT_SHOULDER);
+	setJointProperties(openNIUser.openNISkeletonJoints[4], userID, XN_SKEL_RIGHT_ELBOW);
+	setJointProperties(openNIUser.openNISkeletonJoints[5], userID, XN_SKEL_RIGHT_HAND);
+                
+	setJointProperties(openNIUser.openNISkeletonJoints[6], userID, XN_SKEL_LEFT_SHOULDER);
+	setJointProperties(openNIUser.openNISkeletonJoints[7], userID, XN_SKEL_LEFT_ELBOW);
+	setJointProperties(openNIUser.openNISkeletonJoints[8], userID, XN_SKEL_LEFT_HAND);
+                
+	setJointProperties(openNIUser.openNISkeletonJoints[9], userID, XN_SKEL_RIGHT_HIP);
+	setJointProperties(openNIUser.openNISkeletonJoints[10], userID, XN_SKEL_RIGHT_KNEE);
+	setJointProperties(openNIUser.openNISkeletonJoints[11], userID, XN_SKEL_RIGHT_FOOT);
+                
+	setJointProperties(openNIUser.openNISkeletonJoints[12], userID, XN_SKEL_LEFT_HIP);
+	setJointProperties(openNIUser.openNISkeletonJoints[13], userID, XN_SKEL_LEFT_KNEE);
+	setJointProperties(openNIUser.openNISkeletonJoints[14], userID, XN_SKEL_LEFT_FOOT);
 }
 
 void AKOpenNIUserFrameGenerator::setJointProperties(AKOpenNISkeletonJoint& openNISkeletonJoint, XnUserID user, XnSkeletonJoint eJoint)
@@ -211,6 +258,74 @@ void AKOpenNIUserFrameGenerator::setJointProperties(AKOpenNISkeletonJoint& openN
 	openNISkeletonJoint.orientation.M42 = 0.0;
 	openNISkeletonJoint.orientation.M43 = 0.0;
 	openNISkeletonJoint.orientation.M44 = 1.0;
+}
+
+void AKOpenNIUserFrameGenerator::addBoneElements(AKOpenNIUser &openNIUser, XnUserID userID)
+{
+	setBoneProperties(openNIUser.openNISkeletonBones[0], openNIUser.openNISkeletonJoints[1], 0.0, 0.0, 180.0); //neck bone
+	setBoneProperties(openNIUser.openNISkeletonBones[1], openNIUser.openNISkeletonJoints[3], 0.0, 0.0, 90.0); //left upper arm
+	setBoneProperties(openNIUser.openNISkeletonBones[2], openNIUser.openNISkeletonJoints[4], 0.0, 0.0, 90.0); //left lower arm
+	setBoneProperties(openNIUser.openNISkeletonBones[3], openNIUser.openNISkeletonJoints[6], 0.0, 0.0, -90.0); //right upper arm
+	setBoneProperties(openNIUser.openNISkeletonBones[4], openNIUser.openNISkeletonJoints[7], 0.0, 0.0, -90.0); //right lower arm
+
+	setBoneProperties(openNIUser.openNISkeletonBones[5], openNIUser.openNISkeletonJoints[2], 0.0, 0.0, 180.0); //spine
+	setBoneProperties(openNIUser.openNISkeletonBones[6], openNIUser.openNISkeletonJoints[9], 0.0, 0.0, 0.0); //left_upper_leg
+	setBoneProperties(openNIUser.openNISkeletonBones[7], openNIUser.openNISkeletonJoints[10], 0.0, 0.0, 0.0); //left_lower_leg
+	setBoneProperties(openNIUser.openNISkeletonBones[8], openNIUser.openNISkeletonJoints[12], 0.0, 0.0, 0.0); //right_upper_leg
+	setBoneProperties(openNIUser.openNISkeletonBones[9], openNIUser.openNISkeletonJoints[13], 0.0, 0.0, 0.0); //right_lower_leg
+}
+
+void AKOpenNIUserFrameGenerator::setBoneProperties(AKOpenNISkeletonBone &openNISkeletonBone, AKOpenNISkeletonJoint &jointWhichContainsOrientation, double xDegreesToAppend, double yDegreesToAppend, double zDegreesToAppend)
+{
+	//create a bind pose matrix with the degreestoappend values & append the native orientation to that matrix
+	double cosX = cos(xDegreesToAppend);
+	double sinX = sin(xDegreesToAppend);
+	AKMatrix3D xMatrix;
+	xMatrix.create(
+		1.0, 0.0, 0.0, 0.0,
+		0.0, cosX, -sinX, 0.0,
+		0.0, sinX, cosX, 0.0,
+		0.0, 0.0, 0.0, 1.0);
+
+	double cosY = cos(yDegreesToAppend);
+	double sinY = sin(yDegreesToAppend);
+	AKMatrix3D yMatrix;
+	yMatrix.create(
+		cosY, 0.0, sinY, 0.0,
+		0.0, 1.0, 0.0, 0.0,
+		-sinY, 0.0, cosY, 0.0,
+		0.0, 0.0, 0.0, 1.0);
+
+	double cosZ = cos(zDegreesToAppend);
+	double sinZ = sin(zDegreesToAppend);
+	AKMatrix3D zMatrix;
+	zMatrix.create(
+		cosZ, -sinZ, 0.0, 0.0,
+		sinZ, cosZ, 0.0, 0.0,
+		0.0, 0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 1.0);
+
+	//TODO: multiply the matrices
+
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M11 = jointWhichContainsOrientation.orientation.M11;
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M12 = jointWhichContainsOrientation.orientation.M12;
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M13 = jointWhichContainsOrientation.orientation.M13;
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M14 = jointWhichContainsOrientation.orientation.M14;
+
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M21 = jointWhichContainsOrientation.orientation.M21;
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M22 = jointWhichContainsOrientation.orientation.M22;
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M23 = jointWhichContainsOrientation.orientation.M23;
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M24 = jointWhichContainsOrientation.orientation.M24;
+
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M31 = jointWhichContainsOrientation.orientation.M31;
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M32 = jointWhichContainsOrientation.orientation.M32;
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M33 = jointWhichContainsOrientation.orientation.M33;
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M34 = jointWhichContainsOrientation.orientation.M34;
+
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M41 = jointWhichContainsOrientation.orientation.M41;
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M42 = jointWhichContainsOrientation.orientation.M42;
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M43 = jointWhichContainsOrientation.orientation.M43;
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M44 = jointWhichContainsOrientation.orientation.M44;
 }
 
 void AKOpenNIUserFrameGenerator::calculatePosition(AKPosition &akPosition, XnPoint3D xnPosition)

@@ -18,31 +18,32 @@ void KinectDevice::setDefaults()
 	started = false;
     running = false;
 
-	createUserFrameGenerator();
-
 	asUserMirrored = false;
     asUserEnabled = false;
     asSkeletonMirrored = false;
     asSkeletonEnabled = false;
 	asSeatedSkeletonEnabled = false;
 	asChooseSkeletonsEnabled = false;
+	asDepthEnabled = false;
+    asDepthShowUserColors = false;
+	asNearModeEnabled = false;
+	asRGBEnabled = false;
+	asUserMaskEnabled = false;
+	asPointCloudEnabled = false;
+
+	createUserFrameGenerator();
 
 	depthImageBytesGenerator = new AKImageBytesGenerator();
 	depthImageBytesGenerator->setTargetSize(320, 240);
 	depthImageBytesGenerator->setTargetMirrored(false);
 	depthImageBytesGenerator->setSourceSize(640, 480);
 
-    asDepthEnabled = false;
-    asDepthShowUserColors = false;
-	asNearModeEnabled = false;
-
 	rgbImageBytesGenerator = new AKImageBytesGenerator();
 
 	setRGBMode(640, 480, 640, 480, false);
-    asRGBEnabled = false;
 
-	asUserMaskEnabled = false;
 	createUserMasksGenerator();
+
 	userMasksGenerator->setTargetSize(320, 240);
 	userMasksGenerator->setMaxUsers(userFrameGenerator->getMaxUsers());
 	userMasksGenerator->setTargetMirrored(false);
@@ -50,7 +51,6 @@ void KinectDevice::setDefaults()
 	userMasksGenerator->setSourceSceneSize(640, 480);
 	userMasksGenerator->setSourceRGBSize(640, 480);
 
-	asPointCloudEnabled = false;
 	createPointCloudGenerator();
 	pointCloudGenerator->setTargetSize(320, 240);
 	pointCloudGenerator->setTargetMirrored(false);

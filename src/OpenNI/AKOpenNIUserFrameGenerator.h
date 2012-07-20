@@ -31,6 +31,9 @@ protected:
 	void allocateJointNames();
 	void deallocateJointNames();
 
+	void allocateBoneNames();
+	void deallocateBoneNames();
+
 private:
 
 	AKOpenNIUserFrame* _openNIUserFrame;
@@ -38,8 +41,13 @@ private:
 	xn::DepthGenerator* _depthGenerator;
 	xn::UserGenerator* _userGenerator;
 
+	void addJointElements(AKOpenNIUser &openNIUser, XnUserID userID);
+	void addBoneElements(AKOpenNIUser &openNIUser, XnUserID userID);
+
 	void setJointProperties(AKOpenNISkeletonJoint &openNISkeletonJoint, XnUserID user, XnSkeletonJoint eJoint);
 	void calculatePosition(AKPosition &akPosition, XnPoint3D xnPosition);
+
+	void setBoneProperties(AKOpenNISkeletonBone &openNISkeletonBone, AKOpenNISkeletonJoint &jointWhichContainsOrientation, double xDegreesToAppend, double yDegreesToAppend, double zDegreesToAppend);
 
 };
 

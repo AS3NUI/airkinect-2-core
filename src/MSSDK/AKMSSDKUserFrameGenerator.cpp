@@ -16,6 +16,8 @@ AKMSSDKUserFrameGenerator::AKMSSDKUserFrameGenerator()
 	allocateJointNames();
 	allocateBoneNames();
 	allocateUserFrame();
+
+	_nuiSensor = 0;
 }
 
 AKMSSDKUserFrameGenerator::~AKMSSDKUserFrameGenerator()
@@ -23,6 +25,8 @@ AKMSSDKUserFrameGenerator::~AKMSSDKUserFrameGenerator()
 	deallocateJointNames();
 	deallocateBoneNames();
 	deallocateUserFrame();
+
+	_nuiSensor = 0;
 }
 
 void AKMSSDKUserFrameGenerator::allocateJointNames()

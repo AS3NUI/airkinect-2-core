@@ -12,10 +12,6 @@ MSKinectDevice::MSKinectDevice(int nr)
     this->nr = nr;
     this->freContext = freContext;
 
-	char msg[100];
-	sprintf_s(msg, "MSKinectDevice::MSKinectDevice(%i)", nr);
-	trace((const uint8_t*) msg);
-
 	//initialize the capabilities of this device
 	capabilities.hasCameraElevationSupport				= true;
 	capabilities.hasDepthCameraSupport					= true;
@@ -202,10 +198,13 @@ FREObject MSKinectDevice::freCameraElevationGetAngle(FREObject argv[])
 {
 	dispatchInfoMessage((const uint8_t*) "[MSKinectDevice] Camera Elevation Get Angle Called");
 	FREObject asCameraAngle;
-	long degrees;
-	HRESULT hr = nuiSensor->NuiCameraElevationGetAngle(&degrees);
-	if ( FAILED(hr) ){
-		dispatchErrorMessage((const uint8_t*) "Failed to get sensor angle");
+	long degrees = 0;
+	if(running)
+	{
+		HRESULT hr = nuiSensor->NuiCameraElevationGetAngle(&degrees);
+		if ( FAILED(hr) ){
+			dispatchErrorMessage((const uint8_t*) "Failed to get sensor angle");
+		}
 	}
 	FRENewObjectFromInt32 ((int) degrees, &asCameraAngle );
 	return asCameraAngle;
@@ -214,10 +213,13 @@ FREObject MSKinectDevice::freCameraElevationGetAngle(FREObject argv[])
 FREObject MSKinectDevice::freCameraElevationSetAngle(FREObject argv[])
 {
 	dispatchInfoMessage((const uint8_t*) "[MSKinectDevice] Camera Elevation Set Angle Called");
-	int degrees; FREGetObjectAsInt32(argv[1], &degrees);
-	HRESULT hr = nuiSensor->NuiCameraElevationSetAngle((long) degrees);
-	if ( FAILED(hr) ){
-		dispatchErrorMessage((const uint8_t*) "Failed to set sensor angle");
+	if(running)
+	{
+		int degrees; FREGetObjectAsInt32(argv[1], &degrees);
+		HRESULT hr = nuiSensor->NuiCameraElevationSetAngle((long) degrees);
+		if ( FAILED(hr) ){
+			dispatchErrorMessage((const uint8_t*) "Failed to set sensor angle");
+		}
 	}
 	return NULL;
 }
@@ -273,6 +275,7 @@ void MSKinectDevice::dispatchError(HRESULT hr){
 		char errorMessage[100];
 		sprintf_s(errorMessage, "0x%x", hr);
 		dispatchErrorMessage((const uint8_t*) errorMessage);
+		trace((const uint8_t*) errorMessage);
 	}
 }
 
@@ -285,25 +288,26 @@ void MSKinectDevice::stop()
         mThread.join();
     }
 
-	if(nuiSensor) nuiSensor->NuiShutdown( );
+	if(nuiSensor) 
+		nuiSensor->NuiShutdown( );
 	
 	if( userEvent && ( userEvent != INVALID_HANDLE_VALUE ) ) 
 	{
 		CloseHandle(userEvent );
-		userEvent = NULL;
+		userEvent = 0;
 		nuiSensor->NuiSkeletonTrackingDisable();
 	}
 
 	if( depthFrameEvent && ( depthFrameEvent != INVALID_HANDLE_VALUE ) ) 
 	{
 		CloseHandle( depthFrameEvent );
-		depthFrameEvent = NULL;
+		depthFrameEvent = 0;
 	}
 
 	if( rgbFrameEvent && ( rgbFrameEvent != INVALID_HANDLE_VALUE ) ) 
 	{
 		CloseHandle( rgbFrameEvent );
-		rgbFrameEvent = NULL;
+		rgbFrameEvent = 0;
 	}
 
     //cleanup bytearrays
@@ -312,17 +316,17 @@ void MSKinectDevice::stop()
 	if (nuiSensor)
     {
         nuiSensor->Release();
-        nuiSensor = NULL;
+        nuiSensor = 0;
     }
     
 	bool hadStarted = started;
 	//reset defaults
 	setDefaults();
-    if(hadStarted) {
-        //send stopped event
+    if(hadStarted) 
+	{
 		dispatchStatusMessage((const uint8_t*) "stopped");
     }
-	
+	trace((const uint8_t*) "MSKinectDevice::stop finished");
 }
 
 void MSKinectDevice::cleanupByteArrays()
@@ -345,23 +349,22 @@ void MSKinectDevice::cleanupByteArrays()
 void MSKinectDevice::dispose()
 {
 	dispatchInfoMessage((const uint8_t*) "Disposing Kinect");
-    printf("MSKinectDevice::dispose()\n");
-    //make sure threads are stopped
     stop();
+    freContext = 0;
 
-    //the context of this instance will be destroyed, cleanup everything of this instance
-    freContext = NULL;
+	trace((const uint8_t*) "MSKinectDevice::dispose");
 }
 
 void * MSKinectDevice::deviceThread(void *self)
 {
-    MSKinectDevice *adapter = (MSKinectDevice *) self;
+    MSKinectDevice* adapter = (MSKinectDevice *) self;
     adapter->run();
     return NULL;
 }
 
 void MSKinectDevice::run()
 {
+	trace((const uint8_t*) "MSKinectDevice::run");
     if(running)
     { 
 		dispatchInfoMessage((const uint8_t*) "Starting Device");
@@ -370,27 +373,43 @@ void MSKinectDevice::run()
 		//Failed dispatch some message
 		if ( FAILED(hr) ){
 			dispatchErrorMessage((const uint8_t*) "Failed to create Sensor");
+			running = false;
 			stop();
 			return;
 		}
 
 		depthPlayerIndexEnabled = asDepthShowUserColors || asUserMaskEnabled;
 		DWORD dwFlags;
-		if(asSkeletonEnabled || asUserMaskEnabled) dwFlags |= NUI_INITIALIZE_FLAG_USES_SKELETON;
-		if(asRGBEnabled || asPointCloudEnabled || asUserMaskEnabled) dwFlags |= NUI_INITIALIZE_FLAG_USES_COLOR;
+		if(asSkeletonEnabled || asUserMaskEnabled) 
+		{
+			dwFlags |= NUI_INITIALIZE_FLAG_USES_SKELETON;
+			trace((const uint8_t*) "NUI_INITIALIZE_FLAG_USES_SKELETON");
+		}
+		if(asRGBEnabled || asPointCloudEnabled || asUserMaskEnabled)
+		{
+			dwFlags |= NUI_INITIALIZE_FLAG_USES_COLOR;
+			trace((const uint8_t*) "NUI_INITIALIZE_FLAG_USES_COLOR");
+		}
 		if(asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled){
-			if(depthPlayerIndexEnabled) {
+			if(depthPlayerIndexEnabled)
+			{
 				dwFlags |= NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX;
-			}else{
+				trace((const uint8_t*) "NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX");
+			}
+			else
+			{
 				dwFlags |= NUI_INITIALIZE_FLAG_USES_DEPTH;
+				trace((const uint8_t*) "NUI_INITIALIZE_FLAG_USES_DEPTH");
 			}
 		}
 
-		hr = nuiSensor->NuiInitialize(dwFlags);	
+		hr = nuiSensor->NuiInitialize(dwFlags);
+
 		if (FAILED(hr)) {
 			dispatchErrorMessage((const uint8_t*) "Failed to initialize Sensor");
 			dispatchError(hr);
-			this->dispose();
+			running = false;
+			stop();
 			return;
 		}
 
@@ -401,7 +420,8 @@ void MSKinectDevice::run()
 			hr = setSkeletonTrackingFlags();
 			if ( FAILED(hr) ){
 				dispatchErrorMessage((const uint8_t*) "Failed to Initalize Skeleton Tracking");
-				this->dispose();
+				running = false;
+				stop();
 				return;
 			}
 		}
@@ -413,7 +433,8 @@ void MSKinectDevice::run()
 			hr = nuiSensor->NuiImageStreamOpen( NUI_IMAGE_TYPE_COLOR, rgbResolution, 0, 2, rgbFrameEvent, &rgbFrameHandle );
 			if ( FAILED(hr) ){
 				dispatchErrorMessage((const uint8_t*) "Failed to Initalize RGB Camera");
-				this->dispose();
+				running = false;
+				stop();
 				return;
 			}
 		}
@@ -436,7 +457,8 @@ void MSKinectDevice::run()
 			//Failed dispatch some message
 			if ( FAILED(hr) ){
 				dispatchErrorMessage((const uint8_t*) "Failed to Initalize Depth Camera");
-				this->dispose();
+				running = false;
+				stop();
 				return;
 			}
 		}
@@ -477,6 +499,7 @@ void MSKinectDevice::run()
 			stop();
 		}
 	}
+	running = false;
 }
 
 HRESULT MSKinectDevice::setSkeletonTrackingFlags()

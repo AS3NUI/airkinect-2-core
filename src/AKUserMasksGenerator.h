@@ -8,7 +8,7 @@ class AKUserMasksGenerator
 public:
 
 	AKUserMasksGenerator();
-	~AKUserMasksGenerator();
+	virtual ~AKUserMasksGenerator();
 
 	virtual void setSourceDepthSize(int width, int height);
 	virtual void setSourceSceneSize(int width, int height);

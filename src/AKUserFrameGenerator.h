@@ -17,7 +17,7 @@ class AKUserFrameGenerator
 public:
 
 	AKUserFrameGenerator();
-	~AKUserFrameGenerator();
+	virtual ~AKUserFrameGenerator();
 
 	virtual void setRGBTargetMirrored(bool rgbTargetMirrored);
 	virtual void setRGBTargetSize(int width, int height);

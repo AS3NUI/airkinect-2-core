@@ -10,6 +10,9 @@ class AKMSSDKPointCloudGenerator : public AKPointCloudGenerator
 {
 public:
 
+	AKMSSDKPointCloudGenerator();
+	~AKMSSDKPointCloudGenerator();
+
 	void setSourceDepthSize(int width, int height);
 	void setSourceRGBSize(int width, int height);
 	void setNuiSensor(INuiSensor* nuiSensor);

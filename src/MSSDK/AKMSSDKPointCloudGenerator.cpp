@@ -2,6 +2,16 @@
 #include "../AKUtilityFunctions.h"
 #ifdef AIRKINECT_TARGET_MSSDK
 
+AKMSSDKPointCloudGenerator::AKMSSDKPointCloudGenerator()
+{
+	_nuiSensor = 0;
+}
+
+AKMSSDKPointCloudGenerator::~AKMSSDKPointCloudGenerator()
+{
+	_nuiSensor = 0;
+}
+
 void AKMSSDKPointCloudGenerator::setSourceDepthSize(int width, int height)
 {
 	AKPointCloudGenerator::setSourceDepthSize(width, height);

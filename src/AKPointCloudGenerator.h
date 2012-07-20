@@ -9,7 +9,7 @@ class AKPointCloudGenerator
 public:
 
 	AKPointCloudGenerator();
-	~AKPointCloudGenerator();
+	virtual ~AKPointCloudGenerator();
 
 	virtual void setSourceDepthSize(int width, int height);
 	virtual void setSourceRGBSize(int width, int height);

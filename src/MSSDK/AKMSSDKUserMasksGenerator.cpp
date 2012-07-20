@@ -3,6 +3,18 @@
 
 #ifdef AIRKINECT_TARGET_MSSDK
 
+AKMSSDKUserMasksGenerator::AKMSSDKUserMasksGenerator()
+{
+	_sourceSceneBytes = 0;
+	_nuiSensor = 0;
+}
+
+AKMSSDKUserMasksGenerator::~AKMSSDKUserMasksGenerator()
+{
+	_sourceSceneBytes = 0;
+	_nuiSensor = 0;
+}
+
 void AKMSSDKUserMasksGenerator::setSourceDepthSize(int width, int height)
 {
 	AKUserMasksGenerator::setSourceDepthSize(width, height);

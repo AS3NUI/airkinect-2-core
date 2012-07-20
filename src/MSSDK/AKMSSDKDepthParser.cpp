@@ -11,6 +11,11 @@ AKMSSDKDepthParser::AKMSSDKDepthParser()
 	_imageByteArray = 0;
 	_depthByteArray = 0;
 	_sceneByteArray = 0;
+
+	_nuiSensor = 0;
+	_depthFrameHandle = 0;
+	_depthFrameTimeout = 0;
+	_userIndexColors = 0;
 }
 
 AKMSSDKDepthParser::~AKMSSDKDepthParser()
@@ -26,6 +31,11 @@ AKMSSDKDepthParser::~AKMSSDKDepthParser()
 	if(_sceneByteArray != 0)
 		delete [] _sceneByteArray;
 	_sceneByteArray = 0;
+
+	_nuiSensor = 0;
+	_depthFrameHandle = 0;
+	_depthFrameTimeout = 0;
+	_userIndexColors = 0;
 }
 
 void AKMSSDKDepthParser::setImageSize(int width, int height)

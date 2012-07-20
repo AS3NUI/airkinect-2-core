@@ -7,6 +7,10 @@ AKMSSDKRGBParser::AKMSSDKRGBParser()
 	_height = 0;
 	_numPixels = 0;
 	_imageByteArray = 0;
+
+	_nuiSensor = 0;
+	_rgbFrameHandle = 0;
+	_imageFrameTimeout = 0;
 }
 
 AKMSSDKRGBParser::~AKMSSDKRGBParser()
@@ -14,6 +18,10 @@ AKMSSDKRGBParser::~AKMSSDKRGBParser()
 	if(_imageByteArray != 0)
 		delete [] _imageByteArray;
 	_imageByteArray = 0;
+
+	_nuiSensor = 0;
+	_rgbFrameHandle = 0;
+	_imageFrameTimeout = 0;
 }
 
 void AKMSSDKRGBParser::setImageSize(int width, int height)
