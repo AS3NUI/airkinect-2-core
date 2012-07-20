@@ -1,8 +1,8 @@
 package com.as3nui.nativeExtensions.air.kinect.data
 {
+	
 	public class Quaternion
 	{
-		
 		public var x:Number = 0;
 		public var y:Number = 0;
 		public var z:Number = 0;

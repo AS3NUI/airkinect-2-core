@@ -15,6 +15,7 @@
 */
 package com.as3nui.nativeExtensions.air.kinect.data
 {
+
 	/**
 	 * The pointcloud region class defines a 3D region in the point cloud.
 	 * 

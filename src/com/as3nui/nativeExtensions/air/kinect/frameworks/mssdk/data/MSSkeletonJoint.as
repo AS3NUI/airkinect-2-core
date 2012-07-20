@@ -7,7 +7,6 @@ package com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data
 	
 	public class MSSkeletonJoint extends SkeletonJoint
 	{
-		
 		public var nativeHierarchicalRotationQuaternion:Quaternion;
 		public var nativeHierarchicalRotationMatrix:Matrix3D;
 		public var nativeAbsoluteRotationQuaternion:Quaternion;

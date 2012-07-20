@@ -17,6 +17,7 @@ package com.as3nui.nativeExtensions.air.kinect.data {
 	import com.as3nui.nativeExtensions.air.kinect.constants.Framework;
 
 	public class DeviceCapabilities {
+		
 		private var _hasCameraElevationSupport:Boolean					= false;
 		private var _hasRGBCameraSupport:Boolean						= false;
 		private var _hasDepthCameraSupport:Boolean						= false;

@@ -5,7 +5,6 @@ package com.as3nui.nativeExtensions.air.kinect.data
 
 	public class Position
 	{
-		
 		/**
 		 * 3D position in world coordinate space
 		 */ 

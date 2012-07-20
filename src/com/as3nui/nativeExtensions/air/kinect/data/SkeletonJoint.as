@@ -15,7 +15,6 @@
 */
 package com.as3nui.nativeExtensions.air.kinect.data
 {
-	
 
 	/**
 	 * This class represents one joint in a user skeleton.
@@ -24,9 +23,9 @@ package com.as3nui.nativeExtensions.air.kinect.data
 	 * positions (x, y, z), you can get position info in 2D in
 	 * RGB or depth space aswell.</p>
 	 */ 
-	[RemoteClass(alias='com.as3nui.nativeExtensions.air.kinect.data.SkeletonJoint')]
 	public class SkeletonJoint extends Object
 	{
+		
 		public static const HEAD:String = "head";
 		public static const NECK:String = "neck";
 		public static const TORSO:String = "torso";

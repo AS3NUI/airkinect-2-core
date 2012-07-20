@@ -15,11 +15,7 @@
 */
 package com.as3nui.nativeExtensions.air.kinect.data
 {
-	import com.as3nui.nativeExtensions.air.kinect.namespaces.as3nui;
-	
 	import flash.display.BitmapData;
-	import flash.geom.Point;
-	import flash.geom.Vector3D;
 	import flash.utils.Dictionary;
 
 	/**
@@ -43,10 +39,8 @@ package com.as3nui.nativeExtensions.air.kinect.data
 	 * <p>When you enable user masking in the kinect config, the <code>userMask</code>
 	 * property will contain the rgb pixels for this user.</p>
 	 */ 
-	[RemoteClass(alias='com.as3nui.nativeExtensions.air.kinect.data.User')]
 	public class User
 	{
-		
 		/**
 		 * Current user User ID
 		 */
