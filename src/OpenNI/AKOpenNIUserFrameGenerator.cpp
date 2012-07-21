@@ -262,13 +262,13 @@ void AKOpenNIUserFrameGenerator::setJointProperties(AKOpenNISkeletonJoint& openN
 
 void AKOpenNIUserFrameGenerator::addBoneElements(AKOpenNIUser &openNIUser, XnUserID userID)
 {
-	setBoneProperties(openNIUser.openNISkeletonBones[0], openNIUser.openNISkeletonJoints[1], 0.0, 0.0, 180.0); //neck bone
-	setBoneProperties(openNIUser.openNISkeletonBones[1], openNIUser.openNISkeletonJoints[3], 0.0, 0.0, 90.0); //left upper arm
-	setBoneProperties(openNIUser.openNISkeletonBones[2], openNIUser.openNISkeletonJoints[4], 0.0, 0.0, 90.0); //left lower arm
-	setBoneProperties(openNIUser.openNISkeletonBones[3], openNIUser.openNISkeletonJoints[6], 0.0, 0.0, -90.0); //right upper arm
-	setBoneProperties(openNIUser.openNISkeletonBones[4], openNIUser.openNISkeletonJoints[7], 0.0, 0.0, -90.0); //right lower arm
+	setBoneProperties(openNIUser.openNISkeletonBones[0], openNIUser.openNISkeletonJoints[1], 0.0, 0.0, -180.0); //neck bone
+	setBoneProperties(openNIUser.openNISkeletonBones[1], openNIUser.openNISkeletonJoints[3], 0.0, 0.0, -90.0); //left upper arm
+	setBoneProperties(openNIUser.openNISkeletonBones[2], openNIUser.openNISkeletonJoints[4], 0.0, 0.0, -90.0); //left lower arm
+	setBoneProperties(openNIUser.openNISkeletonBones[3], openNIUser.openNISkeletonJoints[6], 0.0, 0.0, 90.0); //right upper arm
+	setBoneProperties(openNIUser.openNISkeletonBones[4], openNIUser.openNISkeletonJoints[7], 0.0, 0.0, 90.0); //right lower arm
 
-	setBoneProperties(openNIUser.openNISkeletonBones[5], openNIUser.openNISkeletonJoints[2], 0.0, 0.0, 180.0); //spine
+	setBoneProperties(openNIUser.openNISkeletonBones[5], openNIUser.openNISkeletonJoints[2], 0.0, 0.0, -135.0); //spine - why not 180?
 	setBoneProperties(openNIUser.openNISkeletonBones[6], openNIUser.openNISkeletonJoints[9], 0.0, 0.0, 0.0); //left_upper_leg
 	setBoneProperties(openNIUser.openNISkeletonBones[7], openNIUser.openNISkeletonJoints[10], 0.0, 0.0, 0.0); //left_lower_leg
 	setBoneProperties(openNIUser.openNISkeletonBones[8], openNIUser.openNISkeletonJoints[12], 0.0, 0.0, 0.0); //right_upper_leg
@@ -305,27 +305,37 @@ void AKOpenNIUserFrameGenerator::setBoneProperties(AKOpenNISkeletonBone &openNIS
 		0.0, 0.0, 1.0, 0.0,
 		0.0, 0.0, 0.0, 1.0);
 
-	//TODO: multiply the matrices
+	//AKMatrix3D rotation = multiplyMatrices(xMatrix, yMatrix);
+	//rotation = multiplyMatrices(rotation, zMatrix);
 
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M11 = jointWhichContainsOrientation.orientation.M11;
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M12 = jointWhichContainsOrientation.orientation.M12;
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M13 = jointWhichContainsOrientation.orientation.M13;
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M14 = jointWhichContainsOrientation.orientation.M14;
+	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix = multiplyMatrices(zMatrix, jointWhichContainsOrientation.orientation);
+}
 
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M21 = jointWhichContainsOrientation.orientation.M21;
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M22 = jointWhichContainsOrientation.orientation.M22;
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M23 = jointWhichContainsOrientation.orientation.M23;
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M24 = jointWhichContainsOrientation.orientation.M24;
+AKMatrix3D AKOpenNIUserFrameGenerator::multiplyMatrices(AKMatrix3D &m1, AKMatrix3D &m2)
+{
+	AKMatrix3D result;
 
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M31 = jointWhichContainsOrientation.orientation.M31;
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M32 = jointWhichContainsOrientation.orientation.M32;
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M33 = jointWhichContainsOrientation.orientation.M33;
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M34 = jointWhichContainsOrientation.orientation.M34;
+	result.M11 = m1.M11 * m2.M11 + m1.M12 * m2.M21 + m1.M13 * m2.M31 + m1.M14 * m2.M41;
+	result.M12 = m1.M11 * m2.M12 + m1.M12 * m2.M22 + m1.M13 * m2.M32 + m1.M14 * m2.M42;
+	result.M13 = m1.M11 * m2.M13 + m1.M12 * m2.M23 + m1.M13 * m2.M33 + m1.M14 * m2.M43;
+	result.M14 = m1.M11 * m2.M14 + m1.M12 * m2.M24 + m1.M13 * m2.M34 + m1.M14 * m2.M44;
 
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M41 = jointWhichContainsOrientation.orientation.M41;
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M42 = jointWhichContainsOrientation.orientation.M42;
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M43 = jointWhichContainsOrientation.orientation.M43;
-	openNISkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M44 = jointWhichContainsOrientation.orientation.M44;
+	result.M21 = m1.M21 * m2.M11 + m1.M22 * m2.M21 + m1.M23 * m2.M31 + m1.M24 * m2.M41;
+	result.M22 = m1.M21 * m2.M12 + m1.M22 * m2.M22 + m1.M23 * m2.M32 + m1.M24 * m2.M42;
+	result.M23 = m1.M21 * m2.M13 + m1.M22 * m2.M23 + m1.M23 * m2.M33 + m1.M24 * m2.M43;
+	result.M24 = m1.M21 * m2.M14 + m1.M22 * m2.M24 + m1.M23 * m2.M34 + m1.M24 * m2.M44;
+
+	result.M31 = m1.M31 * m2.M11 + m1.M32 * m2.M21 + m1.M33 * m2.M31 + m1.M34 * m2.M41;
+	result.M32 = m1.M31 * m2.M12 + m1.M32 * m2.M22 + m1.M33 * m2.M32 + m1.M34 * m2.M42;
+	result.M33 = m1.M31 * m2.M13 + m1.M32 * m2.M23 + m1.M33 * m2.M33 + m1.M34 * m2.M43;
+	result.M34 = m1.M31 * m2.M14 + m1.M32 * m2.M24 + m1.M33 * m2.M34 + m1.M34 * m2.M44;
+
+	result.M41 = m1.M41 * m2.M11 + m1.M42 * m2.M21 + m1.M43 * m2.M31 + m1.M44 * m2.M41;
+	result.M42 = m1.M41 * m2.M12 + m1.M42 * m2.M22 + m1.M43 * m2.M32 + m1.M44 * m2.M42;
+	result.M43 = m1.M41 * m2.M13 + m1.M42 * m2.M23 + m1.M43 * m2.M33 + m1.M44 * m2.M43;
+	result.M44 = m1.M41 * m2.M14 + m1.M42 * m2.M24 + m1.M43 * m2.M34 + m1.M44 * m2.M44;
+
+	return result;
 }
 
 void AKOpenNIUserFrameGenerator::calculatePosition(AKPosition &akPosition, XnPoint3D xnPosition)

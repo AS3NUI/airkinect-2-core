@@ -378,41 +378,62 @@ void MSKinectDevice::run()
 			return;
 		}
 
-		depthPlayerIndexEnabled = asDepthShowUserColors || asUserMaskEnabled;
-		DWORD dwFlags;
-		if(asSkeletonEnabled || asUserMaskEnabled) 
+		//try initializing the sensor
+		//it might not be available for initialization right away, so try a couple of times
+		bool initialized = false;
+		for(int i = 0; i < 5; i++)
 		{
-			dwFlags |= NUI_INITIALIZE_FLAG_USES_SKELETON;
-			trace((const uint8_t*) "NUI_INITIALIZE_FLAG_USES_SKELETON");
-		}
-		if(asRGBEnabled || asPointCloudEnabled || asUserMaskEnabled)
-		{
-			dwFlags |= NUI_INITIALIZE_FLAG_USES_COLOR;
-			trace((const uint8_t*) "NUI_INITIALIZE_FLAG_USES_COLOR");
-		}
-		if(asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled){
-			if(depthPlayerIndexEnabled)
+			depthPlayerIndexEnabled = asDepthShowUserColors || asUserMaskEnabled;
+			DWORD dwFlags = 0;
+			if(asSkeletonEnabled || asUserMaskEnabled) 
 			{
-				dwFlags |= NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX;
-				trace((const uint8_t*) "NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX");
+				dwFlags |= NUI_INITIALIZE_FLAG_USES_SKELETON;
+			}
+			if(asRGBEnabled || asPointCloudEnabled || asUserMaskEnabled)
+			{
+				dwFlags |= NUI_INITIALIZE_FLAG_USES_COLOR;
+			}
+			if(asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled){
+				if(depthPlayerIndexEnabled)
+				{
+					dwFlags |= NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX;
+				}
+				else
+				{
+					dwFlags |= NUI_INITIALIZE_FLAG_USES_DEPTH;
+				}
+			}
+
+			char flagsMessage[100];
+			sprintf_s(flagsMessage, "dwFlags: %d", dwFlags);
+			trace((const uint8_t*) flagsMessage);
+			hr = nuiSensor->NuiInitialize(dwFlags);
+			if (FAILED(hr))
+			{
+				dispatchErrorMessage((const uint8_t*) "Failed to initialize Sensor");
+				dispatchError(hr);
+
+				nuiSensor->NuiShutdown();
+				nuiSensor->Release();
+				NuiCreateSensorByIndex(this->nr, &nuiSensor);
+
+				boost::this_thread::sleep(boost::posix_time::seconds(1));
 			}
 			else
 			{
-				dwFlags |= NUI_INITIALIZE_FLAG_USES_DEPTH;
-				trace((const uint8_t*) "NUI_INITIALIZE_FLAG_USES_DEPTH");
+				initialized = true;
+				break;
 			}
 		}
 
-		hr = nuiSensor->NuiInitialize(dwFlags);
-
-		if (FAILED(hr)) {
-			dispatchErrorMessage((const uint8_t*) "Failed to initialize Sensor");
-			dispatchError(hr);
+		if(!initialized)
+		{
+			trace((const uint8_t*) "Sensor initialization failed, aborting");
 			running = false;
 			stop();
 			return;
 		}
-
+		
 		userEvent	= CreateEvent( NULL, TRUE, FALSE, NULL );
 		if(asSkeletonEnabled || asUserMaskEnabled){
 			dispatchInfoMessage((const uint8_t*) "Starting Skeleton Tracking");
