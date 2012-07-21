@@ -470,6 +470,10 @@ void AKMSSDKUserFrameGenerator::setBoneProperties(AKMSSDKSkeletonBone &mssdkSkel
 	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M42 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M42;
 	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M43 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M43;
 	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M44 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M44;
+
+	//invert Y
+	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M22 *= -1.0;
+
 }
 
 FREObject AKMSSDKUserFrameGenerator::getFREObject()

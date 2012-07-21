@@ -49,8 +49,6 @@ private:
 
 	void setBoneProperties(AKOpenNISkeletonBone &openNISkeletonBone, AKOpenNISkeletonJoint &jointWhichContainsOrientation, double xDegreesToAppend, double yDegreesToAppend, double zDegreesToAppend);
 
-	AKMatrix3D multiplyMatrices(AKMatrix3D &m1, AKMatrix3D &m2);
-
 };
 
 #endif

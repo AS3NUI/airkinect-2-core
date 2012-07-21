@@ -187,6 +187,33 @@ typedef struct _AKMatrix3D
 		this->M44 = M44;
 	};
 
+	_AKMatrix3D operator* (const _AKMatrix3D &m2)
+	{
+		_AKMatrix3D result;
+
+		result.M11 = this->M11 * m2.M11 + this->M12 * m2.M21 + this->M13 * m2.M31 + this->M14 * m2.M41;
+		result.M12 = this->M11 * m2.M12 + this->M12 * m2.M22 + this->M13 * m2.M32 + this->M14 * m2.M42;
+		result.M13 = this->M11 * m2.M13 + this->M12 * m2.M23 + this->M13 * m2.M33 + this->M14 * m2.M43;
+		result.M14 = this->M11 * m2.M14 + this->M12 * m2.M24 + this->M13 * m2.M34 + this->M14 * m2.M44;
+
+		result.M21 = this->M21 * m2.M11 + this->M22 * m2.M21 + this->M23 * m2.M31 + this->M24 * m2.M41;
+		result.M22 = this->M21 * m2.M12 + this->M22 * m2.M22 + this->M23 * m2.M32 + this->M24 * m2.M42;
+		result.M23 = this->M21 * m2.M13 + this->M22 * m2.M23 + this->M23 * m2.M33 + this->M24 * m2.M43;
+		result.M24 = this->M21 * m2.M14 + this->M22 * m2.M24 + this->M23 * m2.M34 + this->M24 * m2.M44;
+
+		result.M31 = this->M31 * m2.M11 + this->M32 * m2.M21 + this->M33 * m2.M31 + this->M34 * m2.M41;
+		result.M32 = this->M31 * m2.M12 + this->M32 * m2.M22 + this->M33 * m2.M32 + this->M34 * m2.M42;
+		result.M33 = this->M31 * m2.M13 + this->M32 * m2.M23 + this->M33 * m2.M33 + this->M34 * m2.M43;
+		result.M34 = this->M31 * m2.M14 + this->M32 * m2.M24 + this->M33 * m2.M34 + this->M34 * m2.M44;
+
+		result.M41 = this->M41 * m2.M11 + this->M42 * m2.M21 + this->M43 * m2.M31 + this->M44 * m2.M41;
+		result.M42 = this->M41 * m2.M12 + this->M42 * m2.M22 + this->M43 * m2.M32 + this->M44 * m2.M42;
+		result.M43 = this->M41 * m2.M13 + this->M42 * m2.M23 + this->M43 * m2.M33 + this->M44 * m2.M43;
+		result.M44 = this->M41 * m2.M14 + this->M42 * m2.M24 + this->M43 * m2.M34 + this->M44 * m2.M44;
+
+		return result;
+	};
+
 	FREObject asFREObject()
 	{
 		FREObject freM11, freM12, freM13, freM14;
