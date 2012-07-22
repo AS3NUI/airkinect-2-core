@@ -331,14 +331,11 @@ void AKOpenNIUserFrameGenerator::setBoneProperties(AKOpenNISkeletonBone &openNIS
 
 void AKOpenNIUserFrameGenerator::calculatePosition(AKPosition &akPosition, XnPoint3D xnPosition)
 {
-	double worldX = xnPosition.X;
-	if(!_skeletonMirrored) worldX *= -1;
+	akPosition.world.create((!_skeletonMirrored) ? xnPosition.X : xnPosition.X * -1, xnPosition.Y, xnPosition.Z);
 
-	akPosition.world.create(worldX, xnPosition.Y, xnPosition.Z);
-
-	akPosition.worldRelative.x = (_depthSourceWidth - worldX) / (_depthSourceWidth * 2) - .5;
-	akPosition.worldRelative.y = -1 * (((_depthSourceHeight - xnPosition.Y) / (_depthSourceHeight * 2)) - .5);
-	akPosition.worldRelative.z = (xnPosition.Z * 7.8125) / MAX_DEPTH;
+	akPosition.worldRelative.x = -1 * ((_depthSourceWidth - akPosition.world.x) / (_depthSourceWidth * 2) - .5);
+	akPosition.worldRelative.y = -1 * (((_depthSourceHeight - akPosition.world.y) / (_depthSourceHeight * 2)) - .5);
+	akPosition.worldRelative.z = (akPosition.world.z * 7.8125) / MAX_DEPTH;
             
 	//depth & rgb space are the same, as we aligned the depth & image streams
 	XnPoint3D pt[1];
