@@ -65,7 +65,7 @@ private:
 	void setJointProperties(AKMSSDKSkeletonJoint &mssdkSkeletonJoint, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint);
 	void calculatePosition(AKPosition &kTransform, Vector4 skeletonTransform);
 
-	void setBoneProperties(AKMSSDKSkeletonBone &mssdkSkeletonBone, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX indexOfJointWithRotation);
+	void setBoneProperties(AKMSSDKSkeletonBone &mssdkSkeletonBone, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX indexOfJointWithRotation, int startJointNameIndex, int endJointNameIndex, int parentBoneNameIndex);
 
 };
 

@@ -16,6 +16,51 @@
 
 #ifndef _AKMSSDKSkeletonJoint_
 #define _AKMSSDKSkeletonJoint_
+
+typedef enum AkMssdkRegularJointIndex
+{
+	AK_MSSDK_REGULAR_JOINT_INDEX_WAIST = 0,
+	AK_MSSDK_REGULAR_JOINT_INDEX_TORSO = 1,
+	AK_MSSDK_REGULAR_JOINT_INDEX_NECK = 2,
+	AK_MSSDK_REGULAR_JOINT_INDEX_HEAD = 3,
+
+	AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_SHOULDER = 4,
+	AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_ELBOW = 5,
+	AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_WRIST = 6,
+	AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_HAND = 7,
+
+	AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_SHOULDER = 8,
+	AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_ELBOW = 9,
+	AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_WRIST = 10,
+	AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_HAND = 11,
+
+	AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_HIP = 12,
+	AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_KNEE = 13,
+	AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_ANKLE = 14,
+	AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_FOOT = 15,
+
+	AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_HIP = 16,
+	AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_KNEE = 17,
+	AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_ANKLE = 18,
+	AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_FOOT = 19
+};
+
+typedef enum AkMssdkSeatedJointIndex
+{
+	AK_MSSDK_SEATED_JOINT_INDEX_NECK = 0,
+	AK_MSSDK_SEATED_JOINT_INDEX_HEAD = 1,
+
+	AK_MSSDK_SEATED_JOINT_INDEX_LEFT_SHOULDER = 2,
+	AK_MSSDK_SEATED_JOINT_INDEX_LEFT_ELBOW = 3,
+	AK_MSSDK_SEATED_JOINT_INDEX_LEFT_WRIST = 4,
+	AK_MSSDK_SEATED_JOINT_INDEX_LEFT_HAND = 5,
+
+	AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_SHOULDER = 6,
+	AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_ELBOW = 7,
+	AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_WRIST = 8,
+	AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_HAND = 9
+};
+
 typedef struct _AKMSSDKSkeletonJoint
 {
 	AKSkeletonJoint* skeletonJoint;
@@ -25,18 +70,6 @@ typedef struct _AKMSSDKSkeletonJoint
 
 	AKQuaternion absoluteRotationQuaternion;
 	AKMatrix3D absoluteRotationMatrix;
-
-	FREObject asFREObject()
-	{
-		FREObject freJoint = skeletonJoint->asFREObject();
-
-		FRESetObjectProperty(freJoint, (const uint8_t*) "nativeHierarchicalRotationQuaternion", hierarchicalRotationQuaternion.asFREObject(), NULL);
-		FRESetObjectProperty(freJoint, (const uint8_t*) "nativeHierarchicalRotationMatrix", hierarchicalRotationMatrix.asFREObject(), NULL);
-		FRESetObjectProperty(freJoint, (const uint8_t*) "nativeAbsoluteRotationQuaternion", absoluteRotationQuaternion.asFREObject(), NULL);
-		FRESetObjectProperty(freJoint, (const uint8_t*) "nativeAbsoluteRotationMatrix", absoluteRotationMatrix.asFREObject(), NULL);
-
-		return freJoint;
-	};
 
 } AKMSSDKSkeletonJoint;
 #endif _AKMSSDKSkeletonJoint_

@@ -9,7 +9,6 @@
     #include <Adobe AIR/Adobe AIR.h>
 #endif
 
-#include <string.h>
 #include "AKBasicStructs.h"
 
 #ifndef _AKSkeletonBone_
@@ -18,21 +17,17 @@ typedef struct _AKSkeletonBone
 {
 	AKOrientation orientation;
 
-	const char* asBoneClass;
-	const char* boneName;
+	int boneNameIndex;
+	int startJointNameIndex;
+	int endJointNameIndex;
+	int parentBoneNameIndex;
 
-	FREObject asFREObject()
+	_AKSkeletonBone()
 	{
-		FREObject freBone, freBoneName;
-		
-		FRENewObject( (const uint8_t*) this->asBoneClass, 0, NULL, &freBone, NULL);
-
-		FRENewObjectFromUTF8(strlen(this->boneName), (const uint8_t*) this->boneName, &freBoneName);
-
-		FRESetObjectProperty(freBone, (const uint8_t*) "name", freBoneName, NULL);
-		FRESetObjectProperty(freBone, (const uint8_t*) "orientation", this->orientation.asFREObject(), NULL);
-
-		return freBone;
+		boneNameIndex = -1;
+		startJointNameIndex = -1;
+		endJointNameIndex = -1;
+		parentBoneNameIndex = -1;
 	};
 
 } AKSkeletonBone;

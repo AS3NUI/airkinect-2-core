@@ -21,26 +21,6 @@ typedef struct _AKOpenNIUserFrame
     AKUserFrame* userFrame;
 	AKOpenNIUser* openNIUsers;
 
-	FREObject asFREObject()
-	{
-		FREObject freUserFrame = userFrame->asFREObjectWithoutUsers();
-
-		short int trackedSkeletons = 0;
-		FREObject freUsers;
-		FREGetObjectProperty(freUserFrame, (const uint8_t*) "users", &freUsers, NULL);
-		for(int i = 0; i < userFrame->maxSkeletons; i++)
-		{
-			if(this->openNIUsers[i].user->isTracking)
-			{
-				FREObject freUser = this->openNIUsers[i].asFREObject();
-				FRESetArrayElementAt(freUsers, trackedSkeletons, freUser);
-				trackedSkeletons++;
-			}
-		}
-		FRESetObjectProperty(freUserFrame, (const uint8_t*) "users", freUsers, NULL);
-
-		return freUserFrame;
-	};
 } AKOpenNIUserFrame;
 #endif _AKOpenNIUserFrame_
 

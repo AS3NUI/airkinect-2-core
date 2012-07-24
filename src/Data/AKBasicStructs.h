@@ -9,6 +9,8 @@
     #include <Adobe AIR/Adobe AIR.h>
 #endif
 
+#include <math.h>
+
 //
 // This structure describes a point in 2D space
 //
@@ -212,6 +214,39 @@ typedef struct _AKMatrix3D
 		result.M44 = this->M41 * m2.M14 + this->M42 * m2.M24 + this->M43 * m2.M34 + this->M44 * m2.M44;
 
 		return result;
+	};
+
+	void createRotationX(double degreesX)
+	{
+		double cosX = cos(degreesX);
+		double sinX = sin(degreesX);
+		this->create(
+			1.0, 0.0, 0.0, 0.0,
+			0.0, cosX, -sinX, 0.0,
+			0.0, sinX, cosX, 0.0,
+			0.0, 0.0, 0.0, 1.0);
+	};
+
+	void createRotationY(double degreesY)
+	{
+		double cosY = cos(degreesY);
+		double sinY = sin(degreesY);
+		this->create(
+			cosY, 0.0, sinY, 0.0,
+			0.0, 1.0, 0.0, 0.0,
+			-sinY, 0.0, cosY, 0.0,
+			0.0, 0.0, 0.0, 1.0);
+	};
+
+	void createRotationZ(double degreesZ)
+	{
+		double cosZ = cos(degreesZ);
+		double sinZ = sin(degreesZ);
+		this->create(
+			cosZ, -sinZ, 0.0, 0.0,
+			sinZ, cosZ, 0.0, 0.0,
+			0.0, 0.0, 1.0, 0.0,
+			0.0, 0.0, 0.0, 1.0);
 	};
 
 	FREObject asFREObject()

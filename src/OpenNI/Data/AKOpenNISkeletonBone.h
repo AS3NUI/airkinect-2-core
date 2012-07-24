@@ -16,15 +16,25 @@
 
 #ifndef _AKOpenNISkeletonBone_
 #define _AKOpenNISkeletonBone_
+
+typedef enum AkOpenniBoneIndex
+{
+	AK_OPENNI_BONE_INDEX_NECK = 0,
+	AK_OPENNI_BONE_INDEX_LEFT_UPPER_ARM = 1,
+	AK_OPENNI_BONE_INDEX_LEFT_LOWER_ARM = 2,
+	AK_OPENNI_BONE_INDEX_RIGHT_UPPER_ARM = 3,
+	AK_OPENNI_BONE_INDEX_RIGHT_LOWER_ARM = 4,
+
+	AK_OPENNI_BONE_INDEX_SPINE = 5,
+	AK_OPENNI_BONE_INDEX_LEFT_UPPER_LEG = 6,
+	AK_OPENNI_BONE_INDEX_LEFT_LOWER_LEG = 7,
+	AK_OPENNI_BONE_INDEX_RIGHT_UPPER_LEG = 8,
+	AK_OPENNI_BONE_INDEX_RIGHT_LOWER_LEG = 9
+};
+
 typedef struct _AKOpenNISkeletonBone
 {
 	AKSkeletonBone* skeletonBone;
-
-	FREObject asFREObject()
-	{
-		FREObject freBone = skeletonBone->asFREObject();
-		return freBone;
-	};
 
 } AKOpenNISkeletonBone;
 #endif _AKOpenNISkeletonBone_

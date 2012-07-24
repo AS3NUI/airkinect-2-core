@@ -67,76 +67,95 @@ void AKMSSDKUserFrameGenerator::allocateJointNamesForSeatedSkeletonTracking()
 {
 	_numJoints = 10;
 	_jointNames = new char*[_numJoints];
-	_jointNames[0] = "neck";
-	_jointNames[1] = "head";
+	_jointNames[AK_MSSDK_SEATED_JOINT_INDEX_NECK] = "neck";
+	_jointNames[AK_MSSDK_SEATED_JOINT_INDEX_HEAD] = "head";
     
-	_jointNames[2] = "left_shoulder";
-	_jointNames[3] = "left_elbow";
-	_jointNames[4] = "left_wrist";
-	_jointNames[5] = "left_hand";
+	_jointNames[AK_MSSDK_SEATED_JOINT_INDEX_LEFT_SHOULDER] = "left_shoulder";
+	_jointNames[AK_MSSDK_SEATED_JOINT_INDEX_LEFT_ELBOW] = "left_elbow";
+	_jointNames[AK_MSSDK_SEATED_JOINT_INDEX_LEFT_WRIST] = "left_wrist";
+	_jointNames[AK_MSSDK_SEATED_JOINT_INDEX_LEFT_HAND] = "left_hand";
     
-	_jointNames[6] = "right_shoulder";
-	_jointNames[7] = "right_elbow";
-	_jointNames[8] = "right_wrist";
-	_jointNames[9] = "right_hand";
+	_jointNames[AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_SHOULDER] = "right_shoulder";
+	_jointNames[AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_ELBOW] = "right_elbow";
+	_jointNames[AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_WRIST] = "right_wrist";
+	_jointNames[AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_HAND] = "right_hand";
 }
 
 void AKMSSDKUserFrameGenerator::allocateJointNamesForRegularSkeletonTracking()
 {
 	_numJoints = 20;
 	_jointNames = new char*[_numJoints];
-	_jointNames[0] = "waist";
-	_jointNames[1] = "torso";
-	_jointNames[2] = "neck";
-	_jointNames[3] = "head";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_WAIST] = "waist";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_TORSO] = "torso";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_NECK] = "neck";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_HEAD] = "head";
     
-	_jointNames[4] = "left_shoulder";
-	_jointNames[5] = "left_elbow";
-	_jointNames[6] = "left_wrist";
-	_jointNames[7] = "left_hand";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_SHOULDER] = "left_shoulder";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_ELBOW] = "left_elbow";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_WRIST] = "left_wrist";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_HAND] = "left_hand";
     
-	_jointNames[8] = "right_shoulder";
-	_jointNames[9] = "right_elbow";
-	_jointNames[10] = "right_wrist";
-	_jointNames[11] = "right_hand";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_SHOULDER] = "right_shoulder";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_ELBOW] = "right_elbow";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_WRIST] = "right_wrist";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_HAND] = "right_hand";
     
-	_jointNames[12] = "left_hip";
-	_jointNames[13] = "left_knee";
-	_jointNames[14] = "left_ankle";
-	_jointNames[15] = "left_foot";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_HIP] = "left_hip";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_KNEE] = "left_knee";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_ANKLE] = "left_ankle";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_FOOT] = "left_foot";
     
-	_jointNames[16] = "right_hip";
-	_jointNames[17] = "right_knee";
-	_jointNames[18] = "right_ankle";
-	_jointNames[19] = "right_foot";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_HIP] = "right_hip";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_KNEE] = "right_knee";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_ANKLE] = "right_ankle";
+	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_FOOT] = "right_foot";
 }
 
 void AKMSSDKUserFrameGenerator::allocateBoneNamesForSeatedSkeletonTracking()
 {
-	_numBones = 5;
+	_numBones = 9;
 	_boneNames = new char*[_numBones];
-	_boneNames[0] = "neck";
-	_boneNames[1] = "left_upper_arm";
-	_boneNames[2] = "left_lower_arm";
-	_boneNames[3] = "right_upper_arm";
-	_boneNames[4] = "right_lower_arm";
+	_boneNames[AK_MSSDK_SEATED_BONE_INDEX_NECK] = "neck";
+
+	_boneNames[AK_MSSDK_SEATED_BONE_INDEX_LEFT_COLLAR] = "left_collar";
+	_boneNames[AK_MSSDK_SEATED_BONE_INDEX_LEFT_UPPER_ARM] = "left_upper_arm";
+	_boneNames[AK_MSSDK_SEATED_BONE_INDEX_LEFT_LOWER_ARM] = "left_lower_arm";
+	_boneNames[AK_MSSDK_SEATED_BONE_INDEX_LEFT_HAND] = "left_hand";
+
+	_boneNames[AK_MSSDK_SEATED_BONE_INDEX_RIGHT_COLLAR] = "right_collar";
+	_boneNames[AK_MSSDK_SEATED_BONE_INDEX_RIGHT_UPPER_ARM] = "right_upper_arm";
+	_boneNames[AK_MSSDK_SEATED_BONE_INDEX_RIGHT_LOWER_ARM] = "right_lower_arm";
+	_boneNames[AK_MSSDK_SEATED_BONE_INDEX_RIGHT_HAND] = "right_hand";
 }
 
 void AKMSSDKUserFrameGenerator::allocateBoneNamesForRegularSkeletonTracking()
 {
-	_numBones = 10;
+	_numBones = 19;
 	_boneNames = new char*[_numBones];
-	_boneNames[0] = "neck";
-	_boneNames[1] = "left_upper_arm";
-	_boneNames[2] = "left_lower_arm";
-	_boneNames[3] = "right_upper_arm";
-	_boneNames[4] = "right_lower_arm";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_NECK] = "neck";
 
-	_boneNames[5] = "spine";
-	_boneNames[6] = "left_upper_leg";
-	_boneNames[7] = "left_lower_leg";
-	_boneNames[8] = "right_upper_leg";
-	_boneNames[9] = "right_lower_leg";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_COLLAR] = "left_collar";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_UPPER_ARM] = "left_upper_arm";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_LOWER_ARM] = "left_lower_arm";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_HAND] = "left_hand";
+
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_COLLAR] = "right_collar";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_UPPER_ARM] = "right_upper_arm";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_LOWER_ARM] = "right_lower_arm";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_HAND] = "right_hand";
+
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_SPINE] = "spine";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_LOWER_SPINE] = "lower_spine";
+
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_HIP] = "left_hip";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_UPPER_LEG] = "left_upper_leg";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_LOWER_LEG] = "left_lower_leg";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_FOOT] = "left_foot";
+
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_HIP] = "right_hip";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_UPPER_LEG] = "right_upper_leg";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_LOWER_LEG] = "right_lower_leg";
+	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_FOOT] = "right_foot";
 }
 
 void AKMSSDKUserFrameGenerator::allocateUserFrame()
@@ -306,46 +325,46 @@ void AKMSSDKUserFrameGenerator::addJointElements(AKMSSDKUser &mssdkUser, NUI_SKE
 
 void AKMSSDKUserFrameGenerator::addJointElementsForSeatedSkeletonTracking(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
 {
-	setJointProperties(mssdkUser.mssdkSkeletonJoints[0], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[1], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HEAD);
+	setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_SEATED_JOINT_INDEX_NECK], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_SEATED_JOINT_INDEX_HEAD], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HEAD);
                 
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[2], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_LEFT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[3], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[4], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[5], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_SEATED_JOINT_INDEX_LEFT_SHOULDER], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_LEFT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_SEATED_JOINT_INDEX_LEFT_ELBOW], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_SEATED_JOINT_INDEX_LEFT_WRIST], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_SEATED_JOINT_INDEX_LEFT_HAND], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT);
                 
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[6], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_RIGHT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[7], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[8], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[9], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_SHOULDER], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_RIGHT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_ELBOW], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_WRIST], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_HAND], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT);
 }
 
 void AKMSSDKUserFrameGenerator::addJointElementsForRegularSkeletonTracking(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
 {
-	setJointProperties(mssdkUser.mssdkSkeletonJoints[0], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[1], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SPINE);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[2], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[3], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HEAD);
+	setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_WAIST], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_CENTER);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_TORSO], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SPINE);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_NECK], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_HEAD], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HEAD);
                 
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[4], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_LEFT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[5], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[6], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[7], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_SHOULDER], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_LEFT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_ELBOW], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_WRIST], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_HAND], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT);
                 
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[8], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_RIGHT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[9], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[10], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[11], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_SHOULDER], skeletonData, boneOrientations, NUI_SKELETON_POSITION_SHOULDER_RIGHT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_ELBOW], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_WRIST], skeletonData, boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_HAND], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT);
                 
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[12], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_LEFT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[13], skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_LEFT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[14], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_LEFT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[15], skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_LEFT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_HIP], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_LEFT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_KNEE], skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_LEFT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_ANKLE], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_LEFT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_FOOT], skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_LEFT);
                 
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[16], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_RIGHT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[17], skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_RIGHT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[18], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_RIGHT);
-    setJointProperties(mssdkUser.mssdkSkeletonJoints[19], skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_RIGHT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_HIP], skeletonData, boneOrientations, NUI_SKELETON_POSITION_HIP_RIGHT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_KNEE], skeletonData, boneOrientations, NUI_SKELETON_POSITION_KNEE_RIGHT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_ANKLE], skeletonData, boneOrientations, NUI_SKELETON_POSITION_ANKLE_RIGHT);
+    setJointProperties(mssdkUser.mssdkSkeletonJoints[AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_FOOT], skeletonData, boneOrientations, NUI_SKELETON_POSITION_FOOT_RIGHT);
 }
 
 void AKMSSDKUserFrameGenerator::setJointProperties(AKMSSDKSkeletonJoint &mssdkSkeletonJoint, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX eJoint)
@@ -426,30 +445,49 @@ void AKMSSDKUserFrameGenerator::addBoneElements(AKMSSDKUser &mssdkUser, NUI_SKEL
 
 void AKMSSDKUserFrameGenerator::addBoneElementsForSeatedSkeletonTracking(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
 {
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[0], boneOrientations, NUI_SKELETON_POSITION_HEAD); //neck bone
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[1], boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT); //left upper arm
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[2], boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT); //left lower arm
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[3], boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT); //right upper arm
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[4], boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT); //right lower arm
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_SEATED_BONE_INDEX_NECK], boneOrientations, NUI_SKELETON_POSITION_HEAD, AK_MSSDK_SEATED_JOINT_INDEX_NECK, AK_MSSDK_SEATED_JOINT_INDEX_HEAD, -1);
+	
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_SEATED_BONE_INDEX_LEFT_COLLAR], boneOrientations, NUI_SKELETON_POSITION_SHOULDER_LEFT, AK_MSSDK_SEATED_JOINT_INDEX_NECK, AK_MSSDK_SEATED_JOINT_INDEX_LEFT_SHOULDER, AK_MSSDK_SEATED_BONE_INDEX_NECK);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_SEATED_BONE_INDEX_LEFT_UPPER_ARM], boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT, AK_MSSDK_SEATED_JOINT_INDEX_LEFT_SHOULDER, AK_MSSDK_SEATED_JOINT_INDEX_LEFT_ELBOW, AK_MSSDK_SEATED_BONE_INDEX_LEFT_COLLAR);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_SEATED_BONE_INDEX_LEFT_LOWER_ARM], boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT, AK_MSSDK_SEATED_JOINT_INDEX_LEFT_ELBOW, AK_MSSDK_SEATED_JOINT_INDEX_LEFT_WRIST, AK_MSSDK_SEATED_BONE_INDEX_LEFT_UPPER_ARM);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_SEATED_BONE_INDEX_LEFT_HAND], boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT, AK_MSSDK_SEATED_JOINT_INDEX_LEFT_WRIST, AK_MSSDK_SEATED_JOINT_INDEX_LEFT_HAND, AK_MSSDK_SEATED_BONE_INDEX_LEFT_LOWER_ARM);
+	
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_SEATED_BONE_INDEX_RIGHT_COLLAR], boneOrientations, NUI_SKELETON_POSITION_SHOULDER_RIGHT, AK_MSSDK_SEATED_JOINT_INDEX_NECK, AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_SHOULDER, AK_MSSDK_SEATED_BONE_INDEX_NECK);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_SEATED_BONE_INDEX_RIGHT_UPPER_ARM], boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT, AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_SHOULDER, AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_ELBOW, AK_MSSDK_SEATED_BONE_INDEX_RIGHT_COLLAR);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_SEATED_BONE_INDEX_RIGHT_LOWER_ARM], boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT, AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_ELBOW, AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_WRIST, AK_MSSDK_SEATED_BONE_INDEX_RIGHT_UPPER_ARM);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_SEATED_BONE_INDEX_RIGHT_HAND], boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT, AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_WRIST, AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_HAND, AK_MSSDK_SEATED_BONE_INDEX_RIGHT_LOWER_ARM);
 }
 
 void AKMSSDKUserFrameGenerator::addBoneElementsForRegularSkeletonTracking(AKMSSDKUser &mssdkUser, NUI_SKELETON_DATA skeletonData, NUI_SKELETON_BONE_ORIENTATION *boneOrientations)
 {
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[0], boneOrientations, NUI_SKELETON_POSITION_HEAD); //neck bone
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[1], boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT); //left upper arm
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[2], boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT); //left lower arm
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[3], boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT); //right upper arm
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[4], boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT); //right lower arm
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_NECK], boneOrientations, NUI_SKELETON_POSITION_HEAD, AK_MSSDK_REGULAR_JOINT_INDEX_NECK, AK_MSSDK_REGULAR_JOINT_INDEX_HEAD, AK_MSSDK_REGULAR_BONE_INDEX_SPINE);
+	
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_COLLAR], boneOrientations, NUI_SKELETON_POSITION_SHOULDER_LEFT, AK_MSSDK_REGULAR_JOINT_INDEX_NECK, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_SHOULDER, AK_MSSDK_REGULAR_BONE_INDEX_NECK);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_UPPER_ARM], boneOrientations, NUI_SKELETON_POSITION_ELBOW_LEFT, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_SHOULDER, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_ELBOW, AK_MSSDK_REGULAR_BONE_INDEX_LEFT_COLLAR);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_LOWER_ARM], boneOrientations, NUI_SKELETON_POSITION_WRIST_LEFT, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_ELBOW, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_WRIST, AK_MSSDK_REGULAR_BONE_INDEX_LEFT_UPPER_ARM);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_HAND], boneOrientations, NUI_SKELETON_POSITION_HAND_LEFT, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_WRIST, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_HAND, AK_MSSDK_REGULAR_BONE_INDEX_LEFT_LOWER_ARM);
+	
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_COLLAR], boneOrientations, NUI_SKELETON_POSITION_SHOULDER_RIGHT, AK_MSSDK_REGULAR_JOINT_INDEX_NECK, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_SHOULDER, AK_MSSDK_REGULAR_BONE_INDEX_NECK);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_UPPER_ARM], boneOrientations, NUI_SKELETON_POSITION_ELBOW_RIGHT, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_SHOULDER, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_ELBOW, AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_COLLAR);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_LOWER_ARM], boneOrientations, NUI_SKELETON_POSITION_WRIST_RIGHT, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_ELBOW, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_WRIST, AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_UPPER_ARM);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_HAND], boneOrientations, NUI_SKELETON_POSITION_HAND_RIGHT, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_WRIST, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_HAND, AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_LOWER_ARM);
 
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[5], boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER); //spine
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[6], boneOrientations, NUI_SKELETON_POSITION_KNEE_LEFT); //left_upper_leg
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[7], boneOrientations, NUI_SKELETON_POSITION_ANKLE_LEFT); //left_lower_leg
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[8], boneOrientations, NUI_SKELETON_POSITION_KNEE_RIGHT); //right_upper_leg
-	setBoneProperties(mssdkUser.mssdkSkeletonBones[9], boneOrientations, NUI_SKELETON_POSITION_ANKLE_RIGHT); //right_lower_leg
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_SPINE], boneOrientations, NUI_SKELETON_POSITION_SHOULDER_CENTER, AK_MSSDK_REGULAR_JOINT_INDEX_TORSO, AK_MSSDK_REGULAR_JOINT_INDEX_NECK, AK_MSSDK_REGULAR_BONE_INDEX_LOWER_SPINE);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_LOWER_SPINE], boneOrientations, NUI_SKELETON_POSITION_SPINE, AK_MSSDK_REGULAR_JOINT_INDEX_WAIST, AK_MSSDK_REGULAR_JOINT_INDEX_TORSO, -1);
+
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_HIP], boneOrientations, NUI_SKELETON_POSITION_HIP_LEFT, AK_MSSDK_REGULAR_JOINT_INDEX_WAIST, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_HIP, -1);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_UPPER_LEG], boneOrientations, NUI_SKELETON_POSITION_KNEE_LEFT, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_HIP, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_KNEE, AK_MSSDK_REGULAR_BONE_INDEX_LEFT_HIP);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_LOWER_LEG], boneOrientations, NUI_SKELETON_POSITION_ANKLE_LEFT, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_KNEE, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_ANKLE, AK_MSSDK_REGULAR_BONE_INDEX_LEFT_UPPER_LEG);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_FOOT], boneOrientations, NUI_SKELETON_POSITION_FOOT_LEFT, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_ANKLE, AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_FOOT, AK_MSSDK_REGULAR_BONE_INDEX_LEFT_LOWER_LEG);
+
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_HIP], boneOrientations, NUI_SKELETON_POSITION_HIP_RIGHT, AK_MSSDK_REGULAR_JOINT_INDEX_WAIST, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_HIP, -1);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_UPPER_LEG], boneOrientations, NUI_SKELETON_POSITION_KNEE_RIGHT, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_HIP, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_KNEE, AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_HIP);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_LOWER_LEG], boneOrientations, NUI_SKELETON_POSITION_ANKLE_RIGHT, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_KNEE, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_ANKLE, AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_UPPER_LEG);
+	setBoneProperties(mssdkUser.mssdkSkeletonBones[AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_FOOT], boneOrientations, NUI_SKELETON_POSITION_FOOT_RIGHT, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_ANKLE, AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_FOOT, AK_MSSDK_REGULAR_BONE_INDEX_RIGHT_LOWER_LEG);
 }
 
 
-void AKMSSDKUserFrameGenerator::setBoneProperties(AKMSSDKSkeletonBone &mssdkSkeletonBone, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX indexOfJointWithRotation)
+void AKMSSDKUserFrameGenerator::setBoneProperties(AKMSSDKSkeletonBone &mssdkSkeletonBone, NUI_SKELETON_BONE_ORIENTATION *boneOrientations, NUI_SKELETON_POSITION_INDEX indexOfJointWithRotation, int startJointNameIndex, int endJointNameIndex, int parentBoneNameIndex)
 {
 	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M11 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M11;
 	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M12 = boneOrientations[indexOfJointWithRotation].absoluteRotation.rotationMatrix.M12;
@@ -474,11 +512,100 @@ void AKMSSDKUserFrameGenerator::setBoneProperties(AKMSSDKSkeletonBone &mssdkSkel
 	//invert Y
 	mssdkSkeletonBone.skeletonBone->orientation.absoluteOrientationMatrix.M22 *= -1.0;
 
+	mssdkSkeletonBone.skeletonBone->startJointNameIndex = startJointNameIndex;
+	mssdkSkeletonBone.skeletonBone->endJointNameIndex = endJointNameIndex;
+	mssdkSkeletonBone.skeletonBone->parentBoneNameIndex = parentBoneNameIndex;
 }
 
 FREObject AKMSSDKUserFrameGenerator::getFREObject()
 {
-	return _mssdkUserFrame->asFREObject();
+	FREObject freUserFrame, freUsers;
+
+	FRENewObject( (const uint8_t*) _asUserFrameClass, 0, NULL, &freUserFrame, NULL);
+
+	FRESetObjectProperty(freUserFrame, (const uint8_t*) "frameNumber", createFREObjectForUnsignedInt(_userFrame->frameNumber), NULL);
+	FRESetObjectProperty(freUserFrame, (const uint8_t*) "timeStamp", createFREObjectForUnsignedInt(_userFrame->timeStamp), NULL);
+    
+	FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.User>", 0, NULL, &freUsers, NULL);
+
+	int trackedSkeletons = 0;
+	for(int i = 0; i < _userFrame->maxSkeletons; i++)
+	{
+		AKMSSDKUser* user = &_mssdkUserFrame->mssdkUsers[i];
+		if(user->user->isTracking)
+		{
+			FREObject freUser, freJoints, freBones;
+
+			FRENewObject( (const uint8_t*) _asUserClass, 0, NULL, &freUser, NULL);
+
+			FRESetObjectProperty(freUser, (const uint8_t*) "framework", createFREObjectForUTF8(_framework), NULL);
+			FRESetObjectProperty(freUser, (const uint8_t*) "userID", createFREObjectForUnsignedInt(user->user->userID), NULL);
+			FRESetObjectProperty(freUser, (const uint8_t*) "trackingID", createFREObjectForUnsignedInt(user->user->trackingID), NULL);
+			FRESetObjectProperty(freUser, (const uint8_t*) "position", user->user->position.asFREObject(), NULL);
+			FRESetObjectProperty(freUser, (const uint8_t*) "hasSkeleton", createFREObjectForBool(user->user->hasSkeleton), NULL);
+
+			FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.SkeletonJoint>", 0, NULL, &freJoints, NULL);
+
+			for(int j = 0; j < user->user->numJoints; j++)
+			{
+				AKMSSDKSkeletonJoint* skeletonJoint = &user->mssdkSkeletonJoints[j];
+
+				FREObject freJoint;
+				FRENewObject( (const uint8_t*) _asJointClass, 0, NULL, &freJoint, NULL);
+
+				FRESetObjectProperty(freJoint, (const uint8_t*) "name", createFREObjectForUTF8(_jointNames[skeletonJoint->skeletonJoint->jointNameIndex]), NULL);
+				FRESetObjectProperty(freJoint, (const uint8_t*) "position", skeletonJoint->skeletonJoint->position.asFREObject(), NULL);
+				FRESetObjectProperty(freJoint, (const uint8_t*) "positionConfidence", createFREObjectForDouble(skeletonJoint->skeletonJoint->positionConfidence), NULL);
+				
+				FRESetObjectProperty(freJoint, (const uint8_t*) "nativeHierarchicalRotationQuaternion", skeletonJoint->hierarchicalRotationQuaternion.asFREObject(), NULL);
+				FRESetObjectProperty(freJoint, (const uint8_t*) "nativeHierarchicalRotationMatrix", skeletonJoint->hierarchicalRotationMatrix.asFREObject(), NULL);
+				FRESetObjectProperty(freJoint, (const uint8_t*) "nativeAbsoluteRotationQuaternion", skeletonJoint->absoluteRotationQuaternion.asFREObject(), NULL);
+				FRESetObjectProperty(freJoint, (const uint8_t*) "nativeAbsoluteRotationMatrix", skeletonJoint->absoluteRotationMatrix.asFREObject(), NULL);
+				
+				FRESetArrayElementAt(freJoints, j, freJoint);
+			}
+
+			FRESetObjectProperty(freUser, (const uint8_t*) "skeletonJoints", freJoints, NULL);
+
+			FRENewObject( (const uint8_t*) "Vector.<com.as3nui.nativeExtensions.air.kinect.data.SkeletonBone>", 0, NULL, &freBones, NULL);
+
+			for(int j = 0; j < user->user->numBones; j++)
+			{
+				AKMSSDKSkeletonBone* skeletonBone = &user->mssdkSkeletonBones[j];
+				FREObject freBone;
+				FRENewObject( (const uint8_t*) _asBoneClass, 0, NULL, &freBone, NULL);
+
+				FRESetObjectProperty(freBone, (const uint8_t*) "name", createFREObjectForUTF8(_boneNames[skeletonBone->skeletonBone->boneNameIndex]), NULL);
+				FRESetObjectProperty(freBone, (const uint8_t*) "orientation", skeletonBone->skeletonBone->orientation.asFREObject(), NULL);
+				
+				if(skeletonBone->skeletonBone->startJointNameIndex > -1) 
+					FRESetObjectProperty(freBone, (const uint8_t*) "startJointName", createFREObjectForUTF8(_jointNames[skeletonBone->skeletonBone->startJointNameIndex]), NULL);
+				
+				if(skeletonBone->skeletonBone->endJointNameIndex > -1) 
+					FRESetObjectProperty(freBone, (const uint8_t*) "endJointName", createFREObjectForUTF8(_jointNames[skeletonBone->skeletonBone->endJointNameIndex]), NULL);
+				
+				if(skeletonBone->skeletonBone->parentBoneNameIndex > -1) 
+					FRESetObjectProperty(freBone, (const uint8_t*) "parentBoneName", createFREObjectForUTF8(_boneNames[skeletonBone->skeletonBone->parentBoneNameIndex]), NULL);
+
+				FRESetArrayElementAt(freBones, j, freBone);
+			}
+
+			FRESetObjectProperty(freUser, (const uint8_t*) "skeletonBones", freBones, NULL);
+
+			FRESetObjectProperty(freUser, (const uint8_t*) "skeletonJointNameIndices", freGetSkeletonJointNameIndices(), NULL);
+			FRESetObjectProperty(freUser, (const uint8_t*) "skeletonJointNames", freGetSkeletonJointNames(), NULL);
+
+			FRESetObjectProperty(freUser, (const uint8_t*) "skeletonBoneNameIndices", freGetSkeletonBoneNameIndices(), NULL);
+			FRESetObjectProperty(freUser, (const uint8_t*) "skeletonBoneNames", freGetSkeletonBoneNames(), NULL);
+
+			FRESetArrayElementAt(freUsers, trackedSkeletons, freUser);
+			trackedSkeletons++;
+		}
+	}
+
+	FRESetObjectProperty(freUserFrame, (const uint8_t*) "users", freUsers, NULL);
+
+	return freUserFrame;
 }
 
 #endif

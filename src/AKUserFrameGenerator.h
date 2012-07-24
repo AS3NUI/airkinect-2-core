@@ -10,6 +10,7 @@
 #endif
 
 #include <stdlib.h>
+#include "AKUtilityFunctions.h"
 #include "Data/AKUserFrame.h"
 
 class AKUserFrameGenerator
@@ -70,6 +71,11 @@ protected:
 	AKUserFrame* _userFrame;
 	virtual void allocateUserFrame();
 	virtual void deallocateUserFrame();
+
+	virtual FREObject freGetSkeletonJointNameIndices();
+	virtual FREObject freGetSkeletonJointNames();
+	virtual FREObject freGetSkeletonBoneNameIndices();
+	virtual FREObject freGetSkeletonBoneNames();
 };
 
 #endif

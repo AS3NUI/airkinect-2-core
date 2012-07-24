@@ -23,31 +23,6 @@ typedef struct _AKOpenNIUser
 	AKOpenNISkeletonJoint* openNISkeletonJoints;
 	AKOpenNISkeletonBone* openNISkeletonBones;
 
-	FREObject asFREObject()
-	{
-		FREObject freUser = user->asFREObjectWithoutJoints();
-
-		FREObject freJoints;
-		FREGetObjectProperty(freUser, (const uint8_t*) "skeletonJoints", &freJoints, NULL);
-		for(int i = 0; i < this->user->numJoints; i++)
-		{
-			FREObject freJoint = this->openNISkeletonJoints[i].asFREObject();
-			FRESetArrayElementAt(freJoints, i, freJoint);
-		}
-		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonJoints", freJoints, NULL);
-
-		FREObject freBones;
-		FREGetObjectProperty(freUser, (const uint8_t*) "skeletonBones", &freBones, NULL);
-		for(int i = 0; i < this->user->numBones; i++)
-		{
-			FREObject freBone = this->openNISkeletonBones[i].asFREObject();
-			FRESetArrayElementAt(freBones, i, freBone);
-		}
-		FRESetObjectProperty(freUser, (const uint8_t*) "skeletonBones", freBones, NULL);
-
-		return freUser;
-	};
-
 } AKOpenNIUser;
 #endif _AKOpenNIUser_
 

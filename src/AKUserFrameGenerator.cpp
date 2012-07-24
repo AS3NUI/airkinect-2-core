@@ -24,29 +24,21 @@ AKUserFrameGenerator::~AKUserFrameGenerator()
 void AKUserFrameGenerator::allocateUserFrame()
 {
 	_userFrame = new AKUserFrame();
-	_userFrame->asUserFrameClass = _asUserFrameClass;
 	_userFrame->users = new AKUser[_maxSkeletons];
-	_userFrame->jointNames = _jointNames;
 	_userFrame->maxSkeletons = _maxSkeletons;
 	for(int i = 0; i < _maxSkeletons; i++)
 	{
-		_userFrame->users[i].asUserClass = _asUserClass;
-		_userFrame->users[i].framework = _framework;
 		_userFrame->users[i].skeletonJoints = new AKSkeletonJoint[_numJoints];
-		_userFrame->users[i].jointNames = _jointNames;
 		_userFrame->users[i].numJoints = _numJoints;
 		for(int j = 0; j < _numJoints; j++)
 		{
-			_userFrame->users[i].skeletonJoints[j].asJointClass = _asJointClass;
-			_userFrame->users[i].skeletonJoints[j].jointName = _jointNames[j];
+			_userFrame->users[i].skeletonJoints[j].jointNameIndex = j;
 		}
 		_userFrame->users[i].skeletonBones = new AKSkeletonBone[_numBones];
-		_userFrame->users[i].boneNames = _boneNames;
 		_userFrame->users[i].numBones = _numBones;
 		for(int j = 0; j < _numBones; j++)
 		{
-			_userFrame->users[i].skeletonBones[j].asBoneClass = _asBoneClass;
-			_userFrame->users[i].skeletonBones[j].boneName = _boneNames[j];
+			_userFrame->users[i].skeletonBones[j].boneNameIndex = j;
 		}
 	}
 }
@@ -125,4 +117,52 @@ void AKUserFrameGenerator::generateUserFrame()
 FREObject AKUserFrameGenerator::getFREObject()
 {
 	return NULL;
+}
+
+FREObject AKUserFrameGenerator::freGetSkeletonJointNameIndices()
+{
+	FREObject skeletonJointNameIndices, jointIndex;
+	FRENewObject( (const uint8_t*) "flash.utils.Dictionary", 0, NULL, &skeletonJointNameIndices, NULL);
+	for(int i = 0; i < _numJoints; i++)
+	{
+		FRENewObjectFromUint32(i, &jointIndex);
+		FRESetObjectProperty(skeletonJointNameIndices, (const uint8_t*) _jointNames[i], jointIndex, NULL);
+	}
+	return skeletonJointNameIndices;
+}
+
+FREObject AKUserFrameGenerator::freGetSkeletonJointNames()
+{ 
+	FREObject skeletonJointNames, skeletonJointName;
+	FRENewObject( (const uint8_t*) "Vector.<String>", 0, NULL, &skeletonJointNames, NULL);
+	for(int i = 0; i < _numJoints; i++)
+	{
+		FRENewObjectFromUTF8(strlen(_jointNames[i]), (const uint8_t*) _jointNames[i], &skeletonJointName);
+		FRESetArrayElementAt(skeletonJointNames, i, skeletonJointName);
+	}
+	return skeletonJointNames;
+}
+
+FREObject AKUserFrameGenerator::freGetSkeletonBoneNameIndices()
+{
+	FREObject skeletonBoneNameIndices, boneIndex;
+	FRENewObject( (const uint8_t*) "flash.utils.Dictionary", 0, NULL, &skeletonBoneNameIndices, NULL);
+	for(int i = 0; i < _numBones; i++)
+	{
+		FRENewObjectFromUint32(i, &boneIndex);
+		FRESetObjectProperty(skeletonBoneNameIndices, (const uint8_t*) _boneNames[i], boneIndex, NULL);
+	}
+	return skeletonBoneNameIndices;
+}
+
+FREObject AKUserFrameGenerator::freGetSkeletonBoneNames()
+{ 
+	FREObject skeletonBoneNames, skeletonBoneName;
+	FRENewObject( (const uint8_t*) "Vector.<String>", 0, NULL, &skeletonBoneNames, NULL);
+	for(int i = 0; i < _numBones; i++)
+	{
+		FRENewObjectFromUTF8(strlen(_boneNames[i]), (const uint8_t*) _boneNames[i], &skeletonBoneName);
+		FRESetArrayElementAt(skeletonBoneNames, i, skeletonBoneName);
+	}
+	return skeletonBoneNames;
 }

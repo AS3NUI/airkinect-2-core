@@ -16,6 +16,35 @@ bool createBoolFromFREObject(FREObject freObject)
     return (value != 0);
 }
 
+FREObject createFREObjectForUTF8(const char* str)
+{
+	FREObject fre;
+	if(str != 0)
+		FRENewObjectFromUTF8(strlen(str), (const uint8_t*) str, &fre);
+	return fre;
+}
+
+FREObject createFREObjectForUnsignedInt(unsigned int i)
+{
+	FREObject fre;
+	FRENewObjectFromUint32(i, &fre);
+	return fre;
+}
+
+FREObject createFREObjectForDouble(double d)
+{
+	FREObject fre;
+	FRENewObjectFromDouble(d, &fre);
+	return fre;
+}
+
+FREObject createFREObjectForBool(bool b)
+{
+	FREObject fre;
+	FRENewObjectFromBool((b) ? 1 : 0, &fre);
+	return fre;
+}
+
 #ifdef AIRKINECT_TARGET_MSSDK
 NUI_IMAGE_RESOLUTION getNuiImageResolutionForGivenWidthAndHeight(int width, int height){
 	NUI_IMAGE_RESOLUTION rtnRes = NUI_IMAGE_RESOLUTION_320x240;

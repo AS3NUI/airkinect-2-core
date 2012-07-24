@@ -47,7 +47,7 @@ private:
 	void setJointProperties(AKOpenNISkeletonJoint &openNISkeletonJoint, XnUserID user, XnSkeletonJoint eJoint);
 	void calculatePosition(AKPosition &akPosition, XnPoint3D xnPosition);
 
-	void setBoneProperties(AKOpenNISkeletonBone &openNISkeletonBone, AKOpenNISkeletonJoint &jointWhichContainsOrientation, double xDegreesToAppend, double yDegreesToAppend, double zDegreesToAppend);
+	void setBoneProperties(AKOpenNISkeletonBone &openNISkeletonBone, AKOpenNISkeletonJoint &jointWhichContainsOrientation, double zDegreesCorrection, int startJointNameIndex, int endJointNameIndex, int parentBoneNameIndex);
 
 };
 
