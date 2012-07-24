@@ -133,12 +133,11 @@ FREObject AKUserFrameGenerator::freGetSkeletonJointNameIndices()
 
 FREObject AKUserFrameGenerator::freGetSkeletonJointNames()
 { 
-	FREObject skeletonJointNames, skeletonJointName;
+	FREObject skeletonJointNames;
 	FRENewObject( (const uint8_t*) "Vector.<String>", 0, NULL, &skeletonJointNames, NULL);
 	for(int i = 0; i < _numJoints; i++)
 	{
-		FRENewObjectFromUTF8(strlen(_jointNames[i]), (const uint8_t*) _jointNames[i], &skeletonJointName);
-		FRESetArrayElementAt(skeletonJointNames, i, skeletonJointName);
+		FRESetArrayElementAt(skeletonJointNames, i, createFREObjectForUTF8(_jointNames[i]));
 	}
 	return skeletonJointNames;
 }
@@ -157,12 +156,11 @@ FREObject AKUserFrameGenerator::freGetSkeletonBoneNameIndices()
 
 FREObject AKUserFrameGenerator::freGetSkeletonBoneNames()
 { 
-	FREObject skeletonBoneNames, skeletonBoneName;
+	FREObject skeletonBoneNames;
 	FRENewObject( (const uint8_t*) "Vector.<String>", 0, NULL, &skeletonBoneNames, NULL);
 	for(int i = 0; i < _numBones; i++)
 	{
-		FRENewObjectFromUTF8(strlen(_boneNames[i]), (const uint8_t*) _boneNames[i], &skeletonBoneName);
-		FRESetArrayElementAt(skeletonBoneNames, i, skeletonBoneName);
+		FRESetArrayElementAt(skeletonBoneNames, i, createFREObjectForUTF8(_boneNames[i]));
 	}
 	return skeletonBoneNames;
 }

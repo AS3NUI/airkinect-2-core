@@ -1,6 +1,7 @@
 #include "ExtensionConfig.h"
 #include "AKUtilityFunctions.h"
 #include <stdlib.h>
+#include <string.h>
 
 unsigned int createUnsignedIntFromFREObject(FREObject freObject)
 {
