@@ -38,6 +38,11 @@ package com.as3nui.nativeExtensions.air.kinect.data
 		 */ 
 		public var endJointName:String;
 		
+		/**
+		 * Name of the parent bone
+		 */ 
+		public var parentBoneName:String;
+		
 		public function SkeletonBone()
 		{
 		}
@@ -52,6 +57,7 @@ package com.as3nui.nativeExtensions.air.kinect.data
 			orientation.copyFrom(otherBone.orientation);
 			startJointName = otherBone.startJointName;
 			endJointName = otherBone.endJointName;
+			parentBoneName = otherBone.parentBoneName;
 		}
 	}
 }
