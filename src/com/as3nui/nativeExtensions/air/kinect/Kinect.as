@@ -101,9 +101,6 @@ package com.as3nui.nativeExtensions.air.kinect {
 	 *
 	 * <p>An instance of this class will give you access to the different video streams
 	 * and skeleton information of a Kinect sensor.</p>
-	 *
-	 * @includeExample BasicSkeletonExample.as
-	 * @includeExample BasicCameraExample.as
 	 */
 	public class Kinect extends EventDispatcher {
 		
