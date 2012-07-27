@@ -11,3 +11,5 @@ extension/*
 .fxpProperties
 
 .project
+
+bin/airkinect-2-core.swc
