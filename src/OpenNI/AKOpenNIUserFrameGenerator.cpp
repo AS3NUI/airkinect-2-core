@@ -45,7 +45,7 @@ AKOpenNIUserFrameGenerator::~AKOpenNIUserFrameGenerator()
 
 void AKOpenNIUserFrameGenerator::allocateJointNames()
 {
-	_jointNames = new char*[_numJoints];
+	_jointNames = new const char*[_numJoints];
 	_jointNames[AK_OPENNI_JOINT_INDEX_HEAD] = "head";
 	_jointNames[AK_OPENNI_JOINT_INDEX_NECK] = "neck";
 	_jointNames[AK_OPENNI_JOINT_INDEX_TORSO] = "torso";
@@ -78,7 +78,7 @@ void AKOpenNIUserFrameGenerator::deallocateJointNames()
 
 void AKOpenNIUserFrameGenerator::allocateBoneNames()
 {
-	_boneNames = new char*[_numBones];
+	_boneNames = new const char*[_numBones];
 	_boneNames[AK_OPENNI_BONE_INDEX_NECK] = "neck";
 	_boneNames[AK_OPENNI_BONE_INDEX_LEFT_UPPER_ARM] = "left_upper_arm";
 	_boneNames[AK_OPENNI_BONE_INDEX_LEFT_LOWER_ARM] = "left_lower_arm";

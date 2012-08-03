@@ -80,8 +80,8 @@ protected:
 	int _numBones;
 	int _maxSkeletons;
 	
-	char** _jointNames;
-	char** _boneNames;
+	const char** _jointNames;
+	const char** _boneNames;
 
 	AKUserFrame* _userFrame;
 	virtual void allocateUserFrame();

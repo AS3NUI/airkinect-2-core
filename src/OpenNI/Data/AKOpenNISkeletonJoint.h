@@ -32,7 +32,7 @@
 #ifndef _AKOpenNISkeletonJoint_
 #define _AKOpenNISkeletonJoint_
 
-typedef enum AkOpenniJointIndex
+typedef enum
 {
 	AK_OPENNI_JOINT_INDEX_HEAD = 0,
 	AK_OPENNI_JOINT_INDEX_NECK = 1,
@@ -53,7 +53,7 @@ typedef enum AkOpenniJointIndex
 	AK_OPENNI_JOINT_INDEX_RIGHT_HIP = 12,
 	AK_OPENNI_JOINT_INDEX_RIGHT_KNEE = 13,
 	AK_OPENNI_JOINT_INDEX_RIGHT_FOOT = 14
-};
+} AkOpenniJointIndex;
 
 typedef struct _AKOpenNISkeletonJoint
 {
@@ -63,7 +63,7 @@ typedef struct _AKOpenNISkeletonJoint
 	AKMatrix3D orientation;
 
 } AKOpenNISkeletonJoint;
-#endif _AKOpenNISkeletonJoint_
+#endif //_AKOpenNISkeletonJoint_
 
 #endif
 
