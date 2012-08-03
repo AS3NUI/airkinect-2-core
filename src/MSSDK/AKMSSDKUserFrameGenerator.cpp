@@ -81,7 +81,7 @@ void AKMSSDKUserFrameGenerator::deallocateBoneNames()
 void AKMSSDKUserFrameGenerator::allocateJointNamesForSeatedSkeletonTracking()
 {
 	_numJoints = 10;
-	_jointNames = new char*[_numJoints];
+	_jointNames = new const char*[_numJoints];
 	_jointNames[AK_MSSDK_SEATED_JOINT_INDEX_NECK] = "neck";
 	_jointNames[AK_MSSDK_SEATED_JOINT_INDEX_HEAD] = "head";
     
@@ -99,7 +99,7 @@ void AKMSSDKUserFrameGenerator::allocateJointNamesForSeatedSkeletonTracking()
 void AKMSSDKUserFrameGenerator::allocateJointNamesForRegularSkeletonTracking()
 {
 	_numJoints = 20;
-	_jointNames = new char*[_numJoints];
+	_jointNames = new const char*[_numJoints];
 	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_WAIST] = "waist";
 	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_TORSO] = "torso";
 	_jointNames[AK_MSSDK_REGULAR_JOINT_INDEX_NECK] = "neck";
@@ -129,7 +129,7 @@ void AKMSSDKUserFrameGenerator::allocateJointNamesForRegularSkeletonTracking()
 void AKMSSDKUserFrameGenerator::allocateBoneNamesForSeatedSkeletonTracking()
 {
 	_numBones = 9;
-	_boneNames = new char*[_numBones];
+	_boneNames = new const char*[_numBones];
 	_boneNames[AK_MSSDK_SEATED_BONE_INDEX_NECK] = "neck";
 
 	_boneNames[AK_MSSDK_SEATED_BONE_INDEX_LEFT_COLLAR] = "left_collar";
@@ -146,7 +146,7 @@ void AKMSSDKUserFrameGenerator::allocateBoneNamesForSeatedSkeletonTracking()
 void AKMSSDKUserFrameGenerator::allocateBoneNamesForRegularSkeletonTracking()
 {
 	_numBones = 19;
-	_boneNames = new char*[_numBones];
+	_boneNames = new const char*[_numBones];
 	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_NECK] = "neck";
 
 	_boneNames[AK_MSSDK_REGULAR_BONE_INDEX_LEFT_COLLAR] = "left_collar";
