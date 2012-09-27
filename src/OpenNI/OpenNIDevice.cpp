@@ -98,6 +98,8 @@ void OpenNIDevice::setDefaults()
 {
     KinectDevice::setDefaults();
     
+    frameRate = 30;
+    
     userCallbacksRegistered = false;
     
     depthGenerator = NULL;    
@@ -161,6 +163,20 @@ void OpenNIDevice::setDefaults()
     setUserColor(13, 0xff0000, 1);
 	setUserColor(14, 0x00ff00, 1);
 	setUserColor(15, 0x0000ff, 1);
+}
+
+void OpenNIDevice::setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored)
+{
+	//support higher resolution
+	if(asRGBWidth == 1280 && asRGBHeight == 960)
+	{
+		rgbWidth = 1280;
+        //openni works with 1024 height instead of 960
+		rgbHeight = 1024;
+        //asRGBHeight = 1024;
+        frameRate = 15;
+	}
+	KinectDevice::setRGBMode(rgbWidth, rgbHeight, asRGBWidth, asRGBHeight, asRGBMirrored);
 }
 
 void OpenNIDevice::setUserColor(int userID, int color, bool useIntensity)
@@ -334,47 +350,30 @@ void OpenNIDevice::run()
         dispatchInfoMessage((const uint8_t*) "Starting Device");
         XnStatus rc;
         
-        XnMapOutputMode depthMode;
-		depthMode.nXRes = depthImageBytesGenerator->getSourceWidth();
-		depthMode.nYRes = depthImageBytesGenerator->getSourceHeight();
-        depthMode.nFPS = 30;
+        bool needsDepthGenerator = (asDepthEnabled || asPointCloudEnabled);
+        bool needsImageGenerator = (asRGBEnabled || asUserMaskEnabled || asPointCloudEnabled);
+        bool needsUserGenerator = ((asDepthEnabled && asDepthShowUserColors) || asUserMaskEnabled || asUserEnabled || asSkeletonEnabled);
+        bool needsInfraredGenerator = asInfraredEnabled;
         
-        dispatchInfoMessage((const uint8_t*) "Creating Depth Generator");
-        rc = depthGenerator.Create(context);
-        if(rc != XN_STATUS_OK)
+        if(needsDepthGenerator)
         {
-            dispatchErrorMessage((const uint8_t*) "Create DepthGenerator Failed");
-        }
-        else
-        {
-            depthGeneratorCreated = true;
-            depthGenerator.SetMapOutputMode(depthMode);
-            depthGenerator.GetMirrorCap().SetMirror(false);
-        }
-        
-        //check if running is still true, as OpenNi takes a while to initialize
-        if(!running)
-        {
-            stop();
-            return;
-        }  
-        
-        XnMapOutputMode rgbMode;
-        rgbMode.nXRes = rgbImageBytesGenerator->getSourceWidth();
-        rgbMode.nYRes = rgbImageBytesGenerator->getSourceHeight();
-        rgbMode.nFPS = 30;
-        
-        dispatchInfoMessage((const uint8_t*) "Creating Image Generator");
-        rc = imageGenerator.Create(context);
-        if(rc != XN_STATUS_OK)
-        {
-            dispatchErrorMessage((const uint8_t*) "Create ImageGenerator Failed");
-        }
-        else
-        {
-            imageGeneratorCreated = true;
-            imageGenerator.SetMapOutputMode(rgbMode);
-            imageGenerator.GetMirrorCap().SetMirror(false);
+            XnMapOutputMode depthMode;
+            depthMode.nXRes = depthImageBytesGenerator->getSourceWidth();
+            depthMode.nYRes = depthImageBytesGenerator->getSourceHeight();
+            depthMode.nFPS = frameRate;
+            
+            dispatchInfoMessage((const uint8_t*) "Creating Depth Generator");
+            rc = depthGenerator.Create(context);
+            if(rc != XN_STATUS_OK)
+            {
+                dispatchErrorMessage((const uint8_t*) "Create DepthGenerator Failed");
+            }
+            else
+            {
+                depthGeneratorCreated = true;
+                depthGenerator.SetMapOutputMode(depthMode);
+                depthGenerator.GetMirrorCap().SetMirror(false);
+            }
         }
         
         //check if running is still true, as OpenNi takes a while to initialize
@@ -384,22 +383,25 @@ void OpenNIDevice::run()
             return;
         }
         
-        XnMapOutputMode infraredMode;
-        infraredMode.nXRes = infraredWidth;
-        infraredMode.nYRes = infraredHeight;
-        infraredMode.nFPS = 30;
-        
-        dispatchInfoMessage((const uint8_t*) "Creating Infrared Generator");
-        rc = infraredGenerator.Create(context);
-        if(rc != XN_STATUS_OK)
+        if(needsImageGenerator)
         {
-            dispatchErrorMessage((const uint8_t*) "Create Infrared Generator Failed");
-        }
-        else
-        {
-            infraredGeneratorCreated = true;
-            infraredGenerator.SetMapOutputMode(infraredMode);
-            infraredGenerator.GetMirrorCap().SetMirror(false);
+            XnMapOutputMode rgbMode;
+            rgbMode.nXRes = rgbImageBytesGenerator->getSourceWidth();
+            rgbMode.nYRes = rgbImageBytesGenerator->getSourceHeight();
+            rgbMode.nFPS = frameRate;
+            
+            dispatchInfoMessage((const uint8_t*) "Creating Image Generator");
+            rc = imageGenerator.Create(context);
+            if(rc != XN_STATUS_OK)
+            {
+                dispatchErrorMessage((const uint8_t*) "Create ImageGenerator Failed");
+            }
+            else
+            {
+                imageGeneratorCreated = true;
+                imageGenerator.SetMapOutputMode(rgbMode);
+                imageGenerator.GetMirrorCap().SetMirror(false);
+            }
         }
         
         //check if running is still true, as OpenNi takes a while to initialize
@@ -409,66 +411,54 @@ void OpenNIDevice::run()
             return;
         }
         
-        //map depth to rgb stream
+        if(needsInfraredGenerator)
+        {
+            XnMapOutputMode infraredMode;
+            infraredMode.nXRes = infraredWidth;
+            infraredMode.nYRes = infraredHeight;
+            infraredMode.nFPS = 30;
+            
+            dispatchInfoMessage((const uint8_t*) "Creating Infrared Generator");
+            rc = infraredGenerator.Create(context);
+            if(rc != XN_STATUS_OK)
+            {
+                dispatchErrorMessage((const uint8_t*) "Create Infrared Generator Failed");
+            }
+            else
+            {
+                infraredGeneratorCreated = true;
+                infraredGenerator.SetMapOutputMode(infraredMode);
+                infraredGenerator.GetMirrorCap().SetMirror(false);
+            }
+        }
+        
+        //check if running is still true, as OpenNi takes a while to initialize
+        if(!running)
+        {
+            stop();
+            return;
+        }
+        
+        //align depth to rgb stream
         if(depthGeneratorCreated && imageGeneratorCreated && depthGenerator.IsCapabilitySupported(XN_CAPABILITY_ALTERNATIVE_VIEW_POINT))
         {
             depthGenerator.GetAlternativeViewPointCap().SetViewPoint(imageGenerator);
         }
         
-        //initialize the user generator
-        dispatchInfoMessage((const uint8_t*) "Creating User Generator");
-        rc = userGenerator.Create(context);
-        if(rc != XN_STATUS_OK)
+        if(needsUserGenerator)
         {
-            dispatchErrorMessage((const uint8_t*) "Create Infrared Generator Failed");
-        }
-        else
-        {
-            userGeneratorCreated = true;
-        }
-        
-        //check if running is still true, as OpenNi takes a while to initialize
-        if(!running)
-        {
-            stop();
-            return;
-        }
-        
-        //register skeleton detection callbacks
-        userGenerator.RegisterUserCallbacks(newUserCallback, lostUserCallback, (xn::UserGenerator *)&userGenerator, userHandle);
-        userGenerator.RegisterToUserExit(userExitCallback, (xn::UserGenerator *)&userGenerator, userExitHandle);
-        userGenerator.RegisterToUserReEnter(userReentryCallback, (xn::UserGenerator *)&userGenerator, userReentryHandle);
-        userGenerator.GetSkeletonCap().RegisterToCalibrationStart(calibrationStartCallback, (xn::UserGenerator *)&userGenerator, calibrationStartHandle);
-        userGenerator.GetSkeletonCap().RegisterToCalibrationComplete(calibrationCompleteCallback, (xn::UserGenerator *)&userGenerator, calibrationCompleteHandle);
-        userGenerator.GetPoseDetectionCap().RegisterToPoseDetected(poseDetectedCallback, (xn::UserGenerator *)&userGenerator, poseDetectedHandle);
-        userGenerator.GetPoseDetectionCap().RegisterToOutOfPose(outOfPoseCallback, (xn::UserGenerator *)&userGenerator, outOfPoseHandle);
-        
-        userCallbacksRegistered = true;
-        
-        if (!userGenerator.IsCapabilitySupported(XN_CAPABILITY_SKELETON))
-        {
-			dispatchErrorMessage((const uint8_t*) "Supplied user generator doesn't support skeleton");
-        }
-        
-        if (userGenerator.GetSkeletonCap().NeedPoseForCalibration())
-        {
-            needPose = true;
-            if (!userGenerator.IsCapabilitySupported(XN_CAPABILITY_POSE_DETECTION))
+            //initialize the user generator
+            dispatchInfoMessage((const uint8_t*) "Creating User Generator");
+            rc = userGenerator.Create(context);
+            if(rc != XN_STATUS_OK)
             {
-				dispatchErrorMessage((const uint8_t*) "Pose required, but not supported");
+                dispatchErrorMessage((const uint8_t*) "Create Infrared Generator Failed");
             }
             else
             {
-                userGenerator.GetSkeletonCap().GetCalibrationPose(strPose);
+                userGeneratorCreated = true;
             }
         }
-        else
-        {
-            needPose = false;
-        }
-        
-        userGenerator.GetSkeletonCap().SetSkeletonProfile(XN_SKEL_PROFILE_ALL);
-        userGenerator.GetSkeletonCap().SetSmoothing(0.5f);
         
         //check if running is still true, as OpenNi takes a while to initialize
         if(!running)
@@ -477,7 +467,53 @@ void OpenNIDevice::run()
             return;
         }
         
-        if(depthGeneratorCreated && (asDepthEnabled || asPointCloudEnabled))
+        if(userGeneratorCreated)
+        {
+            //register skeleton detection callbacks
+            userGenerator.RegisterUserCallbacks(newUserCallback, lostUserCallback, (xn::UserGenerator *)&userGenerator, userHandle);
+            userGenerator.RegisterToUserExit(userExitCallback, (xn::UserGenerator *)&userGenerator, userExitHandle);
+            userGenerator.RegisterToUserReEnter(userReentryCallback, (xn::UserGenerator *)&userGenerator, userReentryHandle);
+            userGenerator.GetSkeletonCap().RegisterToCalibrationStart(calibrationStartCallback, (xn::UserGenerator *)&userGenerator, calibrationStartHandle);
+            userGenerator.GetSkeletonCap().RegisterToCalibrationComplete(calibrationCompleteCallback, (xn::UserGenerator *)&userGenerator, calibrationCompleteHandle);
+            userGenerator.GetPoseDetectionCap().RegisterToPoseDetected(poseDetectedCallback, (xn::UserGenerator *)&userGenerator, poseDetectedHandle);
+            userGenerator.GetPoseDetectionCap().RegisterToOutOfPose(outOfPoseCallback, (xn::UserGenerator *)&userGenerator, outOfPoseHandle);
+            
+            userCallbacksRegistered = true;
+            
+            if (!userGenerator.IsCapabilitySupported(XN_CAPABILITY_SKELETON))
+            {
+                dispatchErrorMessage((const uint8_t*) "Supplied user generator doesn't support skeleton");
+            }
+            
+            if (userGenerator.GetSkeletonCap().NeedPoseForCalibration())
+            {
+                needPose = true;
+                if (!userGenerator.IsCapabilitySupported(XN_CAPABILITY_POSE_DETECTION))
+                {
+                    dispatchErrorMessage((const uint8_t*) "Pose required, but not supported");
+                }
+                else
+                {
+                    userGenerator.GetSkeletonCap().GetCalibrationPose(strPose);
+                }
+            }
+            else
+            {
+                needPose = false;
+            }
+            
+            userGenerator.GetSkeletonCap().SetSkeletonProfile(XN_SKEL_PROFILE_ALL);
+            userGenerator.GetSkeletonCap().SetSmoothing(0.5f);
+        }
+        
+        //check if running is still true, as OpenNi takes a while to initialize
+        if(!running)
+        {
+            stop();
+            return;
+        }
+        
+        if(depthGeneratorCreated)
         {
             dispatchInfoMessage((const uint8_t*) "Starting Depth Generator");
             rc = depthGenerator.StartGenerating();
@@ -486,7 +522,7 @@ void OpenNIDevice::run()
                 dispatchErrorMessage((const uint8_t*) "Starting Depth Generator Failed");
             }
         }
-        if(imageGeneratorCreated && (asRGBEnabled || asUserMaskEnabled || asPointCloudEnabled))
+        if(imageGeneratorCreated)
         {
             dispatchInfoMessage((const uint8_t*) "Starting Image Generator");
             rc = imageGenerator.StartGenerating();
@@ -495,7 +531,7 @@ void OpenNIDevice::run()
                 dispatchErrorMessage((const uint8_t*) "Starting Image Generator Failed");
             }
         }
-        if(userGeneratorCreated && ((asDepthEnabled && asDepthShowUserColors) || asUserMaskEnabled || asUserEnabled || asSkeletonEnabled))
+        if(userGeneratorCreated)
         {
             dispatchInfoMessage((const uint8_t*) "Starting User Generator");
             rc = userGenerator.StartGenerating();
@@ -505,7 +541,7 @@ void OpenNIDevice::run()
             }
         }
         //you cant have both infrared and rgb
-        if(infraredGeneratorCreated && (asInfraredEnabled && !(imageGeneratorCreated && imageGenerator.IsGenerating())))
+        if(infraredGeneratorCreated && !(imageGeneratorCreated && imageGenerator.IsGenerating()))
         {
             dispatchInfoMessage((const uint8_t*) "Starting Infrared Generator");
             rc = infraredGenerator.StartGenerating();

@@ -538,7 +538,7 @@ void KinectDevice::setUserColor(int userID, int color, bool useIntensity)
 }
 
 void KinectDevice::setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored)
-{
+{   
 	rgbImageBytesGenerator->setSourceSize(rgbWidth, rgbHeight);
 	rgbImageBytesGenerator->setTargetSize(asRGBWidth, asRGBHeight);
 	rgbImageBytesGenerator->setTargetMirrored(asRGBMirrored);

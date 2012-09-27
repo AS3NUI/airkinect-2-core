@@ -53,6 +53,7 @@ public:
     
 protected:
     
+ 	void                    setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored);
 	void                    setUserColor(int userID, int color, bool useIntensity);
 	void					setDefaults();
 	void					cleanupByteArrays();
@@ -78,6 +79,8 @@ private:
     XnCallbackHandle        calibrationCompleteHandle;
     XnCallbackHandle        poseDetectedHandle;
     XnCallbackHandle        outOfPoseHandle;
+    
+    int                     frameRate;
     
     bool                    userCallbacksRegistered;
     

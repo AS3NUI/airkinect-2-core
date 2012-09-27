@@ -12,3 +12,6 @@ win-visualstudio/KinectExtension/Release
 win-visualstudio/KinectExtension/Release-MSSDK
 win-visualstudio/KinectExtension/Release-OpenNI
 win-visualstudio/KinectExtension.opensdf
+osx-xcode/.DS_Store
+
+bin/.DS_Store
