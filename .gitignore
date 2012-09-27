@@ -11,8 +11,6 @@ bin/airkinect-2-core.swc
 
 .settings/org.eclipse.core.resources.prefs
 
-build/*
-
 extension/*
 
 cert/*

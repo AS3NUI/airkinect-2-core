@@ -52,6 +52,16 @@ package com.as3nui.nativeExtensions.air.kinect {
 	[Event(name="stopped", type="com.as3nui.nativeExtensions.air.kinect.events.DeviceEvent")]
 	
 	/**
+	 * Dispatched when an error occurs on the device. This happens during the startup of the device.
+	 */ 
+	[Event(name="error", type="com.as3nui.nativeExtensions.air.kinect.events.DeviceErrorEvent")]
+	
+	/**
+	 * Dispatched when the device sends us extra info. This happens during the startup of the device.
+	 */ 
+	[Event(name="info", type="com.as3nui.nativeExtensions.air.kinect.events.DeviceInfoEvent")]
+	
+	/**
 	 * Dispatched when the depth bitmapdata is updated.
 	 */ 
 	[Event(name="depthImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent")]

@@ -38,12 +38,8 @@ You can use the instructions "Install OpenNI,NITE and the Sensor Driver" of the 
 
 You can use the instructions "Install OpenNI the short way" of the SimpleOpenNI project to get OpenNI up and running on your OSX machine: <http://code.google.com/p/simple-openni/wiki/Installation#OSX>.
 
-Alternatively, you can follow the instructions below:
+##Building Your Own ANE:
 
-1. Install XCode (required by Macports)
-2. Install Macports: <http://www.macports.org>
-3. Execute the following command in Terminal: `sudo port install libtool`
-4. Execute the following command in Terminal: `sudo port install libusb-devel +universal`
-5. Download & install OpenNI OSX binary (unstable): <http://www.openni.org/>
-6. Download & install Nite OSX binary (unstable): <http://www.openni.org/>
-7. Download & install SensorKinect: <https://github.com/avin2/SensorKinect>
+If you want to build your own ANE, there are ant build scripts in the build directory of this repository. You will need to modify the build.properties file with your own settings.
+
+Note that if you want a cross-platform ane file (windows & OSX), you will need to execute the ant build script on OSX. Creating the ANE on windows results in an ANE file that will only work on windows.
