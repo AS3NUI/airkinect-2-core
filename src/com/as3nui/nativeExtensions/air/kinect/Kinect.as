@@ -67,6 +67,11 @@ package com.as3nui.nativeExtensions.air.kinect {
 	[Event(name="depthImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent")]
 	
 	/**
+	 * Dispatched when the infrared bitmapdata is updated.
+	 */ 
+	[Event(name="infraredImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent")]
+	
+	/**
 	 * Dispatched when the rgb bitmapdata is updated.
 	 */ 
 	[Event(name="rgbImageUpdate", type="com.as3nui.nativeExtensions.air.kinect.events.CameraImageEvent")]
@@ -240,6 +245,11 @@ package com.as3nui.nativeExtensions.air.kinect {
 		protected var depthImageBytes:ByteArray;
 		/** @private */
 		protected var depthImageData:BitmapData;
+		
+		/** @private */
+		protected var infraredImageBytes:ByteArray;
+		/** @private */
+		protected var infraredImageData:BitmapData;
 
 		// RGB Variables
 		/** @private */
@@ -343,6 +353,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		protected function initSettings():void {
 			initRGBSettings();
 			initDepthSettings();
+			initInfraredSettings();
 			initPointCloudSettings();
 			initUserSettings();
 			initUserMaskSettings();
@@ -352,6 +363,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		protected function disposeSettings():void{
 			disposeRGBSettings();
 			disposeDepthSettings();
+			disposeInfraredSettings();
 			disposePointCloudSettings();
 			disposeUserSettings();
 			disposeUserMaskSettings();
@@ -408,6 +420,28 @@ package com.as3nui.nativeExtensions.air.kinect {
 		private function disposeDepthSettings():void {
 			depthImageBytes = null;
 			if(depthImageData) depthImageData.dispose();
+		}
+		
+		//----------------------------------
+		// Infrared Handlers
+		//----------------------------------
+		/** @private */
+		private function initInfraredSettings():void {
+			infraredImageBytes = new ByteArray();
+			infraredImageData = new BitmapData(_settings.infraredResolution.x, _settings.infraredResolution.y, true, 0x000000);
+			applyInfraredSettings()
+		}
+		
+		/** @private */
+		protected function applyInfraredSettings():void {
+			contextBridge.setInfraredEnabled(_nr, _settings.infraredEnabled);
+			contextBridge.setInfraredMode(_nr, _settings.infraredResolution.x, _settings.infraredResolution.y, _settings.infraredMirrored);
+		}
+		
+		/** @private */
+		private function disposeInfraredSettings():void {
+			infraredImageBytes = null;
+			if(infraredImageData) infraredImageData.dispose();
 		}
 
 		//----------------------------------
@@ -597,6 +631,9 @@ package com.as3nui.nativeExtensions.air.kinect {
 						case ExtensionContextBridge.EXTENSION_EVENT_DEPTH_FRAME_AVAILABLE:
 							handleDepthFrame();
 							break;
+						case ExtensionContextBridge.EXTENSION_EVENT_INFRARED_FRAME_AVAILABLE:
+							handleInfraredFrame();
+							break;
 						case ExtensionContextBridge.EXTENSION_EVENT_RGB_FRAME_AVAILABLE:
 							handleRGBFrame();
 							break;
@@ -652,6 +689,20 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 			//dispatch the event
 			dispatchEvent(new CameraImageEvent(CameraImageEvent.DEPTH_IMAGE_UPDATE, false, false, depthImageData));
+		}
+		
+		// -------------------------------------------
+		// Infrared Frame Event Handling
+		// -------------------------------------------
+		/** @private */
+		protected function handleInfraredFrame():void {
+			if (!hasEventListener(CameraImageEvent.INFRARED_IMAGE_UPDATE)) return;
+			contextBridge.getInfraredFrame(_nr, infraredImageBytes);
+			infraredImageBytes.position = 0;
+			infraredImageData.setPixels(infraredImageData.rect, infraredImageBytes);
+			
+			//dispatch the event
+			dispatchEvent(new CameraImageEvent(CameraImageEvent.INFRARED_IMAGE_UPDATE, false, false, infraredImageData));
 		}
 
 		// -------------------------------------------

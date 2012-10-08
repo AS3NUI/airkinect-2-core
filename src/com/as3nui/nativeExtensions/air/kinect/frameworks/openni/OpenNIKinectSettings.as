@@ -6,52 +6,14 @@
  */
 package com.as3nui.nativeExtensions.air.kinect.frameworks.openni {
 	import com.as3nui.nativeExtensions.air.kinect.KinectSettings;
-	import com.as3nui.nativeExtensions.air.kinect.constants.CameraResolution;
 	
-	import flash.geom.Point;
 	import flash.utils.describeType;
 
 	public class OpenNIKinectSettings extends KinectSettings {
-
-		private var _infraredEnabled:Boolean				= false;
-		private var _infraredResolution:Point				= CameraResolution.RESOLUTION_320_240;
-		private var _infraredMirrored:Boolean				= true;
-
-		public function get infraredEnabled():Boolean {
-			return _infraredEnabled;
-		}
-
-		public function set infraredEnabled(value:Boolean):void {
-			_infraredEnabled = value;
-		}
-
-		public function get infraredResolution():Point {
-			return _infraredResolution;
-		}
-
-		public function set infraredResolution(value:Point):void {
-			_infraredResolution = value;
-		}
-
-		public function get infraredMirrored():Boolean {
-			return _infraredMirrored;
-		}
-
-		public function set infraredMirrored(value:Boolean):void {
-			_infraredMirrored = value;
-		}
 		
 		override public function copyFrom(otherKinectSettings:KinectSettings):void
 		{
 			super.copyFrom(otherKinectSettings);
-			if(otherKinectSettings is OpenNIKinectSettings)
-			{
-				var otherOpenNIKinectSettings:OpenNIKinectSettings = otherKinectSettings as OpenNIKinectSettings;
-				
-				_infraredEnabled = otherOpenNIKinectSettings.infraredEnabled;
-				_infraredResolution.copyFrom(otherOpenNIKinectSettings.infraredResolution);
-				_infraredMirrored = otherOpenNIKinectSettings.infraredMirrored;
-			}
 		}
 		
 		override public function clone():KinectSettings

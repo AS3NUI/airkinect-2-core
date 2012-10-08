@@ -23,6 +23,7 @@ package com.as3nui.nativeExtensions.air.kinect.events
 		
 		public static const DEPTH_IMAGE_UPDATE:String = "depthImageUpdate";
 		public static const RGB_IMAGE_UPDATE:String = "rgbImageUpdate";
+		public static const INFRARED_IMAGE_UPDATE:String = "infraredImageUpdate";
 
 		public var imageData:BitmapData;
 		
