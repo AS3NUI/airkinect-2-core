@@ -141,10 +141,13 @@ protected:
 
 	bool						asNearModeEnabled;
 
+	bool						asInfraredEnabled;
+
 	bool						asRGBEnabled;
 
 	AKImageBytesGenerator*		rgbImageBytesGenerator;
 	AKImageBytesGenerator*		depthImageBytesGenerator;
+	AKImageBytesGenerator*		infraredImageBytesGenerator;
 
 	AKPointCloudGenerator*		pointCloudGenerator;
 	virtual void				createPointCloudGenerator();

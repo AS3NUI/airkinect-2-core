@@ -25,6 +25,7 @@
 #include "KinectDevice.h"
 #include "AKMSSDKRGBParser.h"
 #include "AKMSSDKDepthParser.h"
+#include "AKMSSDKInfraredParser.h"
 
 class MSKinectDevice : public KinectDevice
 {
@@ -39,6 +40,7 @@ public:
 
 	//Overridden FRE functions
 	FREObject			freSetDepthMode(FREObject argv[]);
+	FREObject			freSetInfraredMode(FREObject argv[]);
 
 	FREObject           freSetSkeletonMode(FREObject argv[]);
 	FREObject			freChooseSkeletons(FREObject argv[]);
@@ -75,20 +77,22 @@ private:
 	void                    run();
 
     HANDLE					depthFrameEvent;
+	HANDLE					infraredFrameEvent;
     HANDLE					rgbFrameEvent;
     HANDLE					userEvent;
 
 	HANDLE					userFrameHandle;
     HANDLE					depthFrameHandle;
+	HANDLE					infraredFrameHandle;
     HANDLE					rgbFrameHandle;
 
 	BYTE					*userIndexColors;
-    
-	//NUI_IMAGE_RESOLUTION	asDepthResolution;
+
 	NUI_IMAGE_RESOLUTION	depthResolution;
 	bool					depthPlayerIndexEnabled;
+
+	NUI_IMAGE_RESOLUTION	infraredResolution;
     
-	//NUI_IMAGE_RESOLUTION	asRGBResolution;
 	NUI_IMAGE_RESOLUTION	rgbResolution;
 
 	//Handlers
@@ -98,9 +102,13 @@ private:
 	void					readDepthFrame();
 	AKMSSDKDepthParser*		depthParser;
 
+	void					readInfraredFrame();
+	AKMSSDKInfraredParser*	infraredParser;
+
 	void					dispatchUserFrameIfNeeded();
 	void					dispatchRGBIfNeeded();
 	void					dispatchDepthIfNeeded();
+	void					dispatchInfraredIfNeeded();
 	void					dispatchPointCloudIfNeeded();
 	void					dispatchUserMaskIfNeeded();
 };

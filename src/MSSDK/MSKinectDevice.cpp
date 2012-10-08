@@ -31,7 +31,7 @@ MSKinectDevice::MSKinectDevice(int nr)
 	capabilities.hasCameraElevationSupport				= true;
 	capabilities.hasDepthCameraSupport					= true;
 	capabilities.hasDepthUserSupport					= true;
-	capabilities.hasInfraredSupport						= false;
+	capabilities.hasInfraredSupport						= true;
 	capabilities.hasJointOrientationConfidenceSupport	= false;
 	capabilities.hasJointOrientationSupport				= true;
 	capabilities.hasMultipleSensorSupport				= true;
@@ -128,6 +128,7 @@ void MSKinectDevice::setDefaults()
 
 	depthParser = new AKMSSDKDepthParser();
 	rgbParser = new AKMSSDKRGBParser();
+	infraredParser = new AKMSSDKInfraredParser();
 
 	//Player Index Coloring
 	userIndexColors = 0;
@@ -158,6 +159,15 @@ FREObject MSKinectDevice::freSetDepthMode(FREObject argv[])
 	lockDepthMutex();
 	depthResolution = getNuiImageResolutionForGivenWidthAndHeight(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
 	unlockDepthMutex();
+	return NULL;
+}
+
+FREObject MSKinectDevice::freSetInfraredMode(FREObject argv[])
+{
+	KinectDevice::freSetInfraredMode(argv);
+	lockInfraredMutex();
+	infraredResolution = getNuiImageResolutionForGivenWidthAndHeight(infraredImageBytesGenerator->getSourceWidth(), infraredImageBytesGenerator->getSourceHeight());
+	unlockInfraredMutex();
 	return NULL;
 }
 
@@ -319,6 +329,12 @@ void MSKinectDevice::stop()
 		depthFrameEvent = 0;
 	}
 
+	if( infraredFrameEvent && ( infraredFrameEvent != INVALID_HANDLE_VALUE ) ) 
+	{
+		CloseHandle( infraredFrameEvent );
+		infraredFrameEvent = 0;
+	}
+
 	if( rgbFrameEvent && ( rgbFrameEvent != INVALID_HANDLE_VALUE ) ) 
 	{
 		CloseHandle( rgbFrameEvent );
@@ -351,6 +367,10 @@ void MSKinectDevice::cleanupByteArrays()
 	if(depthParser != 0)
 		delete depthParser;
 	depthParser = 0;
+
+	if(infraredParser != 0)
+		delete infraredParser;
+	infraredParser = 0;
 
 	if(rgbParser != 0)
 		delete rgbParser;
@@ -405,6 +425,10 @@ void MSKinectDevice::run()
 				dwFlags |= NUI_INITIALIZE_FLAG_USES_SKELETON;
 			}
 			if(asRGBEnabled || asPointCloudEnabled || asUserMaskEnabled)
+			{
+				dwFlags |= NUI_INITIALIZE_FLAG_USES_COLOR;
+			}
+			if(asInfraredEnabled)
 			{
 				dwFlags |= NUI_INITIALIZE_FLAG_USES_COLOR;
 			}
@@ -475,6 +499,19 @@ void MSKinectDevice::run()
 			}
 		}
 
+		infraredFrameEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
+		//you cant have both infrared and rgb
+		if(asInfraredEnabled && !(asRGBEnabled || asPointCloudEnabled || asUserMaskEnabled)) {
+			dispatchInfoMessage((const uint8_t*) "Starting Infrared Camera");
+			hr = nuiSensor->NuiImageStreamOpen( NUI_IMAGE_TYPE_COLOR_INFRARED, infraredResolution, 0, 2, infraredFrameEvent, &infraredFrameHandle );
+			if ( FAILED(hr) ){
+				dispatchErrorMessage((const uint8_t*) "Failed to Initalize Infrared Camera");
+				running = false;
+				stop();
+				return;
+			}
+		}
+
 		depthFrameEvent	= CreateEvent( NULL, TRUE, FALSE, NULL );
 	
 		if(asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled) {
@@ -499,11 +536,11 @@ void MSKinectDevice::run()
 			}
 		}
 
-		if(asSkeletonEnabled || asRGBEnabled || asDepthEnabled || asPointCloudEnabled || asUserMaskEnabled){
+		if(asSkeletonEnabled || asRGBEnabled || asDepthEnabled || asInfraredEnabled || asPointCloudEnabled || asUserMaskEnabled){
 			dispatchInfoMessage((const uint8_t*) "Starting Kinect Thread");
 
-			const int numEvents = 3;
-			HANDLE hEvents[numEvents] = { depthFrameEvent, rgbFrameEvent, userEvent };
+			const int numEvents = 4;
+			HANDLE hEvents[numEvents] = { depthFrameEvent, infraredFrameEvent, rgbFrameEvent, userEvent };
 			int    nEventIdx;
 
 			started = true;
@@ -522,10 +559,14 @@ void MSKinectDevice::run()
 						dispatchUserMaskIfNeeded();
 						break;
 					case WAIT_OBJECT_0 +1:
+						readInfraredFrame();
+						dispatchInfraredIfNeeded();
+						break;
+					case WAIT_OBJECT_0 +2:
 						readRGBFrame();
 						dispatchRGBIfNeeded();
 						break;
-					case WAIT_OBJECT_0 +2:
+					case WAIT_OBJECT_0 +3:
 						dispatchUserFrameIfNeeded();
 						break;
 				}
@@ -575,6 +616,16 @@ void MSKinectDevice::readDepthFrame()
 	depthParser->parseData();
 }
 
+void MSKinectDevice::readInfraredFrame()
+{
+	infraredParser->setImageSize(infraredImageBytesGenerator->getSourceWidth(), infraredImageBytesGenerator->getSourceHeight());
+	infraredParser->setNuiSensor(nuiSensor);
+	infraredParser->setInfraredFrameTimeout(imageFrameTimeout);
+	infraredParser->setInfraredFrameHandle(infraredFrameHandle);
+
+	infraredParser->parseData();
+}
+
 void MSKinectDevice::dispatchRGBIfNeeded()
 {
 	if(asRGBEnabled)
@@ -596,6 +647,18 @@ void MSKinectDevice::dispatchDepthIfNeeded()
 		depthImageBytesGenerator->generateTargetBytes();
 		unlockDepthMutex();
 		dispatchStatusMessage((const uint8_t*) "depthFrame");
+	}
+}
+
+void MSKinectDevice::dispatchInfraredIfNeeded()
+{
+	if(asInfraredEnabled) 
+	{
+		lockInfraredMutex();
+		infraredImageBytesGenerator->setSourceBytes(infraredParser->getImageByteArray());
+		infraredImageBytesGenerator->generateTargetBytes();
+		unlockInfraredMutex();
+		dispatchStatusMessage((const uint8_t*) "infraredFrame");
 	}
 }
 

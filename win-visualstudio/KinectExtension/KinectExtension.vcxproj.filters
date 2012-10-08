@@ -156,6 +156,9 @@
     <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNISkeletonBone.h">
       <Filter>Header Files\OpenNI\Data</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKInfraredParser.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -223,6 +226,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\AKUtilityFunctions.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKInfraredParser.cpp">
+      <Filter>Source Files\MSSDK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

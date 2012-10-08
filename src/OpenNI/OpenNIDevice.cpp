@@ -189,56 +189,6 @@ void OpenNIDevice::setUserColor(int userID, int color, bool useIntensity)
     userIndexColors[userID - 1][3] = useIntensity ? 1.0f : 0.0f;
 }
 
-//START FRE FUNCTIONS
-
-FREObject OpenNIDevice::freSetInfraredMode(FREObject argv[])
-{
-    unsigned int width; FREGetObjectAsUint32(argv[1], &width);
-    unsigned int height; FREGetObjectAsUint32(argv[2], &height);
-    unsigned int mirrored; FREGetObjectAsBool(argv[3], &mirrored);
-    
-    lockInfraredMutex();
-    
-    asInfraredWidth = width;
-    asInfraredHeight = height;
-    asInfraredPixelCount = asInfraredWidth * asInfraredHeight;
-    asInfraredMirrored = (mirrored != 0);
-    infraredScale = infraredWidth / asInfraredWidth;
-    
-    if(asInfraredByteArray != 0) delete [] asInfraredByteArray;
-    asInfraredByteArray = new uint32_t[asInfraredPixelCount];
-    
-    unlockInfraredMutex();
-    return NULL;
-}
-
-FREObject OpenNIDevice::freSetInfraredEnabled(FREObject argv[])
-{
-    unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
-    asInfraredEnabled = (enabled != 0);
-    return NULL;
-}
-
-FREObject OpenNIDevice::freGetInfraredFrame(FREObject argv[])
-{
-    const unsigned int numInfraredBytes = asInfraredPixelCount * 4;
-    
-    FREObject objectByteArray = argv[1];
-    FREByteArray byteArray;			
-    FREObject length;
-    FRENewObjectFromUint32(numInfraredBytes, &length);
-    FRESetObjectProperty(objectByteArray, (const uint8_t*) "length", length, NULL);
-    FREAcquireByteArray(objectByteArray, &byteArray);
-    lockInfraredMutex();
-    memcpy(byteArray.bytes, asInfraredByteArray, numInfraredBytes);
-    unlockInfraredMutex();
-    FREReleaseByteArray(objectByteArray);
-    
-    return NULL;
-}
-
-// END FRE FUNCTIONS
-
 void OpenNIDevice::start()
 {
     printf("OpenNIDevice::start()\n");

@@ -47,10 +47,6 @@ public:
 	//Dispose the Device from memory
     void                    dispose();
     
-    FREObject               freSetInfraredMode(FREObject argv[]);
-    FREObject               freSetInfraredEnabled(FREObject argv[]);
-    FREObject               freGetInfraredFrame(FREObject argv[]);
-    
 protected:
     
  	void                    setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored);
@@ -88,19 +84,6 @@ private:
     
     float                   **userIndexColors;//[MAX_SKELETONS][4];
     
-    int                     asInfraredWidth;
-    int                     asInfraredHeight;
-    int                     asInfraredPixelCount;
-    bool                    asInfraredMirrored;
-    bool                    asInfraredEnabled;
-    
-    int                     infraredWidth;
-    int                     infraredHeight;
-    int                     infraredPixelCount;
-    int                     infraredScale;
-    
-    uint32_t                *asInfraredByteArray;
-    
     xn::ImageGenerator      imageGenerator;
     xn::DepthGenerator      depthGenerator;
     xn::UserGenerator       userGenerator;
@@ -120,8 +103,6 @@ private:
 	void					readDepthFrame();
 
 	AKOpenNIRGBParser*		rgbParser;
-    
-    const XnIRPixel         *infraredFrameBuffer;
 	AKOpenNIDepthParser*	depthParser;
 
 	void					dispatchRGBIfNeeded();

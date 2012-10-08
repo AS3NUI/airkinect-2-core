@@ -42,6 +42,7 @@ void KinectDevice::setDefaults()
 	asDepthEnabled = false;
     asDepthShowUserColors = false;
 	asNearModeEnabled = false;
+	asInfraredEnabled = false;
 	asRGBEnabled = false;
 	asUserMaskEnabled = false;
 	asPointCloudEnabled = false;
@@ -52,6 +53,11 @@ void KinectDevice::setDefaults()
 	depthImageBytesGenerator->setTargetSize(320, 240);
 	depthImageBytesGenerator->setTargetMirrored(false);
 	depthImageBytesGenerator->setSourceSize(640, 480);
+
+	infraredImageBytesGenerator = new AKImageBytesGenerator();
+	infraredImageBytesGenerator->setTargetSize(320, 240);
+	infraredImageBytesGenerator->setTargetMirrored(false);
+	infraredImageBytesGenerator->setSourceSize(640, 480);
 
 	rgbImageBytesGenerator = new AKImageBytesGenerator();
 
@@ -111,6 +117,10 @@ void KinectDevice::cleanupByteArrays()
 	if(depthImageBytesGenerator != 0) 
 		delete depthImageBytesGenerator;
 	depthImageBytesGenerator = 0;
+
+	if(infraredImageBytesGenerator != 0) 
+		delete infraredImageBytesGenerator;
+	infraredImageBytesGenerator = 0;
 
 	if(pointCloudGenerator != 0)
 		delete pointCloudGenerator;
@@ -336,16 +346,42 @@ FREObject KinectDevice::freGetRGBFrame(FREObject argv[])
     
     return NULL;
 }
+
 FREObject KinectDevice::freSetInfraredMode(FREObject argv[])
 {
-	return NULL;
-}
-FREObject KinectDevice::freSetInfraredEnabled(FREObject argv[])
-{
+    unsigned int width; FREGetObjectAsUint32(argv[1], &width);
+    unsigned int height; FREGetObjectAsUint32(argv[2], &height);
+    
+    lockInfraredMutex();
+	infraredImageBytesGenerator->setTargetSize(width, height);
+	infraredImageBytesGenerator->setTargetMirrored(createBoolFromFREObject(argv[3]));
+    unlockInfraredMutex();
+
     return NULL;
 }
+
+FREObject KinectDevice::freSetInfraredEnabled(FREObject argv[])
+{
+    unsigned int enabled; FREGetObjectAsBool(argv[1], &enabled);
+    asInfraredEnabled = (enabled != 0);
+    return NULL;
+}
+
 FREObject KinectDevice::freGetInfraredFrame(FREObject argv[])
 {
+    const unsigned int numInfraredBytes = infraredImageBytesGenerator->getTargetPixelCount() * 4;
+    
+    FREObject objectByteArray = argv[1];
+    FREByteArray byteArray;			
+    FREObject length;
+    FRENewObjectFromUint32(numInfraredBytes, &length);
+    FRESetObjectProperty(objectByteArray, (const uint8_t*) "length", length, NULL);
+    FREAcquireByteArray(objectByteArray, &byteArray);
+    lockInfraredMutex();
+	memcpy(byteArray.bytes, infraredImageBytesGenerator->getTargetBytes(), numInfraredBytes);
+    unlockInfraredMutex();
+    FREReleaseByteArray(objectByteArray);
+
 	return NULL;
 }
 FREObject KinectDevice::freSetPointCloudMode(FREObject argv[])
