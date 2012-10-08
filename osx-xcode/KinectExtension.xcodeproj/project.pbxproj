@@ -37,6 +37,10 @@
 		6C7023CE15B5E851002000A7 /* AKMSSDKUserFrameGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023CC15B5E851002000A7 /* AKMSSDKUserFrameGenerator.h */; };
 		6C7023D115B5E85C002000A7 /* AKOpenNIUserFrameGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7023CF15B5E85C002000A7 /* AKOpenNIUserFrameGenerator.cpp */; };
 		6C7023D215B5E85C002000A7 /* AKOpenNIUserFrameGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7023D015B5E85C002000A7 /* AKOpenNIUserFrameGenerator.h */; };
+		6C7A5FB216235B7700A684CB /* AKMSSDKInfraredParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7A5FB016235B7700A684CB /* AKMSSDKInfraredParser.cpp */; };
+		6C7A5FB316235B7700A684CB /* AKMSSDKInfraredParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7A5FB116235B7700A684CB /* AKMSSDKInfraredParser.h */; };
+		6C7A5FB816235BD000A684CB /* AKOpenNIInfraredParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6C7A5FB616235BD000A684CB /* AKOpenNIInfraredParser.cpp */; };
+		6C7A5FB916235BD000A684CB /* AKOpenNIInfraredParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6C7A5FB716235BD000A684CB /* AKOpenNIInfraredParser.h */; };
 		6CAA0B9A15B2E7330085D9CB /* AKMSSDKDepthParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CAA0B8D15B2E7330085D9CB /* AKMSSDKDepthParser.cpp */; };
 		6CAA0B9B15B2E7330085D9CB /* AKMSSDKDepthParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CAA0B8E15B2E7330085D9CB /* AKMSSDKDepthParser.h */; };
 		6CAA0B9C15B2E7330085D9CB /* AKMSSDKRGBParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CAA0B8F15B2E7330085D9CB /* AKMSSDKRGBParser.cpp */; };
@@ -104,6 +108,10 @@
 		6C7023CC15B5E851002000A7 /* AKMSSDKUserFrameGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKMSSDKUserFrameGenerator.h; sourceTree = "<group>"; };
 		6C7023CF15B5E85C002000A7 /* AKOpenNIUserFrameGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKOpenNIUserFrameGenerator.cpp; sourceTree = "<group>"; };
 		6C7023D015B5E85C002000A7 /* AKOpenNIUserFrameGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKOpenNIUserFrameGenerator.h; sourceTree = "<group>"; };
+		6C7A5FB016235B7700A684CB /* AKMSSDKInfraredParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKMSSDKInfraredParser.cpp; sourceTree = "<group>"; };
+		6C7A5FB116235B7700A684CB /* AKMSSDKInfraredParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKMSSDKInfraredParser.h; sourceTree = "<group>"; };
+		6C7A5FB616235BD000A684CB /* AKOpenNIInfraredParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKOpenNIInfraredParser.cpp; sourceTree = "<group>"; };
+		6C7A5FB716235BD000A684CB /* AKOpenNIInfraredParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKOpenNIInfraredParser.h; sourceTree = "<group>"; };
 		6CAA0B8D15B2E7330085D9CB /* AKMSSDKDepthParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKMSSDKDepthParser.cpp; sourceTree = "<group>"; };
 		6CAA0B8E15B2E7330085D9CB /* AKMSSDKDepthParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKMSSDKDepthParser.h; sourceTree = "<group>"; };
 		6CAA0B8F15B2E7330085D9CB /* AKMSSDKRGBParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKMSSDKRGBParser.cpp; sourceTree = "<group>"; };
@@ -231,6 +239,8 @@
 		6CAA0B8C15B2E7330085D9CB /* MSSDK */ = {
 			isa = PBXGroup;
 			children = (
+				6C7A5FB016235B7700A684CB /* AKMSSDKInfraredParser.cpp */,
+				6C7A5FB116235B7700A684CB /* AKMSSDKInfraredParser.h */,
 				6C7022FD15B8495300B8128A /* Data */,
 				6C7023CB15B5E851002000A7 /* AKMSSDKUserFrameGenerator.cpp */,
 				6C7023CC15B5E851002000A7 /* AKMSSDKUserFrameGenerator.h */,
@@ -264,6 +274,8 @@
 				6CAA0B9715B2E7330085D9CB /* AKOpenNIRGBParser.h */,
 				6CAA0B9815B2E7330085D9CB /* OpenNIDevice.cpp */,
 				6CAA0B9915B2E7330085D9CB /* OpenNIDevice.h */,
+				6C7A5FB616235BD000A684CB /* AKOpenNIInfraredParser.cpp */,
+				6C7A5FB716235BD000A684CB /* AKOpenNIInfraredParser.h */,
 			);
 			path = OpenNI;
 			sourceTree = "<group>";
@@ -378,6 +390,8 @@
 				6CE5B3B015BAAE9700D098AC /* AKSkeletonBone.h in Headers */,
 				6CE5B3B315BAAEA400D098AC /* AKMSSDKSkeletonBone.h in Headers */,
 				6CE5B3B515BAAEB200D098AC /* AKOpenNISkeletonBone.h in Headers */,
+				6C7A5FB316235B7700A684CB /* AKMSSDKInfraredParser.h in Headers */,
+				6C7A5FB916235BD000A684CB /* AKOpenNIInfraredParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -465,6 +479,8 @@
 				6C7023C915B5E847002000A7 /* AKUtilityFunctions.cpp in Sources */,
 				6C7023CD15B5E851002000A7 /* AKMSSDKUserFrameGenerator.cpp in Sources */,
 				6C7023D115B5E85C002000A7 /* AKOpenNIUserFrameGenerator.cpp in Sources */,
+				6C7A5FB216235B7700A684CB /* AKMSSDKInfraredParser.cpp in Sources */,
+				6C7A5FB816235BD000A684CB /* AKOpenNIInfraredParser.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

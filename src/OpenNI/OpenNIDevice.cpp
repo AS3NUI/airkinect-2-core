@@ -125,19 +125,7 @@ void OpenNIDevice::setDefaults()
 
 	rgbParser = new AKOpenNIRGBParser();
 	depthParser = new AKOpenNIDepthParser();
-    
-    asInfraredWidth = 320;
-    asInfraredHeight = 240;
-    asInfraredPixelCount = asInfraredWidth * asInfraredHeight;
-    asInfraredMirrored = false;
-    asInfraredEnabled = false;
-    
-    infraredWidth = 640;
-    infraredHeight = 480;
-    infraredPixelCount = infraredWidth * infraredHeight;
-    infraredScale = infraredWidth / asInfraredWidth;
-    
-    asInfraredByteArray = 0;
+    infraredParser = new AKOpenNIInfraredParser();
     
     //player index coloring
 	userIndexColors = new float*[userFrameGenerator->getMaxUsers()];
@@ -280,10 +268,10 @@ void OpenNIDevice::cleanupByteArrays()
 	if(depthParser != 0)
 		delete depthParser;
 	depthParser = 0;
-
-    if(asInfraredByteArray != 0) 
-		delete [] asInfraredByteArray;
-	asInfraredByteArray = 0;
+    
+    if(infraredParser != 0)
+		delete infraredParser;
+	infraredParser = 0;
 }
 
 void * OpenNIDevice::deviceThread(void *self)
@@ -364,8 +352,8 @@ void OpenNIDevice::run()
         if(needsInfraredGenerator)
         {
             XnMapOutputMode infraredMode;
-            infraredMode.nXRes = infraredWidth;
-            infraredMode.nYRes = infraredHeight;
+            infraredMode.nXRes = infraredImageBytesGenerator->getSourceWidth();
+            infraredMode.nYRes = infraredImageBytesGenerator->getSourceHeight();
             infraredMode.nFPS = 30;
             
             dispatchInfoMessage((const uint8_t*) "Creating Infrared Generator");
@@ -567,6 +555,13 @@ void OpenNIDevice::run()
 				readDepthFrame();
 				unlockDepthMutex();
 			}
+            
+            if(infraredGeneratorCreated && infraredGenerator.IsGenerating())
+            {
+                lockInfraredMutex();
+                readInfraredFrame();
+                unlockInfraredMutex();
+            }
 
 			dispatchRGBIfNeeded();
 			dispatchDepthIfNeeded();
@@ -593,6 +588,13 @@ void OpenNIDevice::readDepthFrame()
 	depthParser->setShowUserColors(asDepthShowUserColors);
 	depthParser->setUserIndexColors(userIndexColors);
 	depthParser->parseData();
+}
+
+void OpenNIDevice::readInfraredFrame()
+{
+    infraredParser->setImageSize(infraredImageBytesGenerator->getSourceWidth(), infraredImageBytesGenerator->getSourceHeight());
+    infraredParser->setInfraredMetaData(&infraredMetaData);
+    infraredParser->parseData();
 }
 
 void OpenNIDevice::dispatchRGBIfNeeded()
@@ -624,32 +626,8 @@ void OpenNIDevice::dispatchInfraredIfNeeded()
 	if(asInfraredEnabled && infraredGeneratorCreated && !(imageGeneratorCreated && imageGenerator.IsGenerating()))
     {
         lockInfraredMutex();
-        infraredFrameBuffer = infraredMetaData.Data();
-		uint32_t *depthRun = asInfraredByteArray;
-		int direction = asInfraredMirrored ? -1 : 1;
-		int directionFactor = asInfraredMirrored ? 1 : 0;
-    
-		unsigned int red, green, blue;
-		float value;
-    
-		for(int y = 0; y < asInfraredHeight; y++)
-		{
-			const XnIRPixel *pInfraredBuffer = infraredFrameBuffer + ((y + directionFactor) * (infraredWidth * infraredScale)) - directionFactor;
-        
-			for(int x = 0; x < asInfraredWidth; x++)
-			{
-				value = *pInfraredBuffer;
-            
-				red = ((int) (value * 1)) << 16;
-				green = ((int) (value * 1)) << 8;
-				blue = ((int) (value * 1));
-            
-				*depthRun = 0xff << 24 | (red + green + blue);
-            
-				pInfraredBuffer += (infraredScale * direction);
-				depthRun++;
-			}
-		}
+        infraredImageBytesGenerator->setSourceBytes(infraredParser->getImageByteArray());
+        infraredImageBytesGenerator->generateTargetBytes();
         unlockInfraredMutex();
         dispatchStatusMessage((const uint8_t*) "infraredFrame");
     }

@@ -32,6 +32,7 @@
 #include "PointCloudRegion.h"
 #include "AKOpenNIRGBParser.h"
 #include "AKOpenNIDepthParser.h"
+#include "AKOpenNIInfraredParser.h"
 
 class OpenNIDevice : KinectDevice
 {
@@ -101,9 +102,11 @@ private:
     
 	void					readRGBFrame();
 	void					readDepthFrame();
+    void                    readInfraredFrame();
 
 	AKOpenNIRGBParser*		rgbParser;
 	AKOpenNIDepthParser*	depthParser;
+    AKOpenNIInfraredParser* infraredParser;
 
 	void					dispatchRGBIfNeeded();
 	void					dispatchDepthIfNeeded();
