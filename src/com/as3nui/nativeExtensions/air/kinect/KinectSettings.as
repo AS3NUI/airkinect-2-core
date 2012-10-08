@@ -18,6 +18,10 @@ package com.as3nui.nativeExtensions.air.kinect {
 		private var _depthMirrored:Boolean 					= true;
 		
 		private var _nearModeEnabled:Boolean				= false;
+		
+		private var _infraredEnabled:Boolean				= false;
+		private var _infraredResolution:Point				= CameraResolution.RESOLUTION_320_240;
+		private var _infraredMirrored:Boolean				= true;
 
 		private var _rgbEnabled:Boolean 					= false;
 		private var _rgbResolution:Point 					= CameraResolution.RESOLUTION_640_480;
@@ -136,6 +140,30 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 		public function set depthMirrored(value:Boolean):void {
 			_depthMirrored = value;
+		}
+		
+		public function get infraredEnabled():Boolean {
+			return _infraredEnabled;
+		}
+		
+		public function set infraredEnabled(value:Boolean):void {
+			_infraredEnabled = value;
+		}
+		
+		public function get infraredResolution():Point {
+			return _infraredResolution;
+		}
+		
+		public function set infraredResolution(value:Point):void {
+			_infraredResolution = value;
+		}
+		
+		public function get infraredMirrored():Boolean {
+			return _infraredMirrored;
+		}
+		
+		public function set infraredMirrored(value:Boolean):void {
+			_infraredMirrored = value;
 		}
 
 		public function get rgbEnabled():Boolean {
