@@ -159,6 +159,9 @@
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKInfraredParser.h">
       <Filter>Header Files\MSSDK</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIInfraredParser.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -229,6 +232,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\MSSDK\AKMSSDKInfraredParser.cpp">
       <Filter>Source Files\MSSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIInfraredParser.cpp">
+      <Filter>Source Files\OpenNI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
