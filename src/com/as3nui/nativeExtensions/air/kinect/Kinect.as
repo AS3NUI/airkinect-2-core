@@ -357,6 +357,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 			initPointCloudSettings();
 			initUserSettings();
 			initUserMaskSettings();
+			initHandSettings();
 		}
 
 		/** @private */
@@ -367,6 +368,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 			disposePointCloudSettings();
 			disposeUserSettings();
 			disposeUserMaskSettings();
+			disposeHandSettings();
 		}
 
 		//----------------------------------
@@ -493,7 +495,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 			contextBridge.setUserEnabled(_nr, _settings.userEnabled);
 			contextBridge.setUserMode(_nr, _settings.userMirrored);
 			contextBridge.setSkeletonEnabled(_nr, _settings.skeletonEnabled);
-			contextBridge.setSkeletonMode(_nr, _settings.skeletonMirrored, _settings.seatedSkeletonEnabled, _settings.chooseSkeletonsEnabled);
+			contextBridge.setSkeletonMode(_nr, _settings.skeletonMirrored, _settings.seatedSkeletonEnabled, _settings.chooseSkeletonsEnabled, _settings.skeletonSmoothing);
 		}
 		/** @private */
 		private function disposeUserSettings():void {
@@ -524,6 +526,22 @@ package com.as3nui.nativeExtensions.air.kinect {
 		/** @private */
 		private function disposeUserMaskSettings():void {
 			userMaskByteArrays = null;
+		}
+		
+		//----------------------------------
+		// User/Skeleton Handlers
+		//----------------------------------
+		/** @private */
+		protected function initHandSettings():void {
+			applyHandSettings()
+		}
+		/** @private */
+		protected function applyHandSettings():void {
+			contextBridge.setHandTrackingEnabled(_nr, _settings.handTrackingEnabled);
+			contextBridge.setHandTrackingMode(_nr, _settings.handTrackingMirrored);
+		}
+		/** @private */
+		private function disposeHandSettings():void {
 		}
 
 		// -------------------------------------------
@@ -557,6 +575,14 @@ package com.as3nui.nativeExtensions.air.kinect {
 		 */ 
 		public function setSeatedSkeletonEnabled(value:Boolean):void {
 			_settings.seatedSkeletonEnabled = value;
+			applyUserSettings();
+		}
+		
+		/**
+		 * Change the skeleton smoothing factor while the device is running
+		 */ 
+		public function setSkeletonSmoothing(value:Number):void {
+			_settings.skeletonSmoothing = value;
 			applyUserSettings();
 		}
 		

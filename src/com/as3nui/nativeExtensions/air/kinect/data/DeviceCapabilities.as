@@ -34,6 +34,7 @@ package com.as3nui.nativeExtensions.air.kinect.data {
 		private var _hasNearModeSupport:Boolean							= false;
 		private var _hasSeatedSkeletonSupport:Boolean					= false;
 		private var _hasChooseSkeletonsSupport:Boolean					= false;
+		private var _hasHandTrackingSupport:Boolean						= false;
 
 		private var _maxSensors:uint									= 0;
 

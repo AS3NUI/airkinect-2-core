@@ -74,6 +74,10 @@ package com.as3nui.nativeExtensions.air.kinect.bridge
 		/** @private */
 		protected static const EXTENSION_REQUEST_SET_NEAR_MODE_ENABLED:String = "setNearModeEnabled";
 		/** @private */
+		protected static const EXTENSION_REQUEST_SET_HAND_TRACKING_MODE:String = "setHandTrackingMode";
+		/** @private */
+		protected static const EXTENSION_REQUEST_SET_HAND_TRACKING_ENABLED:String = "setHandTrackingEnabled";
+		/** @private */
 		protected static const EXTENSION_REQUEST_SET_RGB_MODE:String = "setRGBMode";
 		/** @private */
 		protected static const EXTENSION_REQUEST_SET_RGB_ENABLED:String = "setRGBEnabled";
@@ -182,6 +186,16 @@ package com.as3nui.nativeExtensions.air.kinect.bridge
 			context.call(EXTENSION_REQUEST_SET_NEAR_MODE_ENABLED, nr, enableNearMode);
 		}
 		
+		public function setHandTrackingEnabled(nr:uint, enabled:Boolean):void
+		{
+			context.call(EXTENSION_REQUEST_SET_HAND_TRACKING_ENABLED, nr, enabled);
+		}
+		
+		public function setHandTrackingMode(nr:uint, mirrored:Boolean):void
+		{
+			context.call(EXTENSION_REQUEST_SET_HAND_TRACKING_MODE, nr, mirrored);
+		}
+		
 		public function setPointcloudEnabled(nr:uint, enabled:Boolean):void
 		{
 			context.call(EXTENSION_REQUEST_SET_POINTCLOUD_ENABLED, nr, enabled);
@@ -212,9 +226,9 @@ package com.as3nui.nativeExtensions.air.kinect.bridge
 			context.call(EXTENSION_REQUEST_SET_SKELETON_ENABLED, nr, enabled);
 		}
 		
-		public function setSkeletonMode(nr:uint, mirrored:Boolean, seatedSkeletonEnabled:Boolean, chooseSkeletons:Boolean):void
+		public function setSkeletonMode(nr:uint, mirrored:Boolean, seatedSkeletonEnabled:Boolean, chooseSkeletons:Boolean, smoothing:Number):void
 		{
-			context.call(EXTENSION_REQUEST_SET_SKELETON_MODE, nr, mirrored, seatedSkeletonEnabled, chooseSkeletons);
+			context.call(EXTENSION_REQUEST_SET_SKELETON_MODE, nr, mirrored, seatedSkeletonEnabled, chooseSkeletons, smoothing);
 		}
 		
 		public function chooseSkeletons(nr:uint, trackingIds:Vector.<uint>):void
