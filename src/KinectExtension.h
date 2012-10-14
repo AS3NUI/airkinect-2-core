@@ -57,6 +57,9 @@ extern "C"
 
 	FREObject Kinect_setNearModeEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     
+    FREObject Kinect_setHandTrackingMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
+    FREObject Kinect_setHandTrackingEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
+    
     FREObject Kinect_setRGBMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_setRGBEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);
     FREObject Kinect_getRGBFrame(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[]);

@@ -154,6 +154,18 @@ extern "C"
         return kinectDeviceManager.getDevice(nr, ctx)->freSetNearModeEnabled(argv);
 	}
     
+    FREObject Kinect_setHandTrackingMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+    {
+        unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+        return kinectDeviceManager.getDevice(nr, ctx)->freSetHandTrackingMode(argv);
+    }
+    
+    FREObject Kinect_setHandTrackingEnabled(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
+    {
+        unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
+        return kinectDeviceManager.getDevice(nr, ctx)->freSetHandTrackingEnabled(argv);
+    }
+    
     FREObject Kinect_setRGBMode(FREContext ctx, void* funcData, uint32_t argc, FREObject argv[])
     {
         unsigned int nr; FREGetObjectAsUint32(argv[0], &nr);
@@ -255,6 +267,8 @@ extern "C"
         { (const uint8_t*) "getDepthFrame", 0, Kinect_getDepthFrame },
         { (const uint8_t*) "setDepthShowUserColors", 0, Kinect_setDepthShowUserColors },
 		{ (const uint8_t*) "setNearModeEnabled", 0, Kinect_setNearModeEnabled },
+		{ (const uint8_t*) "setHandTrackingMode", 0, Kinect_setHandTrackingMode },
+		{ (const uint8_t*) "setHandTrackingEnabled", 0, Kinect_setHandTrackingEnabled },
         { (const uint8_t*) "setRGBMode", 0, Kinect_setRGBMode },
         { (const uint8_t*) "setRGBEnabled", 0, Kinect_setRGBEnabled },
         { (const uint8_t*) "getRGBFrame", 0, Kinect_getRGBFrame },

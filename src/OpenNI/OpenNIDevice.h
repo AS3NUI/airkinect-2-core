@@ -30,11 +30,17 @@
 #include "KinectDevice.h"
 #include "KinectCapabilities.h"
 #include "PointCloudRegion.h"
-#include "AKOpenNIRGBParser.h"
-#include "AKOpenNIDepthParser.h"
-#include "AKOpenNIInfraredParser.h"
+#include "AKOpenNIRGBGenerator.h"
+#include "AKOpenNIDepthGenerator.h"
+#include "AKOpenNIIRGenerator.h"
+#include "AKOpenNIUserGenerator.h"
 
-class OpenNIDevice : KinectDevice
+class AKOpenNIRGBGenerator;
+class AKOpenNIDepthGenerator;
+class AKOpenNIIRGenerator;
+class AKOpenNIUserGenerator;
+
+class OpenNIDevice : public KinectDevice
 {
     static const int        MAX_DEPTH = 10000;
 public:
@@ -50,10 +56,11 @@ public:
     
 protected:
     
+    FREObject               freSetSkeletonMode(FREObject argv[]);
+    
  	void                    setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored);
 	void                    setUserColor(int userID, int color, bool useIntensity);
 	void					setDefaults();
-	void					cleanupByteArrays();
 	void					setNumJointsAndJointNames();
 
 	void					createPointCloudGenerator();
@@ -67,46 +74,14 @@ private:
     
     static void             *deviceThread(void *ptr);
     
-    int                     returnVal;
-    
-    XnCallbackHandle        userHandle;
-    XnCallbackHandle        userExitHandle;
-    XnCallbackHandle        userReentryHandle;
-    XnCallbackHandle        calibrationStartHandle;
-    XnCallbackHandle        calibrationCompleteHandle;
-    XnCallbackHandle        poseDetectedHandle;
-    XnCallbackHandle        outOfPoseHandle;
-    
     int                     frameRate;
-    
-    bool                    userCallbacksRegistered;
-    
-	void                    addJointElement(AKUser &kUser, XnUserID user, XnSkeletonJoint eJoint, uint32_t targetIndex);
     
     float                   **userIndexColors;//[MAX_SKELETONS][4];
     
-    xn::ImageGenerator      imageGenerator;
-    xn::DepthGenerator      depthGenerator;
-    xn::UserGenerator       userGenerator;
-    xn::IRGenerator         infraredGenerator;
-
-	bool					imageGeneratorCreated;
-	bool					depthGeneratorCreated;
-	bool					userGeneratorCreated;
-	bool					infraredGeneratorCreated;
-    
-    xn::ImageMetaData       imageMetaData;
-    xn::DepthMetaData       depthMetaData;
-    xn::SceneMetaData       sceneMetaData;
-    xn::IRMetaData          infraredMetaData;
-    
-	void					readRGBFrame();
-	void					readDepthFrame();
-    void                    readInfraredFrame();
-
-	AKOpenNIRGBParser*		rgbParser;
-	AKOpenNIDepthParser*	depthParser;
-    AKOpenNIInfraredParser* infraredParser;
+	AKOpenNIRGBGenerator*   rgbGenerator;
+	AKOpenNIDepthGenerator*	depthGenerator;
+    AKOpenNIIRGenerator*    irGenerator;
+    AKOpenNIUserGenerator*  userGenerator;
 
 	void					dispatchRGBIfNeeded();
 	void					dispatchDepthIfNeeded();

@@ -66,6 +66,8 @@ public:
     virtual FREObject           freGetDepthFrame(FREObject argv[]);
     virtual FREObject           freSetDepthShowUserColors(FREObject argv[]);
 	virtual FREObject			freSetNearModeEnabled(FREObject argv[]);
+    virtual FREObject           freSetHandTrackingMode(FREObject argv[]);
+    virtual FREObject           freSetHandTrackingEnabled(FREObject argv[]);
     virtual FREObject           freSetRGBMode(FREObject argv[]);
     virtual FREObject           freSetRGBEnabled(FREObject argv[]);
     virtual FREObject           freGetRGBFrame(FREObject argv[]);
@@ -78,6 +80,11 @@ public:
     virtual FREObject           freSetPointCloudRegions(FREObject argv[]);
 	virtual FREObject           freCameraElevationGetAngle(FREObject argv[]);
 	virtual FREObject           freCameraElevationSetAngle(FREObject argv[]);
+    
+    void						dispatchErrorMessage(const uint8_t* errorMessage);
+	void						dispatchInfoMessage(const uint8_t* infoMessage);
+	void						dispatchStatusMessage(const uint8_t* statusMessage);
+	void						trace(const uint8_t* traceMessage);
 
 protected:
 
@@ -108,11 +115,6 @@ protected:
 	FREContext					freContext;
 	KinectCapabilities			capabilities;
 
-	void						dispatchErrorMessage(const uint8_t* errorMessage);
-	void						dispatchInfoMessage(const uint8_t* infoMessage);
-	void						dispatchStatusMessage(const uint8_t* statusMessage);
-	void						trace(const uint8_t* traceMessage);
-
 	int							nr;
 	bool						running;
 	bool						started;
@@ -133,6 +135,7 @@ protected:
     bool						asSkeletonEnabled;
 	bool						asSeatedSkeletonEnabled;
 	bool						asChooseSkeletonsEnabled;
+    double                      asSkeletonSmoothing;
 
 	bool						asUserMaskEnabled;
 
@@ -140,6 +143,9 @@ protected:
     bool						asDepthShowUserColors;
 
 	bool						asNearModeEnabled;
+    
+    bool                        asHandTrackingMirrored;
+    bool                        asHandTrackingEnabled;
 
 	bool						asInfraredEnabled;
 

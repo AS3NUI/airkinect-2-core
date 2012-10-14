@@ -203,6 +203,29 @@ typedef struct _AKMatrix3D
 		this->M43 = M43;
 		this->M44 = M44;
 	};
+    
+    void identity()
+    {
+        this->M11 = 1.0;
+		this->M12 = 0.0;
+		this->M13 = 0.0;
+        this->M14 = 0.0;
+        
+		this->M21 = 0.0;
+		this->M22 = 1.0;
+        this->M23 = 0.0;
+        this->M24 = 0.0;
+        
+		this->M31 = 0.0;
+		this->M32 = 0.0;
+		this->M33 = 1.0;
+        this->M34 = 0.0;
+        
+        this->M41 = 0.0;
+        this->M42 = 0.0;
+        this->M43 = 0.0;
+        this->M44 = 1.0;
+    };
 
 	_AKMatrix3D operator* (const _AKMatrix3D &m2)
 	{

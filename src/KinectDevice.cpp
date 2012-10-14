@@ -39,9 +39,12 @@ void KinectDevice::setDefaults()
     asSkeletonEnabled = false;
 	asSeatedSkeletonEnabled = false;
 	asChooseSkeletonsEnabled = false;
+    asSkeletonSmoothing = 0.5;
 	asDepthEnabled = false;
     asDepthShowUserColors = false;
 	asNearModeEnabled = false;
+    asHandTrackingMirrored = false;
+    asHandTrackingEnabled = false;
 	asInfraredEnabled = false;
 	asRGBEnabled = false;
 	asUserMaskEnabled = false;
@@ -161,7 +164,7 @@ void KinectDevice::start()
 void KinectDevice::stop()
 {
 }
-    
+
 //Dispose the Device from memory
 void KinectDevice::dispose()
 {
@@ -194,6 +197,7 @@ FREObject KinectDevice::freSetSkeletonMode(FREObject argv[])
 	asSkeletonMirrored = createBoolFromFREObject(argv[1]);
 	asSeatedSkeletonEnabled = createBoolFromFREObject(argv[2]);
 	asChooseSkeletonsEnabled = createBoolFromFREObject(argv[3]);
+    asSkeletonSmoothing = createDoubleFromFREObject(argv[4]);
     return NULL;
 }
 FREObject KinectDevice::freSetSkeletonEnabled(FREObject argv[])
@@ -312,6 +316,16 @@ FREObject KinectDevice::freSetDepthShowUserColors(FREObject argv[])
 FREObject KinectDevice::freSetNearModeEnabled(FREObject argv[])
 {
     asNearModeEnabled = createBoolFromFREObject(argv[1]);
+    return NULL;
+}
+FREObject KinectDevice::freSetHandTrackingMode(FREObject argv[])
+{
+	asHandTrackingMirrored = createBoolFromFREObject(argv[1]);
+    return NULL;
+}
+FREObject KinectDevice::freSetHandTrackingEnabled(FREObject argv[])
+{
+    asHandTrackingEnabled = createBoolFromFREObject(argv[1]);
     return NULL;
 }
 FREObject KinectDevice::freSetRGBMode(FREObject argv[])

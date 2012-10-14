@@ -23,6 +23,7 @@
 #endif
 
 unsigned int createUnsignedIntFromFREObject(FREObject freObject);
+double createDoubleFromFREObject(FREObject freObject);
 bool createBoolFromFREObject(FREObject freObject);
 
 FREObject createFREObjectForUTF8(const char* str);

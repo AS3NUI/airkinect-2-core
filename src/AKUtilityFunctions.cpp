@@ -25,6 +25,13 @@ unsigned int createUnsignedIntFromFREObject(FREObject freObject)
 	return value;
 }
 
+double createDoubleFromFREObject(FREObject freObject)
+{
+	double value;
+	FREGetObjectAsDouble(freObject, &value);
+	return value;
+}
+
 bool createBoolFromFREObject(FREObject freObject)
 {
 	unsigned int value;

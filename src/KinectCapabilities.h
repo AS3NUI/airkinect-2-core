@@ -42,6 +42,7 @@ typedef struct {
 	bool			hasNearModeSupport;
 	bool			hasSeatedSkeletonSupport;
 	bool			hasChooseSkeletonsSupport;
+    bool            hasHandTrackingSupport;
     
 	unsigned int	maxSensors;
     
@@ -105,6 +106,9 @@ typedef struct {
 
 		FRENewObjectFromBool(hasChooseSkeletonsSupport, &freObject);
         FRESetObjectProperty(capabilities, (const uint8_t*)"hasChooseSkeletonsSupport", freObject, NULL);
+        
+        FRENewObjectFromBool(hasHandTrackingSupport, &freObject);
+        FRESetObjectProperty(capabilities, (const uint8_t*)"hasHandTrackingSupport", freObject, NULL);
         
         FRENewObjectFromUint32(maxSensors, &freObject);
         FRESetObjectProperty(capabilities, (const uint8_t*)"maxSensors", freObject, NULL);

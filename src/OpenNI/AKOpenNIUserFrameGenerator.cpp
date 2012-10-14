@@ -236,21 +236,8 @@ void AKOpenNIUserFrameGenerator::setJointProperties(AKOpenNISkeletonJoint& openN
     _userGenerator->GetSkeletonCap().GetSkeletonJointOrientation(user, eJoint, orientation);
 
 	openNISkeletonJoint.orientationConfidence = orientation.fConfidence;
-	if(openNISkeletonJoint.orientationConfidence == 0.0)
-	{
-		openNISkeletonJoint.orientation.M11 = 1.0;
-		openNISkeletonJoint.orientation.M12 = 0.0;
-		openNISkeletonJoint.orientation.M13 = 0.0;
-        
-		openNISkeletonJoint.orientation.M21 = 0.0;
-		openNISkeletonJoint.orientation.M22 = 1.0;
-		openNISkeletonJoint.orientation.M23 = 0.0;
-        
-		openNISkeletonJoint.orientation.M31 = 0.0;
-		openNISkeletonJoint.orientation.M32 = 0.0;
-		openNISkeletonJoint.orientation.M33 = 1.0;
-	}
-	else
+    openNISkeletonJoint.orientation.identity();
+	if(openNISkeletonJoint.orientationConfidence > 0.0)
 	{
 		openNISkeletonJoint.orientation.M11 = orientation.orientation.elements[0];
 		openNISkeletonJoint.orientation.M12 = orientation.orientation.elements[3];
@@ -264,15 +251,6 @@ void AKOpenNIUserFrameGenerator::setJointProperties(AKOpenNISkeletonJoint& openN
 		openNISkeletonJoint.orientation.M32 = orientation.orientation.elements[5];
 		openNISkeletonJoint.orientation.M33 = orientation.orientation.elements[8];
 	}
-
-	openNISkeletonJoint.orientation.M14 = 0.0;
-	openNISkeletonJoint.orientation.M24 = 0.0;
-	openNISkeletonJoint.orientation.M34 = 0.0;
-
-	openNISkeletonJoint.orientation.M41 = 0.0;
-	openNISkeletonJoint.orientation.M42 = 0.0;
-	openNISkeletonJoint.orientation.M43 = 0.0;
-	openNISkeletonJoint.orientation.M44 = 1.0;
 }
 
 void AKOpenNIUserFrameGenerator::addBoneElements(AKOpenNIUser &openNIUser, XnUserID userID)

@@ -45,6 +45,7 @@ MSKinectDevice::MSKinectDevice(int nr)
 	capabilities.hasNearModeSupport						= true;
 	capabilities.hasSeatedSkeletonSupport				= true;
 	capabilities.hasChooseSkeletonsSupport				= true;
+    capabilities.hasHandTrackingSupport                 = false;
 
 	capabilities.maxSensors								= 4;
 	capabilities.framework								= "mssdk";
