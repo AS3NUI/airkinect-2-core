@@ -19,6 +19,9 @@ package com.as3nui.nativeExtensions.air.kinect {
 		
 		private var _nearModeEnabled:Boolean				= false;
 		
+		private var _handTrackingEnabled:Boolean			= false;
+		private var _handTrackingMirrored:Boolean			= true;
+		
 		private var _infraredEnabled:Boolean				= false;
 		private var _infraredResolution:Point				= CameraResolution.RESOLUTION_320_240;
 		private var _infraredMirrored:Boolean				= true;
@@ -33,6 +36,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 		private var _skeletonMirrored:Boolean 				= true;
 		private var _seatedSkeletonEnabled:Boolean			= false;
 		private var _chooseSkeletonsEnabled:Boolean			= false;
+		private var _skeletonSmoothing:Number				= 0.5;
 
 		private var _pointCloudEnabled:Boolean				= false;
 		private var _pointCloudResolution:Point				= CameraResolution.RESOLUTION_320_240;
@@ -66,6 +70,10 @@ package com.as3nui.nativeExtensions.air.kinect {
 			_skeletonMirrored = otherKinectSettings.skeletonMirrored;
 			_seatedSkeletonEnabled = otherKinectSettings.seatedSkeletonEnabled;
 			_chooseSkeletonsEnabled = otherKinectSettings.chooseSkeletonsEnabled;
+			_skeletonSmoothing = otherKinectSettings.skeletonSmoothing;
+			
+			_handTrackingEnabled = otherKinectSettings.handTrackingEnabled;
+			_handTrackingMirrored = otherKinectSettings.handTrackingMirrored;
 			
 			_pointCloudEnabled = otherKinectSettings.pointCloudEnabled;
 			_pointCloudResolution.copyFrom(otherKinectSettings.pointCloudResolution);
@@ -140,6 +148,22 @@ package com.as3nui.nativeExtensions.air.kinect {
 
 		public function set depthMirrored(value:Boolean):void {
 			_depthMirrored = value;
+		}
+		
+		public function get handTrackingEnabled():Boolean {
+			return _handTrackingEnabled;
+		}
+		
+		public function set handTrackingEnabled(value:Boolean):void {
+			_handTrackingEnabled = value;
+		}
+		
+		public function get handTrackingMirrored():Boolean {
+			return _handTrackingMirrored;
+		}
+		
+		public function set handTrackingMirrored(value:Boolean):void {
+			_handTrackingMirrored = value;
 		}
 		
 		public function get infraredEnabled():Boolean {
@@ -236,6 +260,14 @@ package com.as3nui.nativeExtensions.air.kinect {
 		
 		public function set chooseSkeletonsEnabled(value:Boolean):void {
 			_chooseSkeletonsEnabled = value;
+		}
+		
+		public function get skeletonSmoothing():Number {
+			return _skeletonSmoothing;
+		}
+		
+		public function set skeletonSmoothing(value:Number):void {
+			_skeletonSmoothing = value;
 		}
 
 		public function get pointCloudEnabled():Boolean {

@@ -25,13 +25,15 @@ package com.as3nui.nativeExtensions.air.kinect.bridge
 		function setDepthMode(nr:uint, width:uint, height:uint, mirrored:Boolean):void;
 		function setDepthShowUserColors(nr:uint, showUserColors:Boolean):void;
 		function setNearModeEnabled(nr:uint, enableNearMode:Boolean):void;
+		function setHandTrackingEnabled(nr:uint, enabled:Boolean):void;
+		function setHandTrackingMode(nr:uint, mirrored:Boolean):void;
 		function setPointcloudEnabled(nr:uint, enabled:Boolean):void;
 		function setPointcloudMode(nr:uint, width:uint, height:uint, mirrored:Boolean, density:uint, includeRgb:Boolean):void;
 		function setPointCloudRegions(nr:uint, pointCloudRegions:Vector.<PointCloudRegion>):void;
 		function setUserEnabled(nr:uint, enabled:Boolean):void;
 		function setUserMode(nr:uint, mirrored:Boolean):void;
 		function setSkeletonEnabled(nr:uint, enabled:Boolean):void;
-		function setSkeletonMode(nr:uint, mirrored:Boolean, seatedSkeletonEnabled:Boolean, chooseSkeletons:Boolean):void;
+		function setSkeletonMode(nr:uint, mirrored:Boolean, seatedSkeletonEnabled:Boolean, chooseSkeletons:Boolean, smoothing:Number):void;
 		function chooseSkeletons(nr:uint, trackingIds:Vector.<uint>):void;
 		function setUserMaskEnabled(nr:uint, enabled:Boolean):void;
 		function setUserMaskMode(nr:uint, width:uint, height:uint, mirrored:Boolean):void;
