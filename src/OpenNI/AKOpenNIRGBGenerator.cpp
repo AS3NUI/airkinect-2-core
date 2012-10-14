@@ -7,6 +7,7 @@
 //
 
 #include "AKOpenNIRGBGenerator.h"
+#ifdef AIRKINECT_TARGET_OPENNI
 
 AKOpenNIRGBGenerator::AKOpenNIRGBGenerator(OpenNIDevice* device)
 {
@@ -144,3 +145,4 @@ int AKOpenNIRGBGenerator::getSourceHeight()
 {
     return _sourceHeight;
 }
+#endif

@@ -7,6 +7,7 @@
 //
 
 #include "AKOpenNIUserGenerator.h"
+#ifdef AIRKINECT_TARGET_OPENNI
 
 XnBool _needPose = FALSE;
 XnChar _strPose[20] = "";
@@ -320,3 +321,4 @@ void XN_CALLBACK_TYPE _calibrationCompleteCallback(xn::SkeletonCapability& rCapa
         delete buffer;
 	}
 }
+#endif

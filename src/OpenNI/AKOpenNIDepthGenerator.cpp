@@ -7,6 +7,7 @@
 //
 
 #include "AKOpenNIDepthGenerator.h"
+#ifdef AIRKINECT_TARGET_OPENNI
 
 AKOpenNIDepthGenerator::AKOpenNIDepthGenerator(OpenNIDevice* device)
 {
@@ -248,3 +249,4 @@ void AKOpenNIDepthGenerator::updateUserIndexColors(bool showUserColors, float** 
     _userIndexColors = userIndexColors;
     _sceneMetaData = sceneMetaData;
 }
+#endif

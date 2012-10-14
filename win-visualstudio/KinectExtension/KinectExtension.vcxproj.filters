@@ -75,17 +75,11 @@
     <ClInclude Include="..\..\src\OpenNI\OpenNIDevice.h">
       <Filter>Header Files\OpenNI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\OpenNI\AKOpenNIRGBParser.h">
-      <Filter>Header Files\OpenNI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKRGBParser.h">
       <Filter>Header Files\MSSDK</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKDepthParser.h">
       <Filter>Header Files\MSSDK</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\OpenNI\AKOpenNIDepthParser.h">
-      <Filter>Header Files\OpenNI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKPointCloudGenerator.h">
       <Filter>Header Files\MSSDK</Filter>
@@ -159,7 +153,16 @@
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKInfraredParser.h">
       <Filter>Header Files\MSSDK</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\OpenNI\AKOpenNIInfraredParser.h">
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIDepthGenerator.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIIRGenerator.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIRGBGenerator.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserGenerator.h">
       <Filter>Header Files\OpenNI</Filter>
     </ClInclude>
   </ItemGroup>
@@ -188,17 +191,11 @@
     <ClCompile Include="..\..\src\OpenNI\OpenNIDevice.cpp">
       <Filter>Source Files\OpenNI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\OpenNI\AKOpenNIRGBParser.cpp">
-      <Filter>Source Files\OpenNI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\MSSDK\AKMSSDKRGBParser.cpp">
       <Filter>Source Files\MSSDK</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\MSSDK\AKMSSDKDepthParser.cpp">
       <Filter>Source Files\MSSDK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\OpenNI\AKOpenNIDepthParser.cpp">
-      <Filter>Source Files\OpenNI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\MSSDK\AKMSSDKPointCloudGenerator.cpp">
       <Filter>Source Files\MSSDK</Filter>
@@ -233,7 +230,16 @@
     <ClCompile Include="..\..\src\MSSDK\AKMSSDKInfraredParser.cpp">
       <Filter>Source Files\MSSDK</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\OpenNI\AKOpenNIInfraredParser.cpp">
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIDepthGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIIRGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIRGBGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIUserGenerator.cpp">
       <Filter>Source Files\OpenNI</Filter>
     </ClCompile>
   </ItemGroup>
