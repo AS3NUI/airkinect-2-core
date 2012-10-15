@@ -244,6 +244,7 @@
     <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKUserFrame.h" />
     <ClInclude Include="..\..\src\MSSDK\MSKinectDevice.h" />
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIDepthGenerator.h" />
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIHardware.h" />
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIIRGenerator.h" />
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIPointCloudGenerator.h" />
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIRGBGenerator.h" />
@@ -276,6 +277,7 @@
     <ClCompile Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.cpp" />
     <ClCompile Include="..\..\src\MSSDK\MSKinectDevice.cpp" />
     <ClCompile Include="..\..\src\OpenNI\AKOpenNIDepthGenerator.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIHardware.cpp" />
     <ClCompile Include="..\..\src\OpenNI\AKOpenNIIRGenerator.cpp" />
     <ClCompile Include="..\..\src\OpenNI\AKOpenNIPointCloudGenerator.cpp" />
     <ClCompile Include="..\..\src\OpenNI\AKOpenNIRGBGenerator.cpp" />

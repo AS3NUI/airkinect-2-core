@@ -165,6 +165,9 @@
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserGenerator.h">
       <Filter>Header Files\OpenNI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIHardware.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -240,6 +243,9 @@
       <Filter>Source Files\OpenNI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\OpenNI\AKOpenNIUserGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIHardware.cpp">
       <Filter>Source Files\OpenNI</Filter>
     </ClCompile>
   </ItemGroup>
