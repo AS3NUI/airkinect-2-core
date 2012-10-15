@@ -33,7 +33,12 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
     this->context = context;
     
     //initialize the capabilities of this device
+#ifdef AIRKINECT_OS_OSX
+    capabilities.hasCameraElevationSupport				= true;
+#else
     capabilities.hasCameraElevationSupport				= false;
+#endif
+
     capabilities.hasDepthCameraSupport					= true;
     capabilities.hasDepthUserSupport					= true;
     capabilities.hasInfraredSupport						= true;
@@ -129,6 +134,10 @@ void OpenNIDevice::setDefaults()
     setUserColor(13, 0xff0000, 1);
 	setUserColor(14, 0x00ff00, 1);
 	setUserColor(15, 0x0000ff, 1);
+    
+#ifdef AIRKINECT_OS_OSX
+    hardware = new AKOpenNIHardware(this);
+#endif
 }
 
 FREObject OpenNIDevice::freSetSkeletonMode(FREObject argv[])
@@ -139,6 +148,34 @@ FREObject OpenNIDevice::freSetSkeletonMode(FREObject argv[])
         userGenerator->setSmoothing(asSkeletonSmoothing);
     }
     return NULL;
+}
+
+FREObject OpenNIDevice::freCameraElevationGetAngle(FREObject argv[])
+{
+	dispatchInfoMessage((const uint8_t*) "[OpenNIDevice] Camera Elevation Get Angle Called");
+	FREObject asCameraAngle;
+	long degrees = 0;
+	if(running)
+	{
+#ifdef AIRKINECT_OS_OSX
+        degrees = hardware->getTiltAngle();
+#endif
+	}
+	FRENewObjectFromInt32 ((int) degrees, &asCameraAngle );
+	return asCameraAngle;
+}
+
+FREObject OpenNIDevice::freCameraElevationSetAngle(FREObject argv[])
+{
+	dispatchInfoMessage((const uint8_t*) "[OpenNIDevice] Camera Elevation Set Angle Called");
+	if(running)
+	{
+		int degrees; FREGetObjectAsInt32(argv[1], &degrees);
+#ifdef AIRKINECT_OS_OSX
+        hardware->setTiltAngle(degrees);
+#endif
+	}
+	return NULL;
 }
 
 void OpenNIDevice::setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored)
@@ -188,6 +225,10 @@ void OpenNIDevice::stop()
     delete rgbGenerator;
     delete irGenerator;
     delete userGenerator;
+    
+#ifdef AIRKINECT_OS_OSX
+    delete hardware;
+#endif
 
     //cleanup bytearrays
 	cleanupByteArrays();
@@ -214,6 +255,10 @@ void OpenNIDevice::run()
     if(running)
     {  
         dispatchInfoMessage((const uint8_t*) "Starting Device");
+        
+#ifdef AIRKINECT_OS_OSX
+        hardware->setup();
+#endif
         
         bool needsDepthGenerator = (asDepthEnabled || asPointCloudEnabled);
         bool needsImageGenerator = (asRGBEnabled || asUserMaskEnabled || asPointCloudEnabled);
@@ -277,6 +322,10 @@ void OpenNIDevice::run()
             if(!depthGenerator->update()) break;
             if(!irGenerator->update()) break;
             if(!userGenerator->update()) break;
+            
+#ifdef AIRKINECT_OS_OSX
+            hardware->update();
+#endif
             
             lockRGBMutex();
             rgbGenerator->parse();

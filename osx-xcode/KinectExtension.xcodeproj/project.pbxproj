@@ -55,6 +55,9 @@
 		6CAA0BAD15B2E7450085D9CB /* AKImageBytesGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CAA0BA715B2E7450085D9CB /* AKImageBytesGenerator.h */; };
 		6CAC32AB162AC9D000C97307 /* AKOpenNIUserGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CAC32A9162AC9D000C97307 /* AKOpenNIUserGenerator.cpp */; };
 		6CAC32AC162AC9D000C97307 /* AKOpenNIUserGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CAC32AA162AC9D000C97307 /* AKOpenNIUserGenerator.h */; };
+		6CD1B3BB162C2765006D9939 /* AKOpenNIHardware.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CD1B3B9162C2765006D9939 /* AKOpenNIHardware.cpp */; };
+		6CD1B3BC162C2765006D9939 /* AKOpenNIHardware.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CD1B3BA162C2765006D9939 /* AKOpenNIHardware.h */; };
+		6CD1B3BF162C29E3006D9939 /* libusb-1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD1B3BE162C29E3006D9939 /* libusb-1.0.0.dylib */; };
 		6CD69E6215B4630000D1534A /* AKPointCloudGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CD69E5E15B4630000D1534A /* AKPointCloudGenerator.cpp */; };
 		6CD69E6315B4630000D1534A /* AKPointCloudGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 6CD69E5F15B4630000D1534A /* AKPointCloudGenerator.h */; };
 		6CD69E6415B4630000D1534A /* AKUserMasksGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CD69E6015B4630000D1534A /* AKUserMasksGenerator.cpp */; };
@@ -126,6 +129,9 @@
 		6CAA0BA715B2E7450085D9CB /* AKImageBytesGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKImageBytesGenerator.h; sourceTree = "<group>"; };
 		6CAC32A9162AC9D000C97307 /* AKOpenNIUserGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKOpenNIUserGenerator.cpp; sourceTree = "<group>"; };
 		6CAC32AA162AC9D000C97307 /* AKOpenNIUserGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKOpenNIUserGenerator.h; sourceTree = "<group>"; };
+		6CD1B3B9162C2765006D9939 /* AKOpenNIHardware.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKOpenNIHardware.cpp; sourceTree = "<group>"; };
+		6CD1B3BA162C2765006D9939 /* AKOpenNIHardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKOpenNIHardware.h; sourceTree = "<group>"; };
+		6CD1B3BE162C29E3006D9939 /* libusb-1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = "libusb-1.0.0.dylib"; sourceTree = "<group>"; };
 		6CD69E5E15B4630000D1534A /* AKPointCloudGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKPointCloudGenerator.cpp; sourceTree = "<group>"; };
 		6CD69E5F15B4630000D1534A /* AKPointCloudGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKPointCloudGenerator.h; sourceTree = "<group>"; };
 		6CD69E6015B4630000D1534A /* AKUserMasksGenerator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AKUserMasksGenerator.cpp; sourceTree = "<group>"; };
@@ -163,6 +169,7 @@
 				6CD9765714C85BF80061A00B /* libOpenNI.dylib in Frameworks */,
 				6C039C44153447250060F00E /* Adobe AIR.framework in Frameworks */,
 				6C68D786153583D900D2BF8E /* libboost_thread.a in Frameworks */,
+				6CD1B3BF162C29E3006D9939 /* libusb-1.0.0.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,6 +283,8 @@
 				6CA557FB162ABCB500B85A42 /* AKOpenNIIRGenerator.h */,
 				6CAC32A9162AC9D000C97307 /* AKOpenNIUserGenerator.cpp */,
 				6CAC32AA162AC9D000C97307 /* AKOpenNIUserGenerator.h */,
+				6CD1B3B9162C2765006D9939 /* AKOpenNIHardware.cpp */,
+				6CD1B3BA162C2765006D9939 /* AKOpenNIHardware.h */,
 			);
 			path = OpenNI;
 			sourceTree = "<group>";
@@ -340,6 +349,7 @@
 		6CD9765514C85BB70061A00B /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				6CD1B3BE162C29E3006D9939 /* libusb-1.0.0.dylib */,
 				6C68D785153583D900D2BF8E /* libboost_thread.a */,
 				6CD9765614C85BF80061A00B /* libOpenNI.dylib */,
 			);
@@ -392,6 +402,7 @@
 				6CA557F8162AA92600B85A42 /* AKOpenNIDepthGenerator.h in Headers */,
 				6CA557FD162ABCB500B85A42 /* AKOpenNIIRGenerator.h in Headers */,
 				6CAC32AC162AC9D000C97307 /* AKOpenNIUserGenerator.h in Headers */,
+				6CD1B3BC162C2765006D9939 /* AKOpenNIHardware.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -481,6 +492,7 @@
 				6CA557F7162AA92600B85A42 /* AKOpenNIDepthGenerator.cpp in Sources */,
 				6CA557FC162ABCB500B85A42 /* AKOpenNIIRGenerator.cpp in Sources */,
 				6CAC32AB162AC9D000C97307 /* AKOpenNIUserGenerator.cpp in Sources */,
+				6CD1B3BB162C2765006D9939 /* AKOpenNIHardware.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -575,6 +587,7 @@
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../external-libraries/boost\"",
 					"/usr/include/ni/**",
+					"/opt/local/include/libusb-1.0",
 				);
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
 				INFOPLIST_PREPROCESSOR_DEFINITIONS = "";
@@ -614,6 +627,7 @@
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../external-libraries/boost\"",
 					"/usr/include/ni/**",
+					"/opt/local/include/libusb-1.0",
 				);
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
 				INFOPLIST_PREPROCESSOR_DEFINITIONS = "";

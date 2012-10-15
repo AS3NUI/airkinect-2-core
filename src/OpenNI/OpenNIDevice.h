@@ -35,6 +35,13 @@
 #include "AKOpenNIIRGenerator.h"
 #include "AKOpenNIUserGenerator.h"
 
+#ifdef AIRKINECT_OS_OSX
+
+#include "AKOpenNIHardware.h"
+class AKOpenNIHardware;
+
+#endif
+
 class AKOpenNIRGBGenerator;
 class AKOpenNIDepthGenerator;
 class AKOpenNIIRGenerator;
@@ -57,6 +64,9 @@ public:
 protected:
     
     FREObject               freSetSkeletonMode(FREObject argv[]);
+    
+    FREObject               freCameraElevationGetAngle(FREObject argv[]);
+	FREObject               freCameraElevationSetAngle(FREObject argv[]);
     
  	void                    setRGBMode(int rgbWidth, int rgbHeight, int asRGBWidth, int asRGBHeight, bool asRGBMirrored);
 	void                    setUserColor(int userID, int color, bool useIntensity);
@@ -82,6 +92,10 @@ private:
 	AKOpenNIDepthGenerator*	depthGenerator;
     AKOpenNIIRGenerator*    irGenerator;
     AKOpenNIUserGenerator*  userGenerator;
+    
+#ifdef AIRKINECT_OS_OSX
+    AKOpenNIHardware*       hardware;
+#endif
 
 	void					dispatchRGBIfNeeded();
 	void					dispatchDepthIfNeeded();
