@@ -41,6 +41,7 @@
 AKOpenNIHardware::AKOpenNIHardware(OpenNIDevice* device)
 {
     _device = device;
+    dev = 0;
 }
 
 AKOpenNIHardware::~AKOpenNIHardware()
@@ -108,12 +109,6 @@ void AKOpenNIHardware::setup(int index)
     tilt_angle = getTiltAngle();
     if(tilt_angle < -30) tilt_angle = -30;
     if(tilt_angle > 30) tilt_angle = 30;
-	//setTiltAngle(0);	// leaving this reset out for now as that way installations
-	// do not need to be reset ever startup however can cause
-	// strange behaviour if the kinect is tilted in between
-	// application starts eg., the angle continues to be set
-	// even when app not running...which is odd...
-	
 }
 
 void AKOpenNIHardware::update()
@@ -180,18 +175,18 @@ void AKOpenNIHardware::setLedOption(uint16_t option)
 	if (ret != 0)
 	{
         char * buffer = new char[128];
-        sprintf(buffer, "Error in setting tilt angle, libusb_control_transfer returned %i", ret);
+        sprintf(buffer, "Error in setting led, libusb_control_transfer returned %i", ret);
         _device->dispatchErrorMessage((const uint8_t *)buffer);
         delete buffer;
 	}
 }
 
 void AKOpenNIHardware::shutDown() {
-	//setTiltAngle(0);	// leaving this reset out for now as that way installations
-    // do not need to be reset ever startup however can cause
-    // strange behaviour if the kinect is tilted in between
-    // application starts eg., the angle continues to be set
-    // even when app not running...which is odd...
+    if(dev != 0)
+    {
+        libusb_close(dev);
+        libusb_release_interface(dev, 0);
+    }
 	libusb_exit(ctx);
 }
 

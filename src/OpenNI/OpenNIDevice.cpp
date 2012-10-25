@@ -260,7 +260,7 @@ void OpenNIDevice::run()
         hardware->setup();
 #endif
         
-        bool needsDepthGenerator = (asDepthEnabled || asPointCloudEnabled);
+        bool needsDepthGenerator = (asDepthEnabled || asPointCloudEnabled || asUserEnabled || asSkeletonEnabled);
         bool needsImageGenerator = (asRGBEnabled || asUserMaskEnabled || asPointCloudEnabled);
         bool needsUserGenerator = ((asDepthEnabled && asDepthShowUserColors) || asUserMaskEnabled || asUserEnabled || asSkeletonEnabled);
         bool needsInfraredGenerator = asInfraredEnabled;
