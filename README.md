@@ -30,7 +30,7 @@ You can use the instructions "Install OpenNI the short way" of the SimpleOpenNI 
 ##Linking AIRKinect to your project
 
 
-All you need is the ane file matching your driver. If you are using the MS SDK, you will need [airkinect-2-core-mssdk.ane](https://github.com/AS3NUI/airkinect-2-core/blob/master/bin/airkinect-2-core-mssdk.ane), if you are using OpenNI, you will need [airkinect-2-core-openni.ane](https://github.com/AS3NUI/airkinect-2-core/blob/master/bin/airkinect-2-core-openni.ane).
+All you need is the ane file matching your driver. If you are using the MS SDK, you will need [airkinect-2-core-mssdk.ane](https://github.com/AS3NUI/airkinect-2-core/raw/master/bin/airkinect-2-core-mssdk.ane), if you are using OpenNI, you will need [airkinect-2-core-openni.ane](https://github.com/AS3NUI/airkinect-2-core/raw/master/bin/airkinect-2-core-openni.ane).
 
 Once you have the correct file, you will need to link it to your AIR project:
 
