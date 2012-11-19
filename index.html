@@ -54,44 +54,93 @@
     
       <h2>Authors</h2>
       <ul>
+      	<li>Wouter Verweirder (wouter@aboutme.be)</li>
       	<li>Ross Gerbasi (rgerbasi@gmail.com)</li>
         <li>Justin Imhof (justin@justinimhoff.com)</li>
-      	<li>Wouter Verweirder (wouter@aboutme.be)</li>
       </ul>
     <h2>Documentation</h2>
       <p><a href="docs">View documentation online</a></p>
-    <h2>Requirements</h2>
-      <p>Actionscript IDE supporting AIR 3.0 projects. (Flash Builder 4.6, IntelliJ, FDT, ...)</p>
-      <h3>Windows 7</h3>
-      <h4>MS SDK version (airkinect-2-core-mssdk.ane)</h4>
-      <ol>
-      	<li>Install Microsoft Kinect SDK: <a href="http://kinectforwindows.org/" target="_blank">http://kinectforwindows.org/</a></li>
-        <li>That's it</li>
-      </ol>
-      <h4>OpenNI version (airkinect-2-core-openni.ane)</h4>
-      <p>You can use the instructions "Install OpenNI,NITE and the Sensor Driver" of the SimpleOpenNI project to get OpenNI up and running on your windows 7 machine: <a href="http://code.google.com/p/simple-openni/wiki/Installation#Windows" target="_blank">http://code.google.com/p/simple-openni/wiki/Installation#Windows</a>. Make sure you install the 32-bit version. AIRKinect does not work with the 64-bit version.</p>
-<h3>OSX 10.6+</h3>
-      <p>You can use the instructions "Install OpenNI the short way" of the SimpleOpenNI project to get OpenNI up and running on your OSX machine: <a href="http://code.google.com/p/simple-openni/wiki/Installation#OSX" target="_blank">http://code.google.com/p/simple-openni/wiki/Installation#OSX</a>.</p>
-      <p>Alternatively, you can follow the instructions below:</p>
-      <ol>
-      	<li>Install XCode (required by Macports)</li>
-        <li>Install Macports: <a href="http://www.macports.org" target="_blank">http://www.macports.org</a></li>
-        <li>Execute the following command in Terminal: sudo port install libtool</li>
-        <li>Execute the following command in Terminal: sudo port install libusb-devel +universal</li>
-        <li>Download & install OpenNI OSX binary (unstable): <a href="http://www.openni.org/" target="_blank">http://www.openni.org/</a></li>
-        <li>Download & install Nite OSX binary (unstable): <a href="http://www.openni.org/" target="_blank">http://www.openni.org/</a></li>
-        <li>Download & install SensorKinect: <a href="https://github.com/avin2/SensorKinect" target="_blank">https://github.com/avin2/SensorKinect</a></li>
-      </ol>
-	<h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="https://github.com/AS3NUI/airkinect-2-core/zipball/master">zip</a> or
-      <a href="https://github.com/AS3NUI/airkinect-2-core/tarball/master">tar formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/AS3NUI/airkinect-2-core</pre>
-    </p>
+<h2>
+<a name="driver-installation" class="anchor" href="#driver-installation"><span class="mini-icon mini-icon-link"></span></a>Driver Installation</h2>
+
+<p>Before you can use the native extension in your AIR project, you will need to install the kinect drivers. You have several options, depending on your platform.</p>
+
+<h3>
+<a name="windows" class="anchor" href="#windows"><span class="mini-icon mini-icon-link"></span></a>Windows:</h3>
+
+<h4>
+<a name="ms-sdk-version-airkinect-2-core-mssdkane" class="anchor" href="#ms-sdk-version-airkinect-2-core-mssdkane"><span class="mini-icon mini-icon-link"></span></a>MS SDK version: (airkinect-2-core-mssdk.ane)</h4>
+
+<ol>
+<li>Install Microsoft Kinect SDK: <a href="http://kinectforwindows.org/">http://kinectforwindows.org/</a>
+</li>
+<li>That's it</li>
+</ol><h4>
+<a name="openni-version-airkinect-2-core-openniane" class="anchor" href="#openni-version-airkinect-2-core-openniane"><span class="mini-icon mini-icon-link"></span></a>OpenNI version: (airkinect-2-core-openni.ane)</h4>
+
+<p>You can use the instructions "Install OpenNI,NITE and the Sensor Driver" of the SimpleOpenNI project to get OpenNI up and running on your windows 7 machine: <a href="http://code.google.com/p/simple-openni/wiki/Installation#Windows">http://code.google.com/p/simple-openni/wiki/Installation#Windows</a>. Make sure you install the 32-bit version. AIRKinect does not work with the 64-bit version.</p>
+
+<h3>
+<a name="osx-106" class="anchor" href="#osx-106"><span class="mini-icon mini-icon-link"></span></a>OSX 10.6+:</h3>
+
+<p>You can use the instructions "Install OpenNI the short way" of the SimpleOpenNI project to get OpenNI up and running on your OSX machine: <a href="http://code.google.com/p/simple-openni/wiki/Installation#OSX">http://code.google.com/p/simple-openni/wiki/Installation#OSX</a>.</p>
+
+<h2>
+<a name="linking-airkinect-to-your-project" class="anchor" href="#linking-airkinect-to-your-project"><span class="mini-icon mini-icon-link"></span></a>Linking AIRKinect to your project</h2>
+
+<p>All you need is the ane file matching your driver. If you are using the MS SDK, you will need <a href="https://github.com/AS3NUI/airkinect-2-core/raw/master/bin/airkinect-2-core-mssdk.ane">airkinect-2-core-mssdk.ane</a>, if you are using OpenNI, you will need <a href="https://github.com/AS3NUI/airkinect-2-core/raw/master/bin/airkinect-2-core-openni.ane">airkinect-2-core-openni.ane</a>.</p>
+
+<p>Once you have the correct file, you will need to link it to your AIR project:</p>
+
+<h3>
+<a name="flash-builder-46" class="anchor" href="#flash-builder-46"><span class="mini-icon mini-icon-link"></span></a>Flash Builder 4.6</h3>
+
+<ol>
+<li>Right click on your AIR for desktop project and choose properties.</li>
+<li>Select Actionscript build path &gt; Library path and click on Add SWC… Select the ane file you just downloaded.</li>
+<li>In that same window, choose Native Extensions and click on Add ANE… Select that same ane file.</li>
+<li>Select Actionscript Build Packaging &gt; Native extensions. Check the checkbox next to the native extension. Ignore the warning that says the extension isn't used.</li>
+</ol><h3>
+<a name="flash-cs6" class="anchor" href="#flash-cs6"><span class="mini-icon mini-icon-link"></span></a>Flash CS6</h3>
+
+<ol>
+<li>Go the File &gt; Actionscript settings.</li>
+<li>On the Library Path tab, click on the "Browse to a Native Extension (ANE)" button (button to the right of the SWC button)</li>
+<li>Choose the ane file you just downloaded.</li>
+</ol><h3>
+<a name="intellij-idea" class="anchor" href="#intellij-idea"><span class="mini-icon mini-icon-link"></span></a>IntelliJ IDEA</h3>
+
+<ol>
+<li>Right click on your module and choose "Open Module Settings".</li>
+<li>Select the build configuration for your Module and open the Dependencies tab</li>
+<li>Click on the plus (+) button on the bottom of that window and choose "New Library…"</li>
+<li>Choose the ane file you just downloaded</li>
+</ol><h2>
+<a name="basic-usage" class="anchor" href="#basic-usage"><span class="mini-icon mini-icon-link"></span></a>Basic Usage</h2>
+
+<p>AIRKinect has a lot of built-in features. You can check some examples in our <a href="https://github.com/AS3NUI/airkinect-2-examples">examples repository</a>.</p>
+
+<p>A quick example, showing the depth image would be something like this:</p>
+
+<pre><code>private var depthBitmap:Bitmap;
+private var device:Kinect;
+
+public function Demo() {
+    if (Kinect.isSupported()) {
+        device = Kinect.getDevice();
+        depthBitmap = new Bitmap();
+        addChild(depthBitmap);
+device.addEventListener(CameraImageEvent.DEPTH_IMAGE_UPDATE, depthImageUpdateHandler);
+        var settings:KinectSettings = new KinectSettings();
+        settings.depthEnabled = true;            
+        device.start(settings);
+    }
+}
+
+protected function depthImageUpdateHandler(event:CameraImageEvent):void {
+    depthBitmap.bitmapData = event.imageData;
+}
+</code></pre>
 
     <div class="footer">
       get the source code on GitHub : <a href="https://github.com/AS3NUI/airkinect-2-core">AS3NUI/airkinect-2-core</a>
