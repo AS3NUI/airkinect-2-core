@@ -90,6 +90,8 @@ private:
 	
 	raw_tilt_state          tilt_state;
     
+    bool                    isKinect;
+    
 };
 
 #endif
