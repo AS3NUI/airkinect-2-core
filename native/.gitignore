@@ -2,6 +2,7 @@ osx-xcode/build/
 bin/*.exp
 bin/*.lib
 bin/*.pdb
+bin/*.dSYM/
 Release/
 win-visualstudio/ipch/
 win-visualstudio/KinectExtension.sdf
