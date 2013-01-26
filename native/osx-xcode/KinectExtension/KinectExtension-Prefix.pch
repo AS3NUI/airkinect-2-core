@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'KinectExtension' target in the 'KinectExtension' project
+//
+
+#ifdef __OBJC__
+    #import <Cocoa/Cocoa.h>
+#endif

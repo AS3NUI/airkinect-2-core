@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-MSSDK|Win32">
+      <Configuration>Release-MSSDK</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-OpenNI|Win32">
+      <Configuration>Release-OpenNI</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{52840BB7-67AD-4210-8338-71A84BDBECF4}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>KinectExtension</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>false</CLRSupport>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>false</CLRSupport>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-OpenNI|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>false</CLRSupport>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-MSSDK|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>false</CLRSupport>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\lc.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release-OpenNI|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release-MSSDK|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath);$(BOOST_DIR);$(OPEN_NI_INCLUDE);$(ProjectDir);$(SolutionDir)\..\src;C:\Program Files\Microsoft SDKs\Kinect\v1.6\inc;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\external-libraries\boost\lib;C:\Program Files\Microsoft SDKs\Kinect\v1.6\lib\x86;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
+    <TargetName>$(ProjectName)$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath);$(BOOST_DIR);$(OPEN_NI_INCLUDE);$(ProjectDir);$(SolutionDir)\..\src;C:\Program Files\Microsoft SDKs\Kinect\v1.6\inc;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\external-libraries\boost\lib;C:\Program Files\Microsoft SDKs\Kinect\v1.6\lib\x86;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
+    <OutDir>..\..\bin\</OutDir>
+    <TargetName>$(ProjectName)$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-OpenNI|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath);$(BOOST_DIR);$(OPEN_NI_INCLUDE);$(ProjectDir);$(SolutionDir)\..\src;C:\Program Files\Microsoft SDKs\Kinect\v1.6\inc;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\external-libraries\boost\lib;C:\Program Files\Microsoft SDKs\Kinect\v1.6\lib\x86;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
+    <OutDir>..\..\bin\</OutDir>
+    <TargetName>$(ProjectName)$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-MSSDK|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath);$(BOOST_DIR);$(OPEN_NI_INCLUDE);$(ProjectDir);$(SolutionDir)\..\src;C:\Program Files\Microsoft SDKs\Kinect\v1.6\inc;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\external-libraries\boost\lib;C:\Program Files\Microsoft SDKs\Kinect\v1.6\lib\x86;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
+    <OutDir>..\..\bin\</OutDir>
+    <TargetName>$(ProjectName)$(Configuration)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>AIRKINECT_TARGET_MSSDK;AIRKINECT_OS_WINDOWS;WIN32;_DEBUG;_WINDOWS;_USRDLL;KINECTEXTENSION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\external-libraries\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CompileAsManaged>false</CompileAsManaged>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OPEN_NI_LIB);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AssemblyDebug>true</AssemblyDebug>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>AIRKINECT_TARGET_OPENNI;AIRKINECT_TARGET_MSSDK;AIRKINECT_OS_WINDOWS;WIN32;NDEBUG;_WINDOWS;_USRDLL;KINECTEXTENSION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\external-libraries\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <CompileAsManaged>false</CompileAsManaged>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AssemblyDebug>true</AssemblyDebug>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <AdditionalLibraryDirectories>$(OPEN_NI_LIB);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-OpenNI|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>AIRKINECT_TARGET_OPENNI;AIRKINECT_OS_WINDOWS;WIN32;NDEBUG;_WINDOWS;_USRDLL;KINECTEXTENSION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\external-libraries\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <CompileAsManaged>false</CompileAsManaged>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AssemblyDebug>true</AssemblyDebug>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <AdditionalLibraryDirectories>$(OPEN_NI_LIB);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-MSSDK|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>AIRKINECT_TARGET_MSSDK;AIRKINECT_OS_WINDOWS;WIN32;NDEBUG;_WINDOWS;_USRDLL;KINECTEXTENSION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\external-libraries\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <CompileAsManaged>false</CompileAsManaged>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AssemblyDebug>true</AssemblyDebug>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <AdditionalLibraryDirectories>$(OPEN_NI_LIB);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\AKImageBytesGenerator.h" />
+    <ClInclude Include="..\..\src\AKPointCloudGenerator.h" />
+    <ClInclude Include="..\..\src\AKUserFrameGenerator.h" />
+    <ClInclude Include="..\..\src\AKUserMasksGenerator.h" />
+    <ClInclude Include="..\..\src\Data\AKBasicStructs.h" />
+    <ClInclude Include="..\..\src\Data\AKSkeletonBone.h" />
+    <ClInclude Include="..\..\src\Data\AKSkeletonJoint.h" />
+    <ClInclude Include="..\..\src\Data\AKUser.h" />
+    <ClInclude Include="..\..\src\Data\AKUserFrame.h" />
+    <ClInclude Include="..\..\src\ExtensionConfig.h" />
+    <ClInclude Include="..\..\src\AKUtilityFunctions.h" />
+    <ClInclude Include="..\..\src\KinectCapabilities.h" />
+    <ClInclude Include="..\..\src\KinectDevice.h" />
+    <ClInclude Include="..\..\src\KinectDeviceManager.h" />
+    <ClInclude Include="..\..\src\KinectExtension.h" />
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKDepthParser.h" />
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKInfraredParser.h" />
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKPointCloudGenerator.h" />
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKRGBParser.h" />
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserFrameGenerator.h" />
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.h" />
+    <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKSkeletonBone.h" />
+    <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKSkeletonJoint.h" />
+    <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKUser.h" />
+    <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKUserFrame.h" />
+    <ClInclude Include="..\..\src\MSSDK\MSKinectDevice.h" />
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIDepthGenerator.h" />
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIHardware.h" />
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIIRGenerator.h" />
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIPointCloudGenerator.h" />
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIRGBGenerator.h" />
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserFrameGenerator.h" />
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserGenerator.h" />
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserMasksGenerator.h" />
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNISkeletonBone.h" />
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNISkeletonJoint.h" />
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNIUser.h" />
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNIUserFrame.h" />
+    <ClInclude Include="..\..\src\OpenNI\OpenNIDevice.h" />
+    <ClInclude Include="..\..\src\PointCloudRegion.h" />
+    <ClInclude Include="FlashRuntimeExtensions.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\AKImageBytesGenerator.cpp" />
+    <ClCompile Include="..\..\src\AKPointCloudGenerator.cpp" />
+    <ClCompile Include="..\..\src\AKUserFrameGenerator.cpp" />
+    <ClCompile Include="..\..\src\AKUserMasksGenerator.cpp" />
+    <ClCompile Include="..\..\src\AKUtilityFunctions.cpp" />
+    <ClCompile Include="..\..\src\KinectDevice.cpp" />
+    <ClCompile Include="..\..\src\KinectDeviceManager.cpp" />
+    <ClCompile Include="..\..\src\KinectExtension.cpp" />
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKDepthParser.cpp" />
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKInfraredParser.cpp" />
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKPointCloudGenerator.cpp" />
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKRGBParser.cpp" />
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKUserFrameGenerator.cpp" />
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.cpp" />
+    <ClCompile Include="..\..\src\MSSDK\MSKinectDevice.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIDepthGenerator.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIHardware.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIIRGenerator.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIPointCloudGenerator.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIRGBGenerator.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIUserFrameGenerator.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIUserGenerator.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIUserMasksGenerator.cpp" />
+    <ClCompile Include="..\..\src\OpenNI\OpenNIDevice.cpp" />
+    <ClCompile Include="..\..\src\PointCloudRegion.cpp" />
+    <ClCompile Include="dllmain.cpp">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release-OpenNI|Win32'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release-MSSDK|Win32'">false</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-OpenNI|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release-MSSDK|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="FlashRuntimeExtensions.lib" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\lc.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>

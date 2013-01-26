@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{15a6f706-a16b-4f15-bba6-d5638ea967ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{5fb308c3-eef8-49e6-aba9-add4a1dab40b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MSSDK">
+      <UniqueIdentifier>{f57ceb70-8072-431f-a208-f9dc460884f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\OpenNI">
+      <UniqueIdentifier>{a7d1a263-f2cc-4513-bf8b-8a0f1e69ba71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MSSDK">
+      <UniqueIdentifier>{8d348ae3-3eee-4085-89b2-d90df48efedb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\OpenNI">
+      <UniqueIdentifier>{fe07468c-fbbb-4b22-af3e-25cc29636a4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Data">
+      <UniqueIdentifier>{9b4aae67-bbd1-4a37-a458-92cfe324ad08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\OpenNI\Data">
+      <UniqueIdentifier>{bd07c405-9c30-4de9-babb-0e49794cd440}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MSSDK\Data">
+      <UniqueIdentifier>{675b8306-dd05-42b8-a309-26646663ee09}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FlashRuntimeExtensions.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\AKImageBytesGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ExtensionConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\KinectCapabilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\KinectDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\KinectDeviceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\KinectExtension.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\PointCloudRegion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\MSKinectDevice.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\OpenNIDevice.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKRGBParser.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKDepthParser.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKPointCloudGenerator.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\AKPointCloudGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIPointCloudGenerator.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\AKUserMasksGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserMasksGenerator.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\AKUserFrameGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserFrameGenerator.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserFrameGenerator.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\AKUtilityFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Data\AKBasicStructs.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Data\AKSkeletonJoint.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Data\AKUser.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Data\AKUserFrame.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNISkeletonJoint.h">
+      <Filter>Header Files\OpenNI\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNIUser.h">
+      <Filter>Header Files\OpenNI\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNIUserFrame.h">
+      <Filter>Header Files\OpenNI\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKSkeletonJoint.h">
+      <Filter>Header Files\MSSDK\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKUser.h">
+      <Filter>Header Files\MSSDK\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKUserFrame.h">
+      <Filter>Header Files\MSSDK\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Data\AKSkeletonBone.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\Data\AKMSSDKSkeletonBone.h">
+      <Filter>Header Files\MSSDK\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\Data\AKOpenNISkeletonBone.h">
+      <Filter>Header Files\OpenNI\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKInfraredParser.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIDepthGenerator.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIIRGenerator.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIRGBGenerator.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIUserGenerator.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\OpenNI\AKOpenNIHardware.h">
+      <Filter>Header Files\OpenNI</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\AKImageBytesGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\KinectDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\KinectDeviceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\KinectExtension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\PointCloudRegion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MSSDK\MSKinectDevice.cpp">
+      <Filter>Source Files\MSSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\OpenNIDevice.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKRGBParser.cpp">
+      <Filter>Source Files\MSSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKDepthParser.cpp">
+      <Filter>Source Files\MSSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKPointCloudGenerator.cpp">
+      <Filter>Source Files\MSSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\AKPointCloudGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIPointCloudGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\AKUserMasksGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIUserMasksGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKUserMasksGenerator.cpp">
+      <Filter>Source Files\MSSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\AKUserFrameGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIUserFrameGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKUserFrameGenerator.cpp">
+      <Filter>Source Files\MSSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\AKUtilityFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MSSDK\AKMSSDKInfraredParser.cpp">
+      <Filter>Source Files\MSSDK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIDepthGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIIRGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIRGBGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIUserGenerator.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\OpenNI\AKOpenNIHardware.cpp">
+      <Filter>Source Files\OpenNI</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="FlashRuntimeExtensions.lib">
+      <Filter>Resource Files</Filter>
+    </Library>
+  </ItemGroup>
+</Project>
