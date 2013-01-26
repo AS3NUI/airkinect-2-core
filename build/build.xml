@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="extension-ant-build" default="Build Native Extension (Both)">
+	<property file="build.properties"/>
+	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
+	<property name="Flex.ADT" value="${FLEX_HOME}/lib/adt.jar"/>
+
+	<!-- Folder Properties -->
+	<dirname property="Extension.BUILD_ROOT" file="${ant.file.extension-ant-build}"/>
+	<property name="Extension.NATIVE_BIN_ROOT" value="${Extension.BUILD_ROOT}/../native/bin" />
+	<property name="Extension.AS3_ROOT" value="${Extension.BUILD_ROOT}/../as3"/>
+
+	<!-- Project properties -->
+	<property name="Extension.AS3_SRC_ROOT" value="${Extension.AS3_ROOT}/src"/>
+	<property name="Extension.AS3_LIBS_ROOT" value="${Extension.AS3_ROOT}/libs"/>
+	<property name="Extension.BIN_ROOT" location="${Extension.BUILD_ROOT}/../bin"/>
+
+	<!-- Certificate Properties -->
+	<property name="Extension.AIR_CERTIFICATE_ROOT" location="${Extension.BIN_ROOT}/cert"/>
+
+	<!-- Native Extension -->
+	<property name="Extension.EXTENSION_TMP_ROOT" value="${Extension.BUILD_ROOT}/tmp"/>
+
+	<target name="Build Extension SWC">
+		<compc output="${Extension.BIN_ROOT}/${Extension.EXTENSION_NAME}.swc">
+			<load-config filename="${FLEX_HOME}/frameworks/air-config.xml" />
+			<include-sources file="${Extension.AS3_SRC_ROOT}/"/>
+			<include-libraries file="${Extension.AS3_LIBS_ROOT}/"/>
+		</compc>
+	</target>
+
+	<target name="Generate Certificate">
+		<mkdir dir="${Extension.AIR_CERTIFICATE_ROOT}"/>
+		<java jar="${Flex.ADT}" fork="true">
+			<arg value="-certificate"/>
+			<arg value="-cn"/>
+			<arg value="${Extension.AIR_CERTIFICATE_NAME}"/>
+			<arg value="-ou"/>
+			<arg value="${Extension.AIR_ORG_UNIT}"/>
+			<arg value="-o"/>
+			<arg value="${Extension.AIR_ORG_NAME}"/>
+			<arg value="-c"/>
+			<arg value="${Extension.AIR_COUNTRY}"/>
+			<arg value="${Extension.AIR_KEY_TYPE}"/>
+			<arg value="${Extension.AIR_CERTIFICATE_ROOT}/${Extension.AIR_CERTIFICATE_FILE}"/>
+			<arg value="${Extension.AIR_CERTIFICATE_PASSWORD}"/>
+		</java>
+	</target>
+
+	<target name="Build Native Extension (OpenNI)">
+		<antcall target="Build Extension SWC" />
+		<antcall target="Generate Certificate" />
+		<unzip src="${Extension.BIN_ROOT}/${Extension.EXTENSION_NAME}.swc" dest="${Extension.EXTENSION_TMP_ROOT}"/>
+		
+		<!-- copy the mac framework to the tmp folder -->
+		<copy todir="${Extension.EXTENSION_TMP_ROOT}/${Extension.NATIVE_LIBRARY_OSX_OPENNI}">
+			<fileset dir="${Extension.NATIVE_BIN_ROOT}/${Extension.NATIVE_LIBRARY_OSX_OPENNI}" />
+		</copy>
+		
+		<!-- copy the windows dll to the tmp folder -->
+		<copy todir="${Extension.EXTENSION_TMP_ROOT}">
+			<fileset file="${Extension.NATIVE_BIN_ROOT}/${Extension.NATIVE_LIBRARY_WINDOWS_OPENNI}" />
+		</copy>
+		
+		<!-- copy the extension.xml to the tmp folder -->
+		<copy todir="${Extension.EXTENSION_TMP_ROOT}">
+			<fileset file="${Extension.BUILD_ROOT}/extension.xml" />
+		</copy>
+		
+		<!-- replace NATIVE_LIBRARY_WINDOWS & NATIVE_LIBRARY_OSX in the extension.xml -->
+		<replace file="${Extension.EXTENSION_TMP_ROOT}/extension.xml" token="NATIVE_LIBRARY_WINDOWS" value="${Extension.NATIVE_LIBRARY_WINDOWS_OPENNI}" />
+		<replace file="${Extension.EXTENSION_TMP_ROOT}/extension.xml" token="NATIVE_LIBRARY_OSX" value="${Extension.NATIVE_LIBRARY_OSX_OPENNI}" />
+		
+		<java jar="${Flex.ADT}" fork="true" dir="${Extension.EXTENSION_TMP_ROOT}" failonerror="true">
+			<arg value="-package"/>
+			<arg value="-storetype"/>
+			<arg value="pkcs12"/>
+			<arg value="-keystore"/>
+			<arg value="${Extension.AIR_CERTIFICATE_ROOT}/${Extension.AIR_CERTIFICATE_FILE}"/>
+			<arg value="-storepass"/>
+			<arg value="${Extension.AIR_CERTIFICATE_PASSWORD}"/>
+			<arg value="-tsa"/>
+			<arg value="none"/>
+			<arg value="-target"/>
+			<arg value="ane"/>
+			<arg value="${Extension.BIN_ROOT}/${Extension.EXTENSION_NAME}-openni.ane"/>
+			<arg value="extension.xml"/>
+			<arg value="-swc"/>
+			<arg value="${Extension.BIN_ROOT}/${Extension.EXTENSION_NAME}.swc"/>
+			<arg value="-platform"/>
+			<arg value="Windows-x86"/>
+			<arg value="library.swf"/>
+			<arg line="'${Extension.NATIVE_LIBRARY_WINDOWS_OPENNI}'"/>
+			<arg value="-platform"/>
+			<arg value="MacOS-x86"/>
+			<arg value="library.swf"/>
+			<arg line="'${Extension.NATIVE_LIBRARY_OSX_OPENNI}'"/>
+		</java>
+		<delete dir="${Extension.EXTENSION_TMP_ROOT}"/>
+		<delete dir="${Extension.AIR_CERTIFICATE_ROOT}"/>
+		<delete file="${Extension.BIN_ROOT}/${Extension.EXTENSION_NAME}.swc"/>
+	</target>
+	
+	<target name="Build Native Extension (MSSDK)">
+		<antcall target="Build Extension SWC" />
+		<antcall target="Generate Certificate" />
+		<unzip src="${Extension.BIN_ROOT}/${Extension.EXTENSION_NAME}.swc" dest="${Extension.EXTENSION_TMP_ROOT}"/>
+
+		<!-- copy the mac framework to the tmp folder -->
+		<copy todir="${Extension.EXTENSION_TMP_ROOT}/${Extension.NATIVE_LIBRARY_OSX_OPENNI}">
+			<fileset dir="${Extension.NATIVE_BIN_ROOT}/${Extension.NATIVE_LIBRARY_OSX_OPENNI}" />
+		</copy>
+		
+		<!-- copy the windows dll to the tmp folder -->
+		<copy todir="${Extension.EXTENSION_TMP_ROOT}">
+			<fileset file="${Extension.NATIVE_BIN_ROOT}/${Extension.NATIVE_LIBRARY_WINDOWS_MSSDK}" />
+		</copy>
+		
+		<!-- copy the extension.xml to the tmp folder -->
+		<copy todir="${Extension.EXTENSION_TMP_ROOT}">
+			<fileset file="${Extension.BUILD_ROOT}/extension.xml" />
+		</copy>
+	
+		<!-- replace NATIVE_LIBRARY_WINDOWS & NATIVE_LIBRARY_OSX in the extension.xml -->
+		<replace file="${Extension.EXTENSION_TMP_ROOT}/extension.xml" token="NATIVE_LIBRARY_WINDOWS" value="${Extension.NATIVE_LIBRARY_WINDOWS_MSSDK}" />
+		<replace file="${Extension.EXTENSION_TMP_ROOT}/extension.xml" token="NATIVE_LIBRARY_OSX" value="${Extension.NATIVE_LIBRARY_OSX_OPENNI}" />
+		
+		<java jar="${Flex.ADT}" fork="true" dir="${Extension.EXTENSION_TMP_ROOT}" failonerror="true">
+			<arg value="-package"/>
+			<arg value="-storetype"/>
+			<arg value="pkcs12"/>
+			<arg value="-keystore"/>
+			<arg value="${Extension.AIR_CERTIFICATE_ROOT}/${Extension.AIR_CERTIFICATE_FILE}"/>
+			<arg value="-storepass"/>
+			<arg value="${Extension.AIR_CERTIFICATE_PASSWORD}"/>
+			<arg value="-tsa"/>
+			<arg value="none"/>
+			<arg value="-target"/>
+			<arg value="ane"/>
+			<arg value="${Extension.BIN_ROOT}/${Extension.EXTENSION_NAME}-mssdk.ane"/>
+			<arg value="extension.xml"/>
+			<arg value="-swc"/>
+			<arg value="${Extension.BIN_ROOT}/${Extension.EXTENSION_NAME}.swc"/>
+			<arg value="-platform"/>
+			<arg value="Windows-x86"/>
+			<arg value="library.swf"/>
+			<arg line="'${Extension.NATIVE_LIBRARY_WINDOWS_MSSDK}'"/>
+			<arg value="-platform"/>
+			<arg value="MacOS-x86"/>
+			<arg value="library.swf"/>
+			<arg line="'${Extension.NATIVE_LIBRARY_OSX_OPENNI}'"/>
+		</java>
+		<delete dir="${Extension.EXTENSION_TMP_ROOT}"/>
+		<delete dir="${Extension.AIR_CERTIFICATE_ROOT}"/>
+		<delete file="${Extension.BIN_ROOT}/${Extension.EXTENSION_NAME}.swc"/>
+	</target>
+	<target name="Build Native Extension (Both)">
+		<antcall target="Build Native Extension (OpenNI)" />
+		<antcall target="Build Native Extension (MSSDK)" />
+	</target>
+</project>
