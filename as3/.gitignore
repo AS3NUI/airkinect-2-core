@@ -1,24 +1,11 @@
+# Build and Release Folders
+bin/
+bin-debug/
+bin-release/
 
-.actionScriptProperties
+# Other files and folders
+.settings/
 
-bin/airkinect-2-core.swc
-
-.flexLibProperties
-
-.fxpProperties
-
-.project
-
-.settings/org.eclipse.core.resources.prefs
-
-extension/*
-
-cert/*
-
-docs/*
-
-examples/*
-/assets
-/airkinect-2-core.iml
-/bin-debug
-/.fxpProperties
+# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
+# should NOT be excluded as they contain compiler settings and other important
+# information for Eclipse / Flash Builder.
