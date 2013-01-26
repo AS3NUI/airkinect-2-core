@@ -68,11 +68,6 @@ void AKOpenNIHardware::setup(int index)
 		const int r = libusb_get_device_descriptor (devs[i], &desc);
 		if (r < 0)
 			continue;
-        
-        char * buffer = new char[128];
-        sprintf(buffer, "Device: %i Vendor: %i Product: %i", i, desc.idVendor, desc.idProduct);
-        _device->dispatchInfoMessage((const uint8_t *)buffer);
-        delete buffer;
 		
 		// Search for the aux
 		if (desc.idVendor == MS_MAGIC_VENDOR && desc.idProduct == MS_MAGIC_MOTOR_PRODUCT)
