@@ -33,6 +33,7 @@ AKMSSDKUserFrameGenerator::AKMSSDKUserFrameGenerator()
 	allocateUserFrame();
 
 	_nuiSensor = 0;
+	_nuiInteractionStream = 0;
 }
 
 AKMSSDKUserFrameGenerator::~AKMSSDKUserFrameGenerator()
@@ -42,6 +43,7 @@ AKMSSDKUserFrameGenerator::~AKMSSDKUserFrameGenerator()
 	deallocateUserFrame();
 
 	_nuiSensor = 0;
+	_nuiInteractionStream = 0;
 }
 
 void AKMSSDKUserFrameGenerator::allocateJointNames()
@@ -247,6 +249,11 @@ void AKMSSDKUserFrameGenerator::setNuiSensor(INuiSensor* nuiSensor)
 	_nuiSensor = nuiSensor;
 }
 
+void AKMSSDKUserFrameGenerator::setNuiInteractionStream(INuiInteractionStream* nuiInteractionStream)
+{
+	_nuiInteractionStream = nuiInteractionStream;
+}
+
 void AKMSSDKUserFrameGenerator::setTransformSmoothingParameters(NUI_TRANSFORM_SMOOTH_PARAMETERS transformSmoothingParameters)
 {
 	_transformSmoothingParameters = transformSmoothingParameters;
@@ -256,12 +263,17 @@ void AKMSSDKUserFrameGenerator::generateUserFrame()
 {
 	NUI_SKELETON_FRAME skeletonFrame = {0};
 	HRESULT hr = _nuiSensor->NuiSkeletonGetNextFrame( 0, &skeletonFrame );
-	if(FAILED(hr))
-	{
+	if(FAILED(hr)){
 		return;
 	}
 
 	_nuiSensor->NuiTransformSmooth(&skeletonFrame, &_transformSmoothingParameters);
+
+	if(_nuiInteractionStream) {
+		Vector4 v = {0};
+		_nuiSensor->NuiAccelerometerGetCurrentReading(&v);
+		hr = _nuiInteractionStream->ProcessSkeleton(NUI_SKELETON_COUNT, skeletonFrame.SkeletonData, &v, skeletonFrame.liTimeStamp);
+	}
 
 	NUI_SKELETON_DATA skeletonData;
 	_userFrame->frameNumber = skeletonFrame.dwFrameNumber;
@@ -294,6 +306,32 @@ void AKMSSDKUserFrameGenerator::generateUserFrame()
 			delete [] boneOrientations;
 		}else{
 			_userFrame->users[i].isTracking = false;
+		}
+	}
+}
+
+void AKMSSDKUserFrameGenerator::addInteractionInfo(NUI_INTERACTION_FRAME* interactionFrame){
+	for (int i = 0; i < NUI_SKELETON_COUNT; ++i){
+		NUI_USER_INFO userInfo = interactionFrame->UserInfos[i];
+		if(userInfo.SkeletonTrackingId != 0){
+			//get this user in the userframe
+			AKMSSDKUser* msUser = 0;
+			for (int u = 0; u < NUI_SKELETON_COUNT; u++) {
+				if(_mssdkUserFrame->mssdkUsers[u].user->trackingID == userInfo.SkeletonTrackingId){
+					msUser = &_mssdkUserFrame->mssdkUsers[u];
+					break;
+				}
+			}
+			if(msUser != 0){
+				for(int j = 0; j < NUI_USER_HANDPOINTER_COUNT; j++){
+					NUI_HANDPOINTER_INFO handPointerInfo = userInfo.HandPointerInfos[j];
+					if(handPointerInfo.HandType == NUI_HAND_TYPE_LEFT) {
+						msUser->leftHandInfo = handPointerInfo;
+					}else if(handPointerInfo.HandType == NUI_HAND_TYPE_RIGHT) {
+						msUser->rightHandInfo = handPointerInfo;
+					}
+				}
+			}
 		}
 	}
 }
@@ -566,7 +604,24 @@ FREObject AKMSSDKUserFrameGenerator::getFREObject()
 				AKMSSDKSkeletonJoint* skeletonJoint = &user->mssdkSkeletonJoints[j];
 
 				FREObject freJoint;
-				FRENewObject( (const uint8_t*) _asJointClass, 0, NULL, &freJoint, NULL);
+
+				bool isLeftHand = false;
+				bool isRightHand = false;
+				if(_seatedSkeletonEnabled){
+					isLeftHand = (skeletonJoint->skeletonJoint->jointNameIndex == AK_MSSDK_SEATED_JOINT_INDEX_LEFT_HAND);
+					isRightHand = (skeletonJoint->skeletonJoint->jointNameIndex == AK_MSSDK_SEATED_JOINT_INDEX_RIGHT_HAND);
+				} else{
+					isLeftHand = (skeletonJoint->skeletonJoint->jointNameIndex == AK_MSSDK_REGULAR_JOINT_INDEX_LEFT_HAND);
+					isRightHand = (skeletonJoint->skeletonJoint->jointNameIndex == AK_MSSDK_REGULAR_JOINT_INDEX_RIGHT_HAND);
+				}
+
+				if(isLeftHand){
+					FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSHand", 0, NULL, &freJoint, NULL);
+				}else if(isRightHand){
+					FRENewObject( (const uint8_t*) "com.as3nui.nativeExtensions.air.kinect.frameworks.mssdk.data.MSHand", 0, NULL, &freJoint, NULL);
+				}else{
+					FRENewObject( (const uint8_t*) _asJointClass, 0, NULL, &freJoint, NULL);
+				}
 
 				FRESetObjectProperty(freJoint, (const uint8_t*) "name", createFREObjectForUTF8(_jointNames[skeletonJoint->skeletonJoint->jointNameIndex]), NULL);
 				FRESetObjectProperty(freJoint, (const uint8_t*) "position", skeletonJoint->skeletonJoint->position.asFREObject(), NULL);
@@ -577,6 +632,14 @@ FREObject AKMSSDKUserFrameGenerator::getFREObject()
 				FRESetObjectProperty(freJoint, (const uint8_t*) "nativeAbsoluteRotationQuaternion", skeletonJoint->absoluteRotationQuaternion.asFREObject(), NULL);
 				FRESetObjectProperty(freJoint, (const uint8_t*) "nativeAbsoluteRotationMatrix", skeletonJoint->absoluteRotationMatrix.asFREObject(), NULL);
 				
+				if(isLeftHand) {
+					FRESetObjectProperty(freJoint, (const uint8_t*) "event", createFREObjectForUnsignedInt(user->leftHandInfo.HandEventType), NULL);
+					FRESetObjectProperty(freJoint, (const uint8_t*) "state", createFREObjectForUnsignedInt(user->leftHandInfo.State), NULL);
+				} else if(isRightHand) {
+					FRESetObjectProperty(freJoint, (const uint8_t*) "event", createFREObjectForUnsignedInt(user->rightHandInfo.HandEventType), NULL);
+					FRESetObjectProperty(freJoint, (const uint8_t*) "state", createFREObjectForUnsignedInt(user->rightHandInfo.State), NULL);
+				}
+
 				FRESetArrayElementAt(freJoints, j, freJoint);
 			}
 

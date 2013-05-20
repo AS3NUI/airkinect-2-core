@@ -35,9 +35,11 @@ public:
 
 	void setSeatedSkeletonEnabled(bool seatedSkeletonEnabled);
 	void setNuiSensor(INuiSensor* nuiSensor);
+	void setNuiInteractionStream(INuiInteractionStream* nuiInteractionStream);
 	void setTransformSmoothingParameters(NUI_TRANSFORM_SMOOTH_PARAMETERS transformSmoothingParameters);
 
 	void generateUserFrame();
+	void addInteractionInfo(NUI_INTERACTION_FRAME* interactionFrame);
 	FREObject getFREObject();
 
 protected:
@@ -57,6 +59,7 @@ private:
 
 	bool _seatedSkeletonEnabled;
 	INuiSensor* _nuiSensor;
+	INuiInteractionStream* _nuiInteractionStream;
 
 	NUI_IMAGE_RESOLUTION _targetDepthResolution;
 	NUI_IMAGE_RESOLUTION _targetRGBResolution;

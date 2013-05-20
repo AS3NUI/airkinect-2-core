@@ -16,7 +16,9 @@ Before you can use the native extension in your AIR project, you will need to in
 ####MS SDK version: (airkinect-2-core-mssdk.ane)
 
 1. Install Microsoft Kinect SDK: <http://kinectforwindows.org/>
-2. That's it
+2. Install the Kinect Developer Toolkit
+2. Add C:\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.7.0\Redist and C:\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.7.0\Redist\x86 to your system path.
+3. Restart your computer.
 
 ####OpenNI version: (airkinect-2-core-openni.ane)
 
@@ -30,7 +32,17 @@ You can use the instructions "Install OpenNI the short way" of the SimpleOpenNI 
 ##Linking AIRKinect to your project
 
 
-All you need is the ane file matching your driver. If you are using the MS SDK, you will need [airkinect-2-core-mssdk.ane](https://github.com/AS3NUI/airkinect-2-core/raw/master/bin/airkinect-2-core-mssdk.ane), if you are using OpenNI, you will need [airkinect-2-core-openni.ane](https://github.com/AS3NUI/airkinect-2-core/raw/master/bin/airkinect-2-core-openni.ane).
+Get the ane file matching your driver:
+
+###MS SDK
+
+1. download [airkinect-2-core-mssdk.ane](https://github.com/AS3NUI/airkinect-2-core/raw/master/bin/airkinect-2-core-mssdk.ane)
+2. (app deployment): copy the dlls from C:\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.7.0\Redist and C:\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.7.0\Redist\x86 to your app.
+
+###OpenNI
+
+1. download [airkinect-2-core-openni.ane](https://github.com/AS3NUI/airkinect-2-core/raw/master/bin/airkinect-2-core-openni.ane).
+2. that's it
 
 Once you have the correct file, you will need to link it to your AIR project:
 

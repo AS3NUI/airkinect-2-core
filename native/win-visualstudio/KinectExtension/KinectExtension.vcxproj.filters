@@ -168,6 +168,9 @@
     <ClInclude Include="..\..\src\OpenNI\AKOpenNIHardware.h">
       <Filter>Header Files\OpenNI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKInteractionClient.h">
+      <Filter>Header Files\MSSDK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

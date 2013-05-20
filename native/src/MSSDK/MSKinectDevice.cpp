@@ -148,6 +148,11 @@ void MSKinectDevice::setDefaults()
 	transformSmoothingParameters.fPrediction =0.5f;
 	transformSmoothingParameters.fJitterRadius =0.05f;
 	transformSmoothingParameters.fMaxDeviationRadius=0.04f;
+
+	//Interaction stream
+	interactionClient = new AKMSSDKInteractionClient();
+	interactionStream = 0;
+	userFrameIsComplete = false;
 }
 
 //-------------------
@@ -340,6 +345,19 @@ void MSKinectDevice::stop()
 	{
 		CloseHandle( rgbFrameEvent );
 		rgbFrameEvent = 0;
+	}
+
+	if( interactionEvent && ( interactionEvent != INVALID_HANDLE_VALUE ) )
+	{
+		interactionStream->Disable();
+		CloseHandle( interactionEvent );
+		interactionEvent = 0;
+	}
+
+	if( interactionClient )
+	{
+		delete interactionClient;
+		interactionClient = 0;
 	}
 
     //cleanup bytearrays
@@ -537,11 +555,22 @@ void MSKinectDevice::run()
 			}
 		}
 
+		//interaction stream
+		interactionEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
+		if(asSkeletonEnabled){
+			hr = NuiCreateInteractionStream(nuiSensor, interactionClient, &interactionStream);
+			if ( FAILED(hr) ){
+				dispatchErrorMessage((const uint8_t*) "Failed to Create Interaction Stream");
+			} else {
+				interactionStream->Enable( interactionEvent );
+			}
+		}
+
 		if(asSkeletonEnabled || asRGBEnabled || asDepthEnabled || asInfraredEnabled || asPointCloudEnabled || asUserMaskEnabled){
 			dispatchInfoMessage((const uint8_t*) "Starting Kinect Thread");
 
-			const int numEvents = 4;
-			HANDLE hEvents[numEvents] = { depthFrameEvent, infraredFrameEvent, rgbFrameEvent, userEvent };
+			const int numEvents = 5;
+			HANDLE hEvents[numEvents] = { depthFrameEvent, infraredFrameEvent, rgbFrameEvent, userEvent, interactionEvent };
 			int    nEventIdx;
 
 			started = true;
@@ -568,6 +597,11 @@ void MSKinectDevice::run()
 						dispatchRGBIfNeeded();
 						break;
 					case WAIT_OBJECT_0 +3:
+						readUserFrame();
+						dispatchUserFrameIfNeeded();
+						break;
+					case WAIT_OBJECT_0 +4:
+						readInteractionFrame();
 						dispatchUserFrameIfNeeded();
 						break;
 				}
@@ -594,7 +628,39 @@ HRESULT MSKinectDevice::setSkeletonTrackingFlags()
 //                                      EVENT PROCESSING         
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void MSKinectDevice::readUserFrame()
+{
+	if(asUserEnabled || asSkeletonEnabled || asUserMaskEnabled)
+	{
+		lockUserMutex();
+		((AKMSSDKUserFrameGenerator*) userFrameGenerator)->setNuiSensor(nuiSensor);
+		((AKMSSDKUserFrameGenerator*) userFrameGenerator)->setNuiInteractionStream(interactionStream);
+		((AKMSSDKUserFrameGenerator*) userFrameGenerator)->setTransformSmoothingParameters(transformSmoothingParameters);
+		userFrameGenerator->setSkeletonMirrored(asSkeletonMirrored);
+        userFrameGenerator->setSkeletonTrackingEnabled(asSkeletonEnabled);
+		userFrameGenerator->setDepthTargetMirrored(depthImageBytesGenerator->getTargetMirrored());
+		userFrameGenerator->setDepthTargetSize(depthImageBytesGenerator->getTargetWidth(), depthImageBytesGenerator->getTargetHeight());
+		userFrameGenerator->setDepthSourceSize(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
+		userFrameGenerator->setRGBTargetMirrored(rgbImageBytesGenerator->getTargetMirrored());
+		userFrameGenerator->setRGBTargetSize(rgbImageBytesGenerator->getTargetWidth(), rgbImageBytesGenerator->getTargetHeight());
+		userFrameGenerator->setRGBSourceSize(rgbImageBytesGenerator->getSourceWidth(), rgbImageBytesGenerator->getSourceHeight());
+		userFrameGenerator->generateUserFrame();
+		userFrameIsComplete = (interactionStream == 0); //for dispatcher - dispatch now or wait for interaction info
+		unlockUserMutex();
+	}
+}
 
+void MSKinectDevice::readInteractionFrame()
+{
+	NUI_INTERACTION_FRAME interactionFrame;
+	HRESULT hr = interactionStream->GetNextFrame(0, &interactionFrame);
+	if(!FAILED(hr)) {
+		lockUserMutex();
+		((AKMSSDKUserFrameGenerator*) userFrameGenerator)->addInteractionInfo(&interactionFrame);
+		userFrameIsComplete = true;
+		unlockUserMutex();
+	}
+}
 
 void MSKinectDevice::readRGBFrame()
 {
@@ -610,6 +676,7 @@ void MSKinectDevice::readDepthFrame()
 {
 	depthParser->setImageSize(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
 	depthParser->setNuiSensor(nuiSensor);
+	depthParser->setNuiInteractionStream(interactionStream);
 	depthParser->setDepthFrameTimeout(imageFrameTimeout);
 	depthParser->setDepthFrameHandle(depthFrameHandle);
 	depthParser->setUserIndexColors(userIndexColors);
@@ -707,21 +774,6 @@ void MSKinectDevice::dispatchUserFrameIfNeeded()
 {
 	if(asUserEnabled || asSkeletonEnabled || asUserMaskEnabled)
 	{
-		lockUserMutex();
-
-		((AKMSSDKUserFrameGenerator*) userFrameGenerator)->setNuiSensor(nuiSensor);
-		((AKMSSDKUserFrameGenerator*) userFrameGenerator)->setTransformSmoothingParameters(transformSmoothingParameters);
-		userFrameGenerator->setSkeletonMirrored(asSkeletonMirrored);
-        userFrameGenerator->setSkeletonTrackingEnabled(asSkeletonEnabled);
-		userFrameGenerator->setDepthTargetMirrored(depthImageBytesGenerator->getTargetMirrored());
-		userFrameGenerator->setDepthTargetSize(depthImageBytesGenerator->getTargetWidth(), depthImageBytesGenerator->getTargetHeight());
-		userFrameGenerator->setDepthSourceSize(depthImageBytesGenerator->getSourceWidth(), depthImageBytesGenerator->getSourceHeight());
-		userFrameGenerator->setRGBTargetMirrored(rgbImageBytesGenerator->getTargetMirrored());
-		userFrameGenerator->setRGBTargetSize(rgbImageBytesGenerator->getTargetWidth(), rgbImageBytesGenerator->getTargetHeight());
-		userFrameGenerator->setRGBSourceSize(rgbImageBytesGenerator->getSourceWidth(), rgbImageBytesGenerator->getSourceHeight());
-		userFrameGenerator->generateUserFrame();
-
-		unlockUserMutex();
 		dispatchStatusMessage((const uint8_t*) "userFrame");
 	}
 }

@@ -28,6 +28,7 @@ AKMSSDKDepthParser::AKMSSDKDepthParser()
 	_sceneByteArray = 0;
 
 	_nuiSensor = 0;
+	_nuiInteractionStream = 0;
 	_depthFrameHandle = 0;
 	_depthFrameTimeout = 0;
 	_userIndexColors = 0;
@@ -48,6 +49,7 @@ AKMSSDKDepthParser::~AKMSSDKDepthParser()
 	_sceneByteArray = 0;
 
 	_nuiSensor = 0;
+	_nuiInteractionStream = 0;
 	_depthFrameHandle = 0;
 	_depthFrameTimeout = 0;
 	_userIndexColors = 0;
@@ -124,6 +126,11 @@ void AKMSSDKDepthParser::setNuiSensor(INuiSensor* nuiSensor)
 	_nuiSensor = nuiSensor;
 }
 
+void AKMSSDKDepthParser::setNuiInteractionStream(INuiInteractionStream* nuiInteractionStream)
+{
+	_nuiInteractionStream = nuiInteractionStream;
+}
+
 void AKMSSDKDepthParser::setDepthFrameHandle(HANDLE depthFrameHandle)
 {
 	_depthFrameHandle = depthFrameHandle;
@@ -149,6 +156,16 @@ void AKMSSDKDepthParser::parseData()
 	NUI_LOCKED_RECT LockedRect;
 	pTexture->LockRect( 0, &LockedRect, NULL, 0 );
 
+	//interaction
+	if(_nuiInteractionStream != 0) {
+		INuiFrameTexture *pixelFrameTexture = 0;
+		_nuiSensor->NuiImageFrameGetDepthImagePixelFrameTexture(_depthFrameHandle, &depthImageFrame, nullptr, &pixelFrameTexture);
+		NUI_LOCKED_RECT pixelFrameTextureLockedRect;
+		pixelFrameTexture->LockRect(0, &pixelFrameTextureLockedRect, NULL, 0);
+		_nuiInteractionStream->ProcessDepth(pixelFrameTextureLockedRect.size, pixelFrameTextureLockedRect.pBits, depthImageFrame.liTimeStamp);
+		pixelFrameTexture->UnlockRect(0);
+	}
+
 	if( LockedRect.Pitch != 0 ) {
 		unsigned int* depthImageRun = _imageByteArray;
 		unsigned short* depthRun = _depthByteArray;
@@ -170,9 +187,12 @@ void AKMSSDKDepthParser::parseData()
 			* depthImageRun = 0xff << 24 | quad.rgbReserved << 24 | quad.rgbRed <<16 | quad.rgbGreen << 8| quad.rgbBlue;
 			depthImageRun++;
 		}
+		//unlock rect
+		pTexture->UnlockRect(0);
 		//release the frame
 		_nuiSensor->NuiImageStreamReleaseFrame(_depthFrameHandle, &depthImageFrame );
 	}
+
 }
 
 RGBQUAD AKMSSDKDepthParser::ShortToQuad_Depth(unsigned short s)

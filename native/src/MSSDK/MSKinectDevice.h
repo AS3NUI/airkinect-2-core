@@ -26,6 +26,7 @@
 #include "AKMSSDKRGBParser.h"
 #include "AKMSSDKDepthParser.h"
 #include "AKMSSDKInfraredParser.h"
+#include "AKMSSDKInteractionClient.h"
 
 class MSKinectDevice : public KinectDevice
 {
@@ -80,11 +81,17 @@ private:
 	HANDLE					infraredFrameEvent;
     HANDLE					rgbFrameEvent;
     HANDLE					userEvent;
+	HANDLE					interactionEvent;
 
 	HANDLE					userFrameHandle;
     HANDLE					depthFrameHandle;
 	HANDLE					infraredFrameHandle;
     HANDLE					rgbFrameHandle;
+
+	AKMSSDKInteractionClient *interactionClient;
+	INuiInteractionStream	*interactionStream;
+
+	bool					userFrameIsComplete;
 
 	BYTE					*userIndexColors;
 
@@ -96,6 +103,9 @@ private:
 	NUI_IMAGE_RESOLUTION	rgbResolution;
 
 	//Handlers
+	void					readUserFrame();
+	void					readInteractionFrame();
+
 	void					readRGBFrame();
 	AKMSSDKRGBParser*		rgbParser;
 

@@ -15,6 +15,7 @@
 */
 package com.as3nui.nativeExtensions.air.kinect.data
 {
+	
 
 	/**
 	 * This class represents one joint in a user skeleton.

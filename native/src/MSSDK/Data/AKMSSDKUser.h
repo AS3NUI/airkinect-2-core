@@ -38,6 +38,9 @@ typedef struct _AKMSSDKUser
 	AKMSSDKSkeletonJoint* mssdkSkeletonJoints;
 	AKMSSDKSkeletonBone* mssdkSkeletonBones;
 
+	NUI_HANDPOINTER_INFO leftHandInfo;
+	NUI_HANDPOINTER_INFO rightHandInfo;
+
 } AKMSSDKUser;
 #endif _AKMSSDKUser_
 

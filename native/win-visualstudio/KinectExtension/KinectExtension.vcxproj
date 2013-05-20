@@ -72,28 +72,28 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(IncludePath);$(BOOST_DIR);$(OPEN_NI_INCLUDE);$(ProjectDir);$(SolutionDir)\..\src;C:\Program Files\Microsoft SDKs\Kinect\v1.6\inc;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
-    <LibraryPath>$(SolutionDir)\..\external-libraries\boost\lib;C:\Program Files\Microsoft SDKs\Kinect\v1.6\lib\x86;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
+    <IncludePath>$(IncludePath);$(BOOST_DIR);$(OPEN_NI_INCLUDE);$(ProjectDir);$(SolutionDir)\..\src;C:\Program Files\Microsoft SDKs\Kinect\v1.7\inc;C:\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.7.0\inc;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\external-libraries\boost\lib;C:\Program Files\Microsoft SDKs\Kinect\v1.7\lib\x86;C:\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.7.0\Lib\x86;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
     <TargetName>$(ProjectName)$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(IncludePath);$(BOOST_DIR);$(OPEN_NI_INCLUDE);$(ProjectDir);$(SolutionDir)\..\src;C:\Program Files\Microsoft SDKs\Kinect\v1.6\inc;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
-    <LibraryPath>$(SolutionDir)\..\external-libraries\boost\lib;C:\Program Files\Microsoft SDKs\Kinect\v1.6\lib\x86;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
+    <IncludePath>$(IncludePath);$(BOOST_DIR);$(OPEN_NI_INCLUDE);$(ProjectDir);$(SolutionDir)\..\src;C:\Program Files\Microsoft SDKs\Kinect\v1.7\inc;C:\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.7.0\inc;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\external-libraries\boost\lib;C:\Program Files\Microsoft SDKs\Kinect\v1.7\lib\x86;C:\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.7.0\Lib\x86;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
     <OutDir>..\..\bin\</OutDir>
     <TargetName>$(ProjectName)$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-OpenNI|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(IncludePath);$(BOOST_DIR);$(OPEN_NI_INCLUDE);$(ProjectDir);$(SolutionDir)\..\src;C:\Program Files\Microsoft SDKs\Kinect\v1.6\inc;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
-    <LibraryPath>$(SolutionDir)\..\external-libraries\boost\lib;C:\Program Files\Microsoft SDKs\Kinect\v1.6\lib\x86;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
+    <IncludePath>$(IncludePath);$(BOOST_DIR);$(OPEN_NI_INCLUDE);$(ProjectDir);$(SolutionDir)\..\src;C:\Program Files\Microsoft SDKs\Kinect\v1.7\inc;C:\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.7.0\inc;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\external-libraries\boost\lib;C:\Program Files\Microsoft SDKs\Kinect\v1.7\lib\x86;C:\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.7.0\Lib\x86;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
     <OutDir>..\..\bin\</OutDir>
     <TargetName>$(ProjectName)$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-MSSDK|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(IncludePath);$(BOOST_DIR);$(OPEN_NI_INCLUDE);$(ProjectDir);$(SolutionDir)\..\src;C:\Program Files\Microsoft SDKs\Kinect\v1.6\inc;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
-    <LibraryPath>$(SolutionDir)\..\external-libraries\boost\lib;C:\Program Files\Microsoft SDKs\Kinect\v1.6\lib\x86;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
+    <IncludePath>$(IncludePath);$(BOOST_DIR);$(OPEN_NI_INCLUDE);$(ProjectDir);$(SolutionDir)\..\src;C:\Program Files\Microsoft SDKs\Kinect\v1.7\inc;C:\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.7.0\inc;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
+    <LibraryPath>$(SolutionDir)\..\external-libraries\boost\lib;C:\Program Files\Microsoft SDKs\Kinect\v1.7\lib\x86;C:\Program Files\Microsoft SDKs\Kinect\Developer Toolkit v1.7.0\Lib\x86;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
     <OutDir>..\..\bin\</OutDir>
     <TargetName>$(ProjectName)$(Configuration)</TargetName>
   </PropertyGroup>
@@ -234,6 +234,7 @@
     <ClInclude Include="..\..\src\KinectExtension.h" />
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKDepthParser.h" />
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKInfraredParser.h" />
+    <ClInclude Include="..\..\src\MSSDK\AKMSSDKInteractionClient.h" />
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKPointCloudGenerator.h" />
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKRGBParser.h" />
     <ClInclude Include="..\..\src\MSSDK\AKMSSDKUserFrameGenerator.h" />

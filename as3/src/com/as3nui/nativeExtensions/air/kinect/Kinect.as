@@ -816,7 +816,7 @@ package com.as3nui.nativeExtensions.air.kinect {
 				//existing? Update the properties
 				user = usersByTrackingId[otherUser.trackingID];
 				if (user != null) {
-					user.copyFrom(otherUser);
+					updateExistingUser(user, otherUser);
 				}
 				else {
 					usersByTrackingId[otherUser.trackingID] = user = otherUser;
@@ -853,6 +853,11 @@ package com.as3nui.nativeExtensions.air.kinect {
 			//dispatch updated event
 			dispatchEvent(new UserEvent(UserEvent.USERS_UPDATED, false, false, _users));
 
+		}
+		
+		/** @private */
+		protected function updateExistingUser(existingUser:User, otherUser:User):void {
+			existingUser.copyFrom(otherUser);
 		}
 
 		/** @private */

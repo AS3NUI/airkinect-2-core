@@ -35,6 +35,7 @@ public:
 	int getNumPixels();
 
 	void setNuiSensor(INuiSensor* nuiSensor);
+	void setNuiInteractionStream(INuiInteractionStream* nuiInteractionStream);
 	void setDepthFrameHandle(HANDLE depthFrameHandle);
 	void setDepthFrameTimeout(int depthFrameTimeout);
 	void setUserIndexColors(BYTE* userIndexColors);
@@ -48,6 +49,7 @@ public:
 private:
 
 	INuiSensor* _nuiSensor;
+	INuiInteractionStream* _nuiInteractionStream;
 	HANDLE _depthFrameHandle;
 	int	_depthFrameTimeout;
 	BYTE* _userIndexColors;
