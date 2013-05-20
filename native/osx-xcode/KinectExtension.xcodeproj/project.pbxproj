@@ -536,7 +536,7 @@
 					"-isystem",
 					/usr/include/ni,
 				);
-				SDKROOT = macosx10.6;
+				SDKROOT = "";
 				VALID_ARCHS = i386;
 			};
 			name = Debug;
@@ -560,7 +560,7 @@
 					"-isystem",
 					/usr/include/ni,
 				);
-				SDKROOT = macosx10.6;
+				SDKROOT = "";
 				VALID_ARCHS = i386;
 			};
 			name = Release;
@@ -587,7 +587,7 @@
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../external-libraries/boost\"",
 					"/usr/include/ni/**",
-					"/opt/local/include/libusb-1.0",
+					"/usr/local/Cellar/libusb/1.0.9/include/libusb-1.0",
 				);
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
 				INFOPLIST_PREPROCESSOR_DEFINITIONS = "";
@@ -600,7 +600,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.6;
+				SDKROOT = "";
 				SYMROOT = build;
 				VALID_ARCHS = i386;
 				WRAPPER_EXTENSION = framework;
@@ -628,7 +628,7 @@
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../external-libraries/boost\"",
 					"/usr/include/ni/**",
-					"/opt/local/include/libusb-1.0",
+					"/usr/local/Cellar/libusb/1.0.9/include/libusb-1.0",
 				);
 				INFOPLIST_FILE = "KinectExtension/KinectExtension-Info.plist";
 				INFOPLIST_PREPROCESSOR_DEFINITIONS = "";
@@ -641,7 +641,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.6;
+				SDKROOT = "";
 				SYMROOT = build;
 				VALID_ARCHS = i386;
 				WRAPPER_EXTENSION = framework;
