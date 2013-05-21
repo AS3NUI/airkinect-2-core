@@ -35,6 +35,7 @@ package com.as3nui.nativeExtensions.air.kinect.data {
 		private var _hasSeatedSkeletonSupport:Boolean					= false;
 		private var _hasChooseSkeletonsSupport:Boolean					= false;
 		private var _hasHandTrackingSupport:Boolean						= false;
+		private var _hasHandGripReleaseSupport:Boolean					= false;
 
 		private var _maxSensors:uint									= 0;
 
@@ -109,6 +110,14 @@ package com.as3nui.nativeExtensions.air.kinect.data {
 		
 		public function get hasChooseSkeletonsSupport():Boolean {
 			return _hasChooseSkeletonsSupport;
+		}
+		
+		public function get hasHandTrackingSupport():Boolean {
+			return _hasHandTrackingSupport;
+		}
+		
+		public function get hasHandGripReleaseSupport():Boolean {
+			return _hasHandGripReleaseSupport;
 		}
 
 		public function get maxSensors():uint {

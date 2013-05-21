@@ -55,6 +55,7 @@ OpenNIDevice::OpenNIDevice(int nr, xn::Context context)
 	capabilities.hasSeatedSkeletonSupport				= false;
 	capabilities.hasChooseSkeletonsSupport				= false;
     capabilities.hasHandTrackingSupport                 = false;
+	capabilities.hasHandGripReleaseSupport				= false;
     
     capabilities.maxSensors								= 1;
     capabilities.framework								= "openni";

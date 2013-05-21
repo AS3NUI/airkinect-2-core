@@ -46,6 +46,7 @@ MSKinectDevice::MSKinectDevice(int nr)
 	capabilities.hasSeatedSkeletonSupport				= true;
 	capabilities.hasChooseSkeletonsSupport				= true;
     capabilities.hasHandTrackingSupport                 = false;
+	capabilities.hasHandGripReleaseSupport				= true;
 
 	capabilities.maxSensors								= 4;
 	capabilities.framework								= "mssdk";
@@ -437,7 +438,8 @@ void MSKinectDevice::run()
 		bool initialized = false;
 		for(int i = 0; i < 5; i++)
 		{
-			depthPlayerIndexEnabled = asDepthShowUserColors || asUserMaskEnabled;
+			//also for skeleton - we need colored image stream for hand grip/release
+			depthPlayerIndexEnabled = asDepthShowUserColors || asUserMaskEnabled  || asSkeletonEnabled;
 			DWORD dwFlags = 0;
 			if(asSkeletonEnabled || asUserMaskEnabled) 
 			{
