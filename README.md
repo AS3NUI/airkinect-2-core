@@ -20,12 +20,12 @@ Before you can use the native extension in your AIR project, you will need to in
 
 ####OpenNI version: (airkinect-2-core-openni.ane)
 
-You can use the instructions "Install OpenNI,NITE and the Sensor Driver" of the SimpleOpenNI project to get OpenNI up and running on your windows 7 machine: <http://code.google.com/p/simple-openni/wiki/Installation#Windows>. Make sure you install the 32-bit version. AIRKinect does not work with the 64-bit version.
+You can use the instructions "Install OpenNI,NITE and the Sensor Driver" of the SimpleOpenNI project to get OpenNI up and running on your windows 7 machine: <https://code.google.com/p/simple-openni/wiki/Installation_PreOpenNI2#Windows>. Make sure you install the 32-bit version. AIRKinect does not work with the 64-bit version.
 
 
 ###OSX 10.6+:
 
-You can use the instructions "Install OpenNI the short way" of the SimpleOpenNI project to get OpenNI up and running on your OSX machine: <http://code.google.com/p/simple-openni/wiki/Installation#OSX>.
+You can use the instructions "Install OpenNI the short way" of the SimpleOpenNI project to get OpenNI up and running on your OSX machine: <https://code.google.com/p/simple-openni/wiki/Installation_PreOpenNI2#OSX>.
 
 ##Linking AIRKinect to your project
 
